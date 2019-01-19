@@ -1,0 +1,23 @@
+diff -Naur dyld-635.2.orig/include/mach-o/dyld.h dyld-635.2/include/mach-o/dyld.h
+--- dyld-635.2.orig/include/mach-o/dyld.h	2018-06-18 16:44:51.000000000 -0700
++++ dyld-635.2/include/mach-o/dyld.h	2019-01-18 20:58:51.000000000 -0800
+@@ -144,6 +144,7 @@
+ 
+ typedef struct __NSObjectFileImage* NSObjectFileImage;
+ 
++#define __API_UNAVAILABLE_PLATFORM_bridgeos bridgeos,unavailable
+ 
+ 
+ /* NSObjectFileImage can only be used with MH_BUNDLE files */
+diff -Naur dyld-635.2.orig/include/mach-o/dyld_priv.h dyld-635.2/include/mach-o/dyld_priv.h
+--- dyld-635.2.orig/include/mach-o/dyld_priv.h	2018-04-19 21:42:22.000000000 -0700
++++dyld-635.2/include/mach-o/dyld_priv.h	2019-01-18 21:10:56.000000000 -0800
+@@ -180,6 +180,8 @@
+     uint32_t        version;
+ } dyld_build_version_t;
+ 
++#define __API_AVAILABLE_PLATFORM_bridgeos(x) bridgeos,introduced=x
++
+ // Returns the active platform of the process
+ extern dyld_platform_t dyld_get_active_platform(void) __API_AVAILABLE(macos(10.14), ios(12.0), watchos(5.0), tvos(12.0), bridgeos(3.0));
+ 

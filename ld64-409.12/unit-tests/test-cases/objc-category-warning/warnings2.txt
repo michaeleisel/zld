@@ -1,0 +1,2 @@
+ld: warning: instance method 'instance_method_fromcat' in category from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/cat-226c54.o conflicts with same method from another category
+ld: warning: meta method 'class_method_fromcat' in category from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/cat-226c54.o conflicts with same method from another category

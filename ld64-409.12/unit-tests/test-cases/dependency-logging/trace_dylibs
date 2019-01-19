@@ -1,0 +1,34 @@
+[Logging for XBS] Used dynamic library: /Users/michael/projects/ld64/ld64-409.12/unit-tests/test-cases/dependency-logging/libfoo.dylib
+[Logging for XBS] Used dynamic library: /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/lib/libSystem.B.tbd
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libcache.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libcommonCrypto.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libcompiler_rt.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libcopyfile.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libcorecrypto.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libdispatch.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libdyld.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/liblaunch.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libmacho.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libremovefile.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_asl.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_blocks.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_c.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_configuration.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_containermanager.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_coreservices.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_darwin.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_dnssd.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_featureflags.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_info.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_kernel.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_m.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_malloc.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_networkextension.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_notify.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_platform.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_pthread.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_sandbox.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_symptoms.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libsystem_trace.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libunwind.dylib
+[Logging for XBS] Used indirect dynamic library: /usr/lib/system/libxpc.dylib

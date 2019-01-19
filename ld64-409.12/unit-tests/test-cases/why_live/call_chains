@@ -1,0 +1,4 @@
+_bar from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/bar-eed3ef.o
+  _foo from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/foo-cfa1e9.o
+    _main from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/main-92ee92.o
+      _main from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/main-92ee92.o
