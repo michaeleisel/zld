@@ -1,0 +1,30 @@
+diff -Naur ld64-409.12.orig/src/ld/Options.cpp ld64-409.12/src/ld/Options.cpp
+--- ld64-409.12.orig/src/ld/Options.cpp	2018-09-18 15:01:35.000000000 -0700
++++ ld64-409.12/src/ld/Options.cpp	2019-01-18 21:13:17.000000000 -0800
+@@ -60,7 +60,7 @@
+ // magic to place command line in crash reports
+ const int crashreporterBufferSize = 2000;
+ static char crashreporterBuffer[crashreporterBufferSize];
+-#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
++#if 0
+ 	#include <CrashReporterClient.h>
+ 	// hack until ld does not need to build on 10.6 anymore
+     struct crashreporter_annotations_t gCRAnnotations 
+@@ -4667,7 +4667,7 @@
+ 			break;
+ 		case Options::kDyld:
+ 			// arm64e has support for compressed LINKEDIT.
+-			if ( (fArchitecture == CPU_TYPE_ARM64) && (fSubArchitecture == CPU_SUBTYPE_ARM64_E) )
++			if ( (fArchitecture == CPU_TYPE_ARM64) && (fSubArchitecture == CPU_SUBTYPE_ARM64E) )
+ 				break;
+ 		case Options::kPreload:
+ 		case Options::kStaticExecutable:
+@@ -5813,7 +5813,7 @@
+ 	bool newLinker = false;
+ 	
+ 	// build command line buffer in case ld crashes
+-#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
++#if 0
+ 	CRSetCrashLogMessage(crashreporterBuffer);
+ #endif
+ 	const char* srcRoot = getenv("SRCROOT");

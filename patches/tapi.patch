@@ -1,0 +1,59 @@
+diff -Naur tapi-master/include/tapi/APIVersion.h tapi-master.old/include/tapi/APIVersion.h
+--- tapi-master/include/tapi/APIVersion.h	2017-09-07 16:09:54.000000000 -0700
++++ tapi-master.old/include/tapi/APIVersion.h	2019-01-18 21:13:56.000000000 -0800
+@@ -25,7 +25,7 @@
+ ///
+ 
+ #define TAPI_API_VERSION_MAJOR 1U
+-#define TAPI_API_VERSION_MINOR 2U
++#define TAPI_API_VERSION_MINOR 3U
+ #define TAPI_API_VERSION_PATCH 0U
+ 
+ namespace tapi {
+diff -Naur tapi-master/include/tapi/LinkerInterfaceFile.h tapi-master.old/include/tapi/LinkerInterfaceFile.h
+--- tapi-master/include/tapi/LinkerInterfaceFile.h	2017-09-07 16:09:54.000000000 -0700
++++ tapi-master.old/include/tapi/LinkerInterfaceFile.h	2019-01-18 21:24:04.000000000 -0800
+@@ -260,6 +260,12 @@
+          cpu_type_t cpuType, cpu_subtype_t cpuSubType, ParsingFlags flags,
+          PackedVersion32 minOSVersion, std::string &errorMessage) noexcept;
+ 
++  static LinkerInterfaceFile *
++  create(const std::string &path,
++         cpu_type_t cpuType, cpu_subtype_t cpuSubType,
++         ParsingFlags flags,
++         PackedVersion32 minOSVersion, std::string &errorMessage) noexcept;
++
+   ///
+   /// \brief Query the file type.
+   /// \return Returns the file type this TAPI file represents.
+@@ -360,6 +366,13 @@
+   ///
+   const std::string &getParentFrameworkName() const noexcept;
+ 
++
++  LinkerInterfaceFile* getInlinedFramework(const std::string &path,
++                                           cpu_type_t cpuType,
++                                           cpu_subtype_t cpuSubType,
++                                           ParsingFlags flags,
++                                           PackedVersion32 minOSVersion,
++                                           std::string &errorMessage) const noexcept;
+   ///
+   /// \brief Obtain the list of allowable clients.
+   /// \return Returns a list of allowable clients.
+@@ -395,6 +408,8 @@
+   ///
+   const std::vector<Symbol> &undefineds() const noexcept;
+ 
++  const std::vector<std::string> &inlinedFrameworkNames() const noexcept;
++  
+   ///
+   /// \brief Destructor.
+   /// \since 1.0
+diff -Naur tapi-master/include/tapi/Version.inc tapi-master.old/include/tapi/Version.inc
+--- tapi-master/include/tapi/Version.inc	1969-12-31 16:00:00.000000000 -0800
++++ tapi-master.old/include/tapi/Version.inc	2019-01-18 20:36:48.000000000 -0800
+@@ -0,0 +1,4 @@
++#define TAPI_VERSION 1.3.0
++#define TAPI_VERSION_MAJOR 1U
++#define TAPI_VERSION_MINOR 3U
++#define TAPI_VERSION_PATCH 0U
