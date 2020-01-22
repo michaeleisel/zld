@@ -623,7 +623,7 @@ void SymbolTable::removeDeadAtoms()
 		const ld::Atom* atom = it->first;
 		assert(atom != NULL);
 		if ( !atom->live() && !atom->dontDeadStrip() )
-			it = _nonLazyPointerTable.erase(it);
+			_nonLazyPointerTable.erase(it++);
 		else
 			++it;
 	}
@@ -633,7 +633,7 @@ void SymbolTable::removeDeadAtoms()
 		const ld::Atom* atom = it->first;
 		assert(atom != NULL);
 		if ( !atom->live() && !atom->dontDeadStrip() )
-			it = _cstringTable.erase(it);
+			_cstringTable.erase(it++);
 		else
 			++it;
 	}
@@ -643,7 +643,7 @@ void SymbolTable::removeDeadAtoms()
 		const ld::Atom* atom = it->first;
 		assert(atom != NULL);
 		if ( !atom->live() && !atom->dontDeadStrip() )
-			it = _utf16Table.erase(it);
+			_utf16Table.erase(it++);
 		else
 			++it;
 	}
@@ -653,7 +653,7 @@ void SymbolTable::removeDeadAtoms()
 		const ld::Atom* atom = it->first;
 		assert(atom != NULL);
 		if ( !atom->live() && !atom->dontDeadStrip() )
-			it = _cfStringTable.erase(it);
+			_cfStringTable.erase(it++);
 		else
 			++it;
 	}
@@ -663,7 +663,7 @@ void SymbolTable::removeDeadAtoms()
 		const ld::Atom* atom = it->first;
 		assert(atom != NULL);
 		if ( !atom->live() && !atom->dontDeadStrip() )
-			it = _literal4Table.erase(it);
+			_literal4Table.erase(it++);
 		else
 			++it;
 	}
@@ -673,7 +673,7 @@ void SymbolTable::removeDeadAtoms()
 		const ld::Atom* atom = it->first;
 		assert(atom != NULL);
 		if ( !atom->live() && !atom->dontDeadStrip() )
-			it = _literal8Table.erase(it);
+			_literal8Table.erase(it++);
 		else
 			++it;
 	}
@@ -683,7 +683,7 @@ void SymbolTable::removeDeadAtoms()
 		const ld::Atom* atom = it->first;
 		assert(atom != NULL);
 		if ( !atom->live() && !atom->dontDeadStrip() )
-			it = _literal16Table.erase(it);
+			_literal16Table.erase(it++);
 		else
 			++it;
 	}
