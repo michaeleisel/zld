@@ -38,10 +38,15 @@
 #include <unordered_set>
 
 #include "configure.h"
+/*#include "absl/container/btree_map.h"
+#include "absl/container/btree_set.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_set.h"*/
 
 #define LDOrderedMap std::map
 #define LDMap std::unordered_map
 #define LDSet std::unordered_set
+#define LDOrderedSet std::set
 
 namespace ld {
 
@@ -62,7 +67,7 @@ enum Platform {
 	kPlatform_watchOSSimulator=9
 };
 
-typedef std::set<Platform> PlatformSet;
+typedef LDOrderedSet<Platform> PlatformSet;
 
 //
 // minumum OS versions
@@ -72,10 +77,10 @@ typedef std::pair<Platform, uint32_t> Version;
 
 struct VersionSet {
 private:
-	std::map<Platform, uint32_t> _versions;
+	LDOrderedMap<Platform, uint32_t> _versions;
 public:
 	VersionSet() {}
-	VersionSet(const std::map<Platform, uint32_t>& P) : _versions(P) {}
+	VersionSet(const LDOrderedMap<Platform, uint32_t>& P) : _versions(P) {}
 	void add(ld::Version platformVersion) {
 		_versions.insert(platformVersion);
 	}
@@ -1196,7 +1201,7 @@ public:
 
 
 
-// utility classes for using std::unordered_map with c-strings
+// utility classes for using LDMap with c-strings
 struct CStringHash {
 	size_t operator()(const char* __s) const {
 		size_t __h = 0;
@@ -1210,7 +1215,7 @@ struct CStringEquals
 	bool operator()(const char* left, const char* right) const { return (strcmp(left, right) == 0); }
 };
 
-typedef	std::unordered_set<const char*, ld::CStringHash, ld::CStringEquals>  CStringSet;
+typedef	LDSet<const char*, ld::CStringHash, ld::CStringEquals>  CStringSet;
 
 
 class Internal
@@ -1237,7 +1242,7 @@ public:
 		bool							hasExternalRelocs;
 	};
 	
-	typedef std::map<const ld::Atom*, FinalSection*>	AtomToSection;		
+	typedef LDOrderedMap<const ld::Atom*, FinalSection*>	AtomToSection;
 
 	virtual uint64_t					assignFileOffsets() = 0;
 	virtual void						setSectionSizesAndAlignments() = 0;
@@ -1274,8 +1279,8 @@ public:
 	std::vector<const ld::relocatable::File*>	filesWithBitcode;
 	std::vector<const ld::relocatable::File*>	filesFromCompilerRT;
 	std::vector<const ld::Atom*>				deadAtoms;
-	std::unordered_set<const char*>				allUndefProxies;
-	std::unordered_set<uint64_t>				toolsVersions;
+	LDSet<const char*>				allUndefProxies;
+	LDSet<uint64_t>				toolsVersions;
 	const ld::dylib::File*						bundleLoader;
 	const Atom*									entryPoint;
 	const Atom*									classicBindingHelper;

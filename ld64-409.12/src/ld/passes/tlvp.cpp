@@ -165,11 +165,11 @@ void doPass(const Options& opts, ld::Internal& internal)
 	}
 	
 	// compute which TLV references will be weak_imports
-	std::map<const ld::Atom*,bool>		weakImportMap;
+	LDOrderedMap<const ld::Atom*,bool>		weakImportMap;
 	for(std::vector<TlVReferenceCluster>::iterator it=references.begin(); it != references.end(); ++it) {
 		if ( !it->optimizable ) {
 			// record weak_import attribute
-			std::map<const ld::Atom*,bool>::iterator pos = weakImportMap.find(it->targetOfTLV);
+			LDOrderedMap<const ld::Atom*,bool>::iterator pos = weakImportMap.find(it->targetOfTLV);
 			if ( pos == weakImportMap.end() ) {
 				// target not in weakImportMap, so add
 				weakImportMap[it->targetOfTLV] = it->fixupWithTarget->weakImport;
@@ -194,9 +194,9 @@ void doPass(const Options& opts, ld::Internal& internal)
 	}
 
 	// create TLV pointers for TLV references that cannot be optimized
-	std::map<const ld::Atom*,ld::Atom*> variableToPointerMap;
-	for(std::map<const ld::Atom*,bool>::iterator it=weakImportMap.begin(); it != weakImportMap.end(); ++it) {
-		std::map<const ld::Atom*,ld::Atom*>::iterator pos = variableToPointerMap.find(it->first);
+	LDOrderedMap<const ld::Atom*,ld::Atom*> variableToPointerMap;
+	for(LDOrderedMap<const ld::Atom*,bool>::iterator it=weakImportMap.begin(); it != weakImportMap.end(); ++it) {
+		LDOrderedMap<const ld::Atom*,ld::Atom*>::iterator pos = variableToPointerMap.find(it->first);
 		if ( pos == variableToPointerMap.end() ) {
 			if (log) fprintf(stderr, "make TLV pointer for %s\n", it->first->name());
 			if ( it->first->contentType() != ld::Atom::typeTLV )
