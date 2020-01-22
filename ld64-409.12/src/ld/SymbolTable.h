@@ -46,6 +46,8 @@
 
 #include "Options.h"
 #include "ld.hpp"
+#include "absl/container/flat_hash_map.h"
+#include "absl/container/btree_map.h"
 
 namespace ld {
 namespace tool {
@@ -57,27 +59,28 @@ public:
 	typedef uint32_t IndirectBindingSlot;
 
 private:
-	typedef std::unordered_map<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
+	typedef LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;//std::unordered_map<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
 
 	class ContentFuncs {
 	public:
 		size_t	operator()(const ld::Atom*) const;
 		bool	operator()(const ld::Atom* left, const ld::Atom* right) const;
 	};
-	typedef std::unordered_map<const ld::Atom*, IndirectBindingSlot, ContentFuncs, ContentFuncs> ContentToSlot;
+	typedef LDMap<const ld::Atom*, IndirectBindingSlot, ContentFuncs, ContentFuncs> ContentToSlot;
 
 	class ReferencesHashFuncs {
 	public:
 		size_t	operator()(const ld::Atom*) const;
 		bool	operator()(const ld::Atom* left, const ld::Atom* right) const;
 	};
-	typedef std::unordered_map<const ld::Atom*, IndirectBindingSlot, ReferencesHashFuncs, ReferencesHashFuncs> ReferencesToSlot;
+	typedef LDMap<const ld::Atom*, IndirectBindingSlot, ReferencesHashFuncs, ReferencesHashFuncs> ReferencesToSlot;
 
 	class CStringHashFuncs {
 	public:
 		size_t	operator()(const ld::Atom*) const;
 		bool	operator()(const ld::Atom* left, const ld::Atom* right) const;
 	};
+	//typedef LDMap<const ld::Atom*, IndirectBindingSlot, CStringHashFuncs, CStringHashFuncs> CStringToSlot;
 	typedef std::unordered_map<const ld::Atom*, IndirectBindingSlot, CStringHashFuncs, CStringHashFuncs> CStringToSlot;
 
 	class UTF16StringHashFuncs {
@@ -85,13 +88,13 @@ private:
 		size_t	operator()(const ld::Atom*) const;
 		bool	operator()(const ld::Atom* left, const ld::Atom* right) const;
 	};
-	typedef std::unordered_map<const ld::Atom*, IndirectBindingSlot, UTF16StringHashFuncs, UTF16StringHashFuncs> UTF16StringToSlot;
+	typedef LDMap<const ld::Atom*, IndirectBindingSlot, UTF16StringHashFuncs, UTF16StringHashFuncs> UTF16StringToSlot;
 
-	typedef std::map<IndirectBindingSlot, const char*> SlotToName;
-	typedef std::unordered_map<const char*, CStringToSlot*, CStringHash, CStringEquals> NameToMap;
+	typedef LDOrderedMap<IndirectBindingSlot, const char*> SlotToName;
+	typedef LDMap<const char*, CStringToSlot*, CStringHash, CStringEquals> NameToMap;
     
     typedef std::vector<const ld::Atom *> DuplicatedSymbolAtomList;
-    typedef std::map<const char *, DuplicatedSymbolAtomList * > DuplicateSymbols;
+    typedef LDOrderedMap<const char *, DuplicatedSymbolAtomList * > DuplicateSymbols;
 	
 public:
 

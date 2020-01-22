@@ -44,6 +44,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		4C7D5B8223D8D24C006E515E /* libhash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C7D5B8123D8D24C006E515E /* libhash.a */; };
 		4CBE443723D79B240084D187 /* libjemalloc_pic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CBE443423D793D00084D187 /* libjemalloc_pic.a */; };
 		83046A851C8FF2F700024A7E /* objcimageinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83046A841C8FF2D000024A7E /* objcimageinfo.cpp */; };
 		B028FCF21A9E7C3F00E3584B /* bitcode_bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B028FCF11A9E7C3F00E3584B /* bitcode_bundle.cpp */; };
@@ -266,6 +267,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4C7D5B8123D8D24C006E515E /* libhash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhash.a; path = ../../examples/build/libhash.a; sourceTree = "<group>"; };
+		4C7D5B8323D8D46B006E515E /* hash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hash.h; path = "../../examples/abseil-cpp/absl/hash/hash.h"; sourceTree = "<group>"; };
 		4CBE443423D793D00084D187 /* libjemalloc_pic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjemalloc_pic.a; path = ../../jemalloc/lib/libjemalloc_pic.a; sourceTree = "<group>"; };
 		83046A831C8FF23E00024A7E /* objcimageinfo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = objcimageinfo; sourceTree = BUILT_PRODUCTS_DIR; };
 		83046A841C8FF2D000024A7E /* objcimageinfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = objcimageinfo.cpp; path = src/other/objcimageinfo.cpp; sourceTree = "<group>"; };
@@ -387,6 +390,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4CBE443723D79B240084D187 /* libjemalloc_pic.a in Frameworks */,
+				4C7D5B8223D8D24C006E515E /* libhash.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -565,9 +569,11 @@
 			children = (
 				F9AA69BF10583E19003E3539 /* Resolver.cpp */,
 				F9AA69C010583E19003E3539 /* Resolver.h */,
+				4C7D5B8123D8D24C006E515E /* libhash.a */,
 				F9AA69B410583C0C003E3539 /* SymbolTable.cpp */,
 				F9AA69B510583C0C003E3539 /* SymbolTable.h */,
 				F9AA687A10572E27003E3539 /* InputFiles.cpp */,
+				4C7D5B8323D8D46B006E515E /* hash.h */,
 				4CBE443423D793D00084D187 /* libjemalloc_pic.a */,
 				F9AA687B10572E27003E3539 /* InputFiles.h */,
 				F9AA5FCC103F5CD1003E3539 /* ld.hpp */,
@@ -1284,6 +1290,7 @@
 					"$(SRCROOT)/../dyld-635.2/include",
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
+					"/Users/michael/projects/examples/abseil-cpp",
 				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../lib/";
@@ -1291,6 +1298,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					/Users/michael/projects/jemalloc/lib,
+					/Users/michael/projects/examples/build,
 				);
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
 				LLVM_LTO = NO;
@@ -1372,6 +1380,7 @@
 					"$(SRCROOT)/../dyld-635.2/include",
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
+					"/Users/michael/projects/examples/abseil-cpp",
 				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../lib/";
@@ -1379,6 +1388,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					/Users/michael/projects/jemalloc/lib,
+					/Users/michael/projects/examples/build,
 				);
 				LLVM_LTO = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
@@ -1664,6 +1674,7 @@
 					"$(SRCROOT)/../dyld-635.2/include",
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
+					"/Users/michael/projects/examples/abseil-cpp",
 				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../lib/";
@@ -1671,6 +1682,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					/Users/michael/projects/jemalloc/lib,
+					/Users/michael/projects/examples/build,
 				);
 				LLVM_LTO = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.14;

@@ -29,6 +29,8 @@
 #include "Options.h"
 #include <unordered_map>
 #include <unordered_set>
+#include "absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_set.h"
 
 namespace generic {
 namespace dylib {
@@ -179,8 +181,8 @@ protected:
 	struct ReExportChain { ReExportChain* prev; const File* file; };
 
 private:
-	using NameToAtomMap = std::unordered_map<const char*, AtomAndWeak, ld::CStringHash, ld::CStringEquals>;
-	using NameSet = std::unordered_set<const char*, CStringHash, ld::CStringEquals>;
+	using NameToAtomMap = LDMap<const char*, AtomAndWeak, ld::CStringHash, ld::CStringEquals>;
+	using NameSet = LDSet<const char*, CStringHash, ld::CStringEquals>;
 
 	std::pair<bool, bool>		hasWeakDefinitionImpl(const char* name) const;
 	bool						containsOrReExports(const char* name, bool& weakDef, bool& tlv, pint_t& addr) const;
