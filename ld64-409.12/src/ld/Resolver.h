@@ -106,7 +106,7 @@ private:
 	void					doLinkerOption(const std::vector<const char*>& linkerOption, const char* fileName);
 	void					dumpAtoms();
 
-	typedef std::unordered_set<const char*, CStringHash, CStringEquals>  StringSet;
+	typedef LDSet<const char*, CStringHash, CStringEquals>  StringSet;
 
 	class NotLive {
 	public:
@@ -126,7 +126,7 @@ private:
 	InputFiles&						_inputFiles;
 	ld::Internal&					_internal;
 	std::vector<const ld::Atom*>	_atoms;
-	std::set<const ld::Atom*>		_deadStripRoots;
+	LDOrderedSet<const ld::Atom*>		_deadStripRoots;
 	std::vector<const ld::Atom*>	_dontDeadStripIfReferencesLive;
 	std::vector<const ld::Atom*>	_atomsWithUnresolvedReferences;
 	std::vector<const class AliasAtom*>	_aliasesFromCmdLine;

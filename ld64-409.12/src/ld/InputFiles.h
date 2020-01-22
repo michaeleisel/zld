@@ -110,14 +110,14 @@ private:
 	static void					parseWorkerThread(InputFiles *inputFiles);
 	void						startThread(void (*threadFunc)(InputFiles *)) const;
 
-	typedef std::map<std::string, ld::dylib::File*>	InstallNameToDylib;
+	typedef LDOrderedMap<std::string, ld::dylib::File*>	InstallNameToDylib;
 
 	const Options&				_options;
 	std::vector<ld::File*>		_inputFiles;
-	mutable std::set<class ld::File*>	_archiveFilesLogged;
+	mutable LDOrderedSet<class ld::File*>	_archiveFilesLogged;
 	mutable std::vector<std::string>	_archiveFilePaths;
 	InstallNameToDylib			_installPathToDylibs;
-	std::set<ld::dylib::File*>	_allDylibs;
+	LDOrderedSet<ld::dylib::File*>	_allDylibs;
 	ld::dylib::File*			_bundleLoader;
 	bool						_inferredArch;
     struct strcompclass {

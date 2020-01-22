@@ -726,12 +726,12 @@ void InputFiles::createIndirectDylibs()
 {	
 	// keep processing dylibs until no more dylibs are added
 	unsigned long lastMapSize = 0;
-	std::set<ld::dylib::File*>  dylibsProcessed;
+	LDOrderedSet<ld::dylib::File*>  dylibsProcessed;
 	while ( lastMapSize != _allDylibs.size() ) {
 		lastMapSize = _allDylibs.size();
 		// can't iterator _installPathToDylibs while modifying it, so use temp buffer
 		std::vector<ld::dylib::File*> unprocessedDylibs;
-		for (std::set<ld::dylib::File*>::iterator it=_allDylibs.begin(); it != _allDylibs.end(); it++) {
+		for (LDOrderedSet<ld::dylib::File*>::iterator it=_allDylibs.begin(); it != _allDylibs.end(); it++) {
 			if ( dylibsProcessed.count(*it) == 0 )
 				unprocessedDylibs.push_back(*it);
 		}
@@ -1140,7 +1140,7 @@ void InputFiles::waitForInputFiles()
 	try {
 		const char *fifo = _options.pipelineFifo();
 		assert(fifo);
-		std::map<const char *, const Options::FileInfo*, strcompclass> fileMap;
+		LDOrderedMap<const char *, const Options::FileInfo*, strcompclass> fileMap;
 		const std::vector<Options::FileInfo>& files = _options.getInputFiles();
 		for (std::vector<Options::FileInfo>::const_iterator it = files.begin(); it != files.end(); ++it) {
 			const Options::FileInfo& entry = *it;
@@ -1158,7 +1158,7 @@ void InputFiles::waitForInputFiles()
 			int len = strlen(path_buf);
 			if (path_buf[len-1] == '\n')
 				path_buf[len-1] = 0;
-			std::map<const char *, const Options::FileInfo*, strcompclass>::iterator it = fileMap.find(path_buf);
+			LDOrderedMap<const char *, const Options::FileInfo*, strcompclass>::iterator it = fileMap.find(path_buf);
 			if (it == fileMap.end())
 				throwf("pipelined linking error - not in file list: %s\n", path_buf);
 			Options::FileInfo* inputInfo = (Options::FileInfo*)it->second;

@@ -111,12 +111,12 @@ private:
 	struct MemberState { ld::relocatable::File* file; const Entry *entry; bool logged; bool loaded; uint32_t index;};
 	bool											loadMember(MemberState& state, ld::File::AtomHandler& handler, const char *format, ...) const;
 
-	typedef std::unordered_map<const char*, uint64_t, ld::CStringHash, ld::CStringEquals> NameToOffsetMap;
+	typedef LDMap<const char*, uint64_t, ld::CStringHash, ld::CStringEquals> NameToOffsetMap;
 
 	typedef typename A::P							P;
 	typedef typename A::P::E						E;
 
-	typedef std::map<const class Entry*, MemberState> MemberToStateMap;
+	typedef LDOrderedMap<const class Entry*, MemberState> MemberToStateMap;
 
 	MemberState&									makeObjectFileForMember(const Entry* member) const;
 	bool											memberHasObjCCategories(const Entry* member) const;

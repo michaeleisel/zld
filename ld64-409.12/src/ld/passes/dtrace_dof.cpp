@@ -111,8 +111,8 @@ struct DTraceProbeInfo {
 	uint32_t						offset;
 	const char*						probeName;
 };
-typedef std::unordered_map<const char*, std::vector<DTraceProbeInfo>, CStringHash, CStringEquals>	ProviderToProbes;
-typedef	std::unordered_set<const char*, CStringHash, CStringEquals>  CStringSet;
+typedef LDMap<const char*, std::vector<DTraceProbeInfo>, CStringHash, CStringEquals>	ProviderToProbes;
+typedef	LDSet<const char*, CStringHash, CStringEquals>  CStringSet;
 
 
 
@@ -131,7 +131,7 @@ void doPass(const Options& opts, ld::Internal& internal)
 	// scan all atoms looking for dtrace probes
 	std::vector<DTraceProbeInfo>					probeSites;
 	std::vector<DTraceProbeInfo>					isEnabledSites;
-	std::map<const ld::Atom*,CStringSet>			atomToDtraceTypes;
+	LDOrderedMap<const ld::Atom*,CStringSet>			atomToDtraceTypes;
 	for (std::vector<ld::Internal::FinalSection*>::iterator sit=internal.sections.begin(); sit != internal.sections.end(); ++sit) {
 		ld::Internal::FinalSection* sect = *sit;
 		if ( sect->type() != ld::Section::typeCode ) 
@@ -236,7 +236,7 @@ void doPass(const Options& opts, ld::Internal& internal)
 		// build list of typedefs/stability infos for this provider
 		CStringSet types;
 		for(std::vector<DTraceProbeInfo>::const_iterator it = probes.begin(); it != probes.end(); ++it) {
-			std::map<const ld::Atom*,CStringSet>::iterator pos = atomToDtraceTypes.find(it->atom);
+			LDOrderedMap<const ld::Atom*,CStringSet>::iterator pos = atomToDtraceTypes.find(it->atom);
 			if ( pos != atomToDtraceTypes.end() ) {
 				for(CStringSet::iterator sit = pos->second.begin(); sit != pos->second.end(); ++sit) {
 					const char* providerStart = strchr(*sit, '$')+1;

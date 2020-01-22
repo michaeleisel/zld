@@ -562,7 +562,7 @@ void SymbolTable::tentativeDefs(std::vector<const char*>& tents)
 }
 
 
-void SymbolTable::mustPreserveForBitcode(std::unordered_set<const char*>& syms)
+void SymbolTable::mustPreserveForBitcode(LDSet<const char*>& syms)
 {
 	// return all names in _byNameTable that have no associated atom
 	for (const auto &entry: _byNameTable) {
@@ -861,7 +861,7 @@ const ld::Atom* SymbolTable::indirectAtom(IndirectBindingSlot slot) const
 }
 
 
-void SymbolTable::removeDeadUndefs(std::vector<const ld::Atom*>& allAtoms, const std::unordered_set<const ld::Atom*>& keep)
+void SymbolTable::removeDeadUndefs(std::vector<const ld::Atom*>& allAtoms, const LDSet<const ld::Atom*>& keep)
 {
 	// mark the indirect entries in use
 	std::vector<bool> indirectUsed;

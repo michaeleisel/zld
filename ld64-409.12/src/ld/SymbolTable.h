@@ -59,7 +59,7 @@ public:
 	typedef uint32_t IndirectBindingSlot;
 
 private:
-	typedef LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;//std::unordered_map<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
+	typedef LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
 
 	class ContentFuncs {
 	public:
@@ -80,7 +80,6 @@ private:
 		size_t	operator()(const ld::Atom*) const;
 		bool	operator()(const ld::Atom* left, const ld::Atom* right) const;
 	};
-	//typedef LDMap<const ld::Atom*, IndirectBindingSlot, CStringHashFuncs, CStringHashFuncs> CStringToSlot;
 	typedef std::unordered_map<const ld::Atom*, IndirectBindingSlot, CStringHashFuncs, CStringHashFuncs> CStringToSlot;
 
 	class UTF16StringHashFuncs {
@@ -123,14 +122,14 @@ public:
 	unsigned int		updateCount()						{ return _indirectBindingTable.size(); }
 	void				undefines(std::vector<const char*>& undefines);
 	void				tentativeDefs(std::vector<const char*>& undefines);
-	void				mustPreserveForBitcode(std::unordered_set<const char*>& syms);
+	void				mustPreserveForBitcode(LDSet<const char*>& syms);
 	void				removeDeadAtoms();
 	bool				hasName(const char* name);
 	bool				hasExternalTentativeDefinitions()	{ return _hasExternalTentativeDefinitions; }
 	byNameIterator		begin()								{ return byNameIterator(_byNameTable.begin(),_indirectBindingTable); }
 	byNameIterator		end()								{ return byNameIterator(_byNameTable.end(),_indirectBindingTable); }
 	void				printStatistics();
-	void				removeDeadUndefs(std::vector<const ld::Atom *>& allAtoms, const std::unordered_set<const ld::Atom*>& keep);
+	void				removeDeadUndefs(std::vector<const ld::Atom *>& allAtoms, const LDSet<const ld::Atom*>& keep);
 
 	// from ld::IndirectBindingTable
 	virtual const char*			indirectName(IndirectBindingSlot slot) const;
