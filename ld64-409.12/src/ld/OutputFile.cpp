@@ -3449,6 +3449,11 @@ void OutputFile::buildSymbolTable(ld::Internal& state)
 		_importedAtoms.erase(std::remove_if(_importedAtoms.begin(), _importedAtoms.end(), NotInSet(referencedProxyAtoms)), _importedAtoms.end());			
 	}
 	
+	auto query = std::find_if(_exportedAtoms.begin(), _exportedAtoms.end(), [] (const Atom *& s) { return s->name()[0] <= '$'; });
+	if (query == _exportedAtoms.end()) {
+		return;
+	}
+
 	// sort by name
 	std::sort(_exportedAtoms.begin(), _exportedAtoms.end(), AtomByNameSorter());
 	std::sort(_importedAtoms.begin(), _importedAtoms.end(), AtomByNameSorter());
