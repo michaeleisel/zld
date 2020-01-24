@@ -661,7 +661,7 @@ void Resolver::doFile(const ld::File& file)
 	}
 }
 
-void Resolver::doAtom(const ld::Atom& atom)
+void Resolver::doAtom(const ld::Atom& atom, FastFileMap *fileMap)
 {
 	//fprintf(stderr, "Resolver::doAtom(%p), name=%s, sect=%s, scope=%d\n", &atom, atom.name(), atom.section().sectionName(), atom.scope());
 	if ( _ltoCodeGenFinished && (atom.contentType() == ld::Atom::typeLTOtemporary) && (atom.scope() != ld::Atom::scopeTranslationUnit) )
@@ -757,7 +757,7 @@ void Resolver::doAtom(const ld::Atom& atom)
 	}
 
 	// convert references by-name or by-content to by-slot
-	this->convertReferencesToIndirect(atom);
+	this->convertReferencesToIndirect(atom, fileMap);
 	
 	// remember if any atoms are proxies that require LTO
 	if ( atom.contentType() == ld::Atom::typeLTOtemporary )
@@ -817,7 +817,7 @@ bool Resolver::isDtraceProbe(ld::Fixup::Kind kind)
 	return false;
 }
 
-void Resolver::convertReferencesToIndirect(const ld::Atom& atom)
+void Resolver::convertReferencesToIndirect(const ld::Atom& atom, FastFileMap *fileMap)
 {
 	// convert references by-name or by-content to by-slot
 	SymbolTable::IndirectBindingSlot slot;
@@ -833,7 +833,7 @@ void Resolver::convertReferencesToIndirect(const ld::Atom& atom)
 					fit->binding = ld::Fixup::bindingNone;
 				}
 				else {
-					slot = _symbolTable.findSlotForName(fit->u.name);
+					slot = _symbolTable.findSlotForName(fit->u.name, fileMap);
 					fit->binding = ld::Fixup::bindingsIndirectlyBound;
 					fit->u.bindingIndex = slot;
 				}

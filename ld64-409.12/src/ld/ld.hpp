@@ -36,6 +36,7 @@
 #include <vector>
 #include <string>
 #include <unordered_set>
+#include <unordered_map>
 
 #include "configure.h"
 /*#include "absl/container/btree_map.h"
@@ -48,6 +49,20 @@
 #define LDMap std::unordered_map
 #define LDSet std::unordered_set
 #define LDOrderedSet std::set
+
+struct CPointerHash {
+	std::size_t operator()(const char* __s) const {
+		return (std::size_t)__s;
+	};
+};
+
+struct CPointerEquals
+{
+	bool operator()(const char* left, const char* right) const { return left == right; }
+};
+
+
+typedef LDMap<const char*, int32_t, CPointerHash, CPointerEquals> FastFileMap;
 
 namespace ld {
 
@@ -261,7 +276,7 @@ public:
 	class AtomHandler {
 	public:
 		virtual				~AtomHandler() {}
-		virtual void		doAtom(const class Atom&) = 0;
+		virtual void		doAtom(const class Atom&, FastFileMap *fileMap = NULL) = 0;
 		virtual void		doFile(const class File&) = 0;
 	};
 

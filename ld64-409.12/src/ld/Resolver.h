@@ -67,7 +67,7 @@ public:
 								  _haveAliases(false), _havellvmProfiling(false) {}
 								
 
-		virtual void		doAtom(const ld::Atom&);
+		virtual void		doAtom(const ld::Atom&, FastFileMap *fileMap = NULL);
 		virtual void		doFile(const class File&);
 		
 		void				resolve();
@@ -94,7 +94,7 @@ private:
 	void					syncAliases();
 	void					fillInEntryPoint();
 	void					linkTimeOptimize();
-	void					convertReferencesToIndirect(const ld::Atom& atom);
+	void					convertReferencesToIndirect(const ld::Atom& atom, FastFileMap *fileMap = NULL);
 	const ld::Atom*			entryPoint(bool searchArchives);
 	void					markLive(const ld::Atom& atom, WhyLiveBackChain* previous);
 	bool					isDtraceProbe(ld::Fixup::Kind kind);

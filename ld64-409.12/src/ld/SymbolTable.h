@@ -115,8 +115,8 @@ public:
 						SymbolTable(const Options& opts, std::vector<const ld::Atom*>& ibt);
 
 	bool				add(const ld::Atom& atom, bool ignoreDuplicates);
-	IndirectBindingSlot	findSlotForName(const char* name);
-	//IndirectBindingSlot findSlotForName(const char* name, LDMap<const char*, IndirectBindingSlot>& seenPerFile);
+	//IndirectBindingSlot	findSlotForName(const char* name);
+	IndirectBindingSlot findSlotForName(const char* name, FastFileMap *fileMap = NULL);
 	IndirectBindingSlot	findSlotForContent(const ld::Atom* atom, const ld::Atom** existingAtom);
 	IndirectBindingSlot	findSlotForReferences(const ld::Atom* atom, const ld::Atom** existingAtom);
 	const ld::Atom*		atomForSlot(IndirectBindingSlot s)	{ return _indirectBindingTable[s]; }

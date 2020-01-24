@@ -405,7 +405,9 @@ public:
 	const std::vector<const char*>&	astFilePaths() const{ return fASTFilePaths; }
 	bool						makeCompressedDyldInfo() const { return fMakeCompressedDyldInfo; }
 	bool						makeThreadedStartsSection() const { return fMakeThreadedStartsSection; }
-	bool						hasExportedSymbolOrder();
+	//bool						hasExportedSymbolOrder();
+	bool hasExportedSymbolOrder() const;
+	//bool shouldSortExports() const;
 	bool						exportedSymbolOrder(const char* sym, unsigned int* order) const;
 	bool						orderData() { return fOrderData; }
 	bool						errorOnOtherArchFiles() const { return fErrorOnOtherArchFiles; }

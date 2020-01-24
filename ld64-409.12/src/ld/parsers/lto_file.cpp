@@ -242,7 +242,7 @@ private:
 							AtomSyncer(std::vector<const char*>& a, std::vector<const ld::Atom*>&na,
 										const CStringToAtom &la, const CStringToAtom &dla, const OptimizeOptions& options) :
 										_options(options), _additionalUndefines(a), _newAtoms(na), _llvmAtoms(la), _deadllvmAtoms(dla), _lastProxiedAtom(NULL), _lastProxiedFile(NULL) {}
-		void		doAtom(const class ld::Atom&) override;
+		void		doAtom(const class ld::Atom&, FastFileMap *fileMap = NULL) override;
 		void		doFile(const class ld::File&) override { }
 		
 		const OptimizeOptions&			_options;
@@ -1469,7 +1469,7 @@ bool Parser::optimize(  const std::vector<const ld::Atom*>&	allAtoms,
 }
 
 
-void Parser::AtomSyncer::doAtom(const ld::Atom& machoAtom)
+void Parser::AtomSyncer::doAtom(const ld::Atom& machoAtom, FastFileMap *fileMap)
 {
 	static const bool log = false;
 	// update proxy atoms to point to real atoms and find new atoms

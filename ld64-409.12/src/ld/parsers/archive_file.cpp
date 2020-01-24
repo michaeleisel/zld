@@ -535,7 +535,7 @@ class CheckIsDataSymbolHandler : public ld::File::AtomHandler
 {
 public:
 					CheckIsDataSymbolHandler(const char* n) : _name(n), _isData(false) {}
-	virtual void	doAtom(const class ld::Atom& atom) {
+	virtual void	doAtom(const class ld::Atom& atom, FastFileMap *fileMap) {
 						if ( strcmp(atom.name(), _name) == 0 ) {
 							if ( atom.section().type() != ld::Section::typeCode )
 								_isData = true;
