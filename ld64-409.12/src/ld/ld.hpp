@@ -41,7 +41,8 @@
 /*#include "absl/container/btree_map.h"
 #include "absl/container/btree_set.h"
 #include "absl/container/flat_hash_map.h"
-#include "absl/container/flat_hash_set.h"*/
+#include "absl/container/flat_hash_set.h"
+#include "absl/hash/hash.h"*/
 
 #define LDOrderedMap std::map
 #define LDMap std::unordered_map
@@ -1210,6 +1211,11 @@ struct CStringHash {
 		return __h;
 	};
 };
+struct CStringPtrEquals
+{
+	bool operator()(const char* left, const char* right) const { return left == right || (strcmp(left, right) == 0); }
+};
+
 struct CStringEquals
 {
 	bool operator()(const char* left, const char* right) const { return (strcmp(left, right) == 0); }

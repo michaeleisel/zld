@@ -582,17 +582,37 @@ bool SymbolTable::hasName(const char* name)
 	return (_indirectBindingTable[pos->second] != NULL); 
 }
 
+static int foundz = 0;
+static int nfoundz = 0;
+__attribute__((destructor)) void aaazz() {
+	printf("## %d, %d\n", foundz, nfoundz);
+}
+
 // find existing or create new slot
-SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name)
+SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name)//, LDMap<const char*, IndirectBindingSlot>& seenPerFile)
 {
+	/*auto filePos = seenPerFile.find(name);
+	if (filePos != seenPerFile.end()) {
+		return filePos->second;
+	}*/
 	NameToSlot::iterator pos = _byNameTable.find(name);
-	if ( pos != _byNameTable.end() ) 
-		return pos->second;
+	if ( pos != _byNameTable.end() )  {
+		IndirectBindingSlot slot = pos->second;
+		const char *orig = pos->first;
+		if (orig != name) {
+			_byNameTable.erase(pos);
+			// _byNameReverseTable[slot] = name;
+			_byNameTable[name] = slot;
+		}
+		//seenPerFile[name] = pos->second;
+		return slot;
+	}
 	// create new slot for this name
 	SymbolTable::IndirectBindingSlot slot = _indirectBindingTable.size();
 	_indirectBindingTable.push_back(NULL);
 	_byNameTable[name] = slot;
 	_byNameReverseTable[slot] = name;
+	//nfoundz++;
 	return slot;
 }
 

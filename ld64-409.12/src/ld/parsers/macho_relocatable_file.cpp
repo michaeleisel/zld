@@ -4251,8 +4251,9 @@ bool File<A>::forEachAtom(ld::File::AtomHandler& handler) const
 {
 	handler.doFile(*this);
 	uint8_t* p = _atomsArray;
+	//LDMap<const char *, int32_t>fileMap;
 	for(int i=_atomsArrayCount; i > 0; --i) {
-		handler.doAtom(*((Atom<A>*)p));
+		handler.doAtom(*((Atom<A>*)p));//, fileMap);
 		p += sizeof(Atom<A>);
 	}
 	p = _aliasAtomsArray;
