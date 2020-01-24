@@ -59,7 +59,7 @@ public:
 	typedef uint32_t IndirectBindingSlot;
 
 private:
-	typedef LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
+	typedef LDMap<const char*, IndirectBindingSlot, CStringHash, CStringPtrEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
 
 	class ContentFuncs {
 	public:
@@ -116,6 +116,7 @@ public:
 
 	bool				add(const ld::Atom& atom, bool ignoreDuplicates);
 	IndirectBindingSlot	findSlotForName(const char* name);
+	//IndirectBindingSlot findSlotForName(const char* name, LDMap<const char*, IndirectBindingSlot>& seenPerFile);
 	IndirectBindingSlot	findSlotForContent(const ld::Atom* atom, const ld::Atom** existingAtom);
 	IndirectBindingSlot	findSlotForReferences(const ld::Atom* atom, const ld::Atom** existingAtom);
 	const ld::Atom*		atomForSlot(IndirectBindingSlot s)	{ return _indirectBindingTable[s]; }
