@@ -1320,7 +1320,10 @@ void ExportInfoAtom<A>::encode() const
 	}
 
 	// sort vector by -exported_symbols_order, and any others by address
-	std::sort(entries.begin(), entries.end(), TrieEntriesSorter(_options));
+	//if _options.ported
+	if (_options.hasExportedSymbolOrder()) {
+    	std::sort(entries.begin(), entries.end(), TrieEntriesSorter(_options));
+	}
 	
 	// create trie
 	mach_o::trie::makeTrie(entries, this->_encodedData.bytes());

@@ -589,22 +589,22 @@ __attribute__((destructor)) void aaazz() {
 }
 
 // find existing or create new slot
-SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name)//, LDMap<const char*, IndirectBindingSlot>& seenPerFile)
+SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name, FastFileMap *seenPerFile)
 {
-	/*auto filePos = seenPerFile.find(name);
-	if (filePos != seenPerFile.end()) {
-		return filePos->second;
-	}*/
+	if (seenPerFile) {
+    	auto filePos = seenPerFile->find(name);
+    	if (filePos != seenPerFile->end()) {
+			foundz++;
+    		return filePos->second;
+    	}
+		nfoundz++;
+	}
 	NameToSlot::iterator pos = _byNameTable.find(name);
 	if ( pos != _byNameTable.end() )  {
 		IndirectBindingSlot slot = pos->second;
-		const char *orig = pos->first;
-		if (orig != name) {
-			_byNameTable.erase(pos);
-			// _byNameReverseTable[slot] = name;
-			_byNameTable[name] = slot;
+		if (seenPerFile) {
+    		(*seenPerFile)[name] = slot;
 		}
-		//seenPerFile[name] = pos->second;
 		return slot;
 	}
 	// create new slot for this name
