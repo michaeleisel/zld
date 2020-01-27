@@ -267,7 +267,6 @@
 /* Begin PBXFileReference section */
 		4C7D5B8323D8D46B006E515E /* hash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hash.h; path = "../../examples/abseil-cpp/absl/hash/hash.h"; sourceTree = "<group>"; };
 		4C7D5B8623D8F336006E515E /* libhash2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhash2.a; path = ../../examples/build/libhash2.a; sourceTree = "<group>"; };
-		4C9518D023DF72E800B08D20 /* libmimalloc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmimalloc.a; sourceTree = "<group>"; };
 		4CBE443423D793D00084D187 /* libjemalloc_pic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjemalloc_pic.a; path = ../../jemalloc/lib/libjemalloc_pic.a; sourceTree = "<group>"; };
 		83046A831C8FF23E00024A7E /* objcimageinfo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = objcimageinfo; sourceTree = BUILT_PRODUCTS_DIR; };
 		83046A841C8FF2D000024A7E /* objcimageinfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = objcimageinfo.cpp; path = src/other/objcimageinfo.cpp; sourceTree = "<group>"; };
@@ -572,7 +571,6 @@
 				4C7D5B8623D8F336006E515E /* libhash2.a */,
 				4C7D5B8323D8D46B006E515E /* hash.h */,
 				4CBE443423D793D00084D187 /* libjemalloc_pic.a */,
-				4C9518D023DF72E800B08D20 /* libmimalloc.a */,
 				F9AA687B10572E27003E3539 /* InputFiles.h */,
 				F9AA5FCC103F5CD1003E3539 /* ld.hpp */,
 				F9023C3F06D5A254001BBF46 /* ld.cpp */,
@@ -1297,7 +1295,6 @@
 					"$(PROJECT_DIR)",
 					/Users/michael/projects/jemalloc/lib,
 					/Users/michael/projects/examples/build,
-					/Users/michael/projects/mimalloc/out/release,
 				);
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
 				LLVM_LTO = NO;
@@ -1390,7 +1387,6 @@
 					"$(PROJECT_DIR)",
 					/Users/michael/projects/jemalloc/lib,
 					/Users/michael/projects/examples/build,
-					/Users/michael/projects/mimalloc/out/release,
 				);
 				LLVM_LTO = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
@@ -1687,7 +1683,6 @@
 					"$(PROJECT_DIR)",
 					/Users/michael/projects/jemalloc/lib,
 					/Users/michael/projects/examples/build,
-					/Users/michael/projects/mimalloc/out/release,
 				);
 				LLVM_LTO = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
