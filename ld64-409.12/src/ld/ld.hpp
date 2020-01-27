@@ -61,8 +61,10 @@ struct CPointerEquals
 	bool operator()(const char* left, const char* right) const { return left == right; }
 };
 
-
-typedef LDMap<const char*, int32_t, CPointerHash, CPointerEquals> FastFileMap;
+struct FastFileMap {
+	LDMap<const char*, int32_t, CPointerHash, CPointerEquals> *fileMap;
+	uint32_t objcMsgSendSlot = -1;
+};
 
 namespace ld {
 

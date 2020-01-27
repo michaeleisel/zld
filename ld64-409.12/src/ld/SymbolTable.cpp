@@ -582,28 +582,76 @@ bool SymbolTable::hasName(const char* name)
 	return (_indirectBindingTable[pos->second] != NULL); 
 }
 
+//static const char *lastObjcMsgSend = NULL;
+static LDMap<const char *, int, CStringHash, CStringEquals> foundzMap;
+
 static int foundz = 0;
 static int nfoundz = 0;
-__attribute__((destructor)) void aaazz() {
-	printf("## %d, %d\n", foundz, nfoundz);
+/*__attribute__((destructor))*/ void aaazz() {
+	// create an empty vector of pairs
+	std::vector<std::pair<const char *, int>> vec;
+
+	typedef std::pair<const char *, int> Pair;
+	// copy key-value pairs from the map to the vector
+	std::copy(foundzMap.begin(),
+			foundzMap.end(),
+			std::back_inserter<std::vector<Pair>>(vec));
+
+	// sort the vector by increasing order of its pair's second value
+	// if second value are equal, order by the pair's first value
+	std::sort(vec.begin(), vec.end(),
+			[](const Pair& l, const Pair& r) {
+				if (l.second != r.second)
+					return l.second < r.second;
+
+				return l.first < r.first;
+			});
+	//std::cout << vec << std::endl;
+	std::vector<Pair> vv(vec.begin() + 24000, vec.end());
+	int sum = 0;
+	for (auto iter = vec.begin() + 23000; iter < vec.end(); iter++) {
+		sum += iter->second;
+	}
+	int fullSum = 0;
+	for (auto iter = vec.begin(); iter < vec.end(); iter++) {
+		fullSum += iter->second;
+	}
+	//std::accumulate(vv.begin(), vv.end(), 0);
+	printf("## %d, %d\n", sum, fullSum);
+	//printf("## %d, %d\n", foundz, nfoundz);
 }
 
 // find existing or create new slot
 SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name, FastFileMap *seenPerFile)
 {
+	//if (name[1] == 'o' && (lastObjcMsgSend == name || strcmp(name, "_objcMsgSend"))) {
+	//}
+	/*if (strcmp(name, "_objc_msgSend") == 0 || strcmp(name, "_objc_storeStrong") == 0 || strcmp(name, "_objc_release") == 0) {
+		foundz++;
+	} else {
+		nfoundz++;
+	}*/
+	/*if (strstr(name, "_objc") == name) {
+		foundz++;
+	} else {
+		nfoundz++;
+	}*/
+	if (foundzMap.count(name) > 0) {
+    	foundzMap[name]++;
+	} else {
+		foundzMap[name] = 1;
+	}
 	if (seenPerFile) {
-    	auto filePos = seenPerFile->find(name);
-    	if (filePos != seenPerFile->end()) {
-			foundz++;
+    	auto filePos = seenPerFile->fileMap->find(name);
+    	if (filePos != seenPerFile->fileMap->end()) {
     		return filePos->second;
     	}
-		nfoundz++;
 	}
 	NameToSlot::iterator pos = _byNameTable.find(name);
 	if ( pos != _byNameTable.end() )  {
 		IndirectBindingSlot slot = pos->second;
 		if (seenPerFile) {
-    		(*seenPerFile)[name] = slot;
+    		(*(seenPerFile->fileMap))[name] = slot;
 		}
 		return slot;
 	}
