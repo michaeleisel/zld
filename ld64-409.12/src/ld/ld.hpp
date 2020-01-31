@@ -44,6 +44,7 @@
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
 #include "absl/hash/hash.h"*/
+#include <nmmintrin.h>
 
 #define LDOrderedMap std::map
 #define LDMap std::unordered_map
@@ -1219,13 +1220,123 @@ public:
 
 
 
+static size_t zz, zzz;
+
+/*__attribute__((destructor)) static void ff() {
+	printf("zz: %lu, %lu\n", zz, zzz);
+}*/
+
+#if !defined (get16bits)
+#define get16bits(d) ((((uint32_t)(((const uint8_t *)(d))[1])) << 8)\
+                       +(uint32_t)(((const uint8_t *)(d))[0]) )
+#endif
+
+static size_t SuperFastHash (const char * data, int len) {
+size_t hash = len, tmp;
+size_t rem;
+
+    if (len <= 0 || data == NULL) return 0;
+
+    rem = len & 3;
+    len >>= 2;
+
+    /* Main loop */
+    for (;len > 0; len--) {
+        hash  += get16bits (data);
+        tmp    = (get16bits (data+2) << 11) ^ hash;
+        hash   = (hash << 16) ^ tmp;
+        data  += 2*sizeof (uint16_t);
+        hash  += hash >> 11;
+    }
+
+    /* Handle end cases */
+    switch (rem) {
+        case 3: hash += get16bits (data);
+                hash ^= hash << 16;
+                hash ^= ((signed char)data[sizeof (uint16_t)]) << 18;
+                hash += hash >> 11;
+                break;
+        case 2: hash += get16bits (data);
+                hash ^= hash << 11;
+                hash += hash >> 17;
+                break;
+        case 1: hash += (signed char)*data;
+                hash ^= hash << 10;
+                hash += hash >> 1;
+    }
+
+    /* Force "avalanching" of final 127 bits */
+    hash ^= hash << 3;
+    hash += hash >> 5;
+    hash ^= hash << 4;
+    hash += hash >> 17;
+    hash ^= hash << 25;
+    hash += hash >> 6;
+
+    return hash;
+}
+
+static unsigned long long
+c64(unsigned long long __C, unsigned long long __D) {
+	return _mm_crc32_u64(__C, __D);
+}
+
+static unsigned int
+c32(unsigned int __C, unsigned int __D) {
+	return _mm_crc32_u32(__C, __D);
+}
+
 // utility classes for using LDMap with c-strings
 struct CStringHash {
 	size_t operator()(const char* __s) const {
-		size_t __h = 0;
-		for ( ; *__s; ++__s)
-			__h = 5 * __h + *__s;
-		return __h;
+		//c64(0, 0);
+		//c32(0, 0);
+		const int z = 0;
+		if (z == 0) {
+			/*int piece = (int)__h;
+			char c;
+			while ((c = *__s) && ((ptrdiff_t)__s & 0x7)) {
+				__h = _mm_crc32_u8(__h, c);
+				__s++;
+			}
+			if ((ptrdiff_t)__s & 0x4 && len >= 4) {
+				uint32_t *bits = (uint32_t *)(__s);
+				__s += 4;
+				len -= 4;
+				__h = _mm_crc32_u32(__h, *bits);
+				//curr -= 4;
+			}*/
+			int len = strlen(__s);
+			uint32_t __h = 0;
+			int curr = len;
+			uint64_t *chunks = (uint64_t *)__s;
+			while (curr >= 8) {
+				__h = (uint32_t)_mm_crc32_u64((uint64_t)__h, *chunks);
+				chunks++;
+				curr -= 8;
+			}
+			if (curr >= 4) {
+				uint32_t *bits = (uint32_t *)(__s + len - curr);
+				__h = _mm_crc32_u32(__h, *bits);
+				curr -= 4;
+			}
+			if (curr >= 2) {
+				uint16_t *bits = (uint16_t *)(__s + len - curr);
+				__h = _mm_crc32_u16(__h, *bits);
+				curr -= 2;
+			}
+			if (curr >= 1) {
+    			__h = _mm_crc32_u8(__h, __s[len - 1]);
+			}
+			return (size_t)__h;
+		} else if (z == 1) {
+			size_t __h = 0;
+			for ( ; *__s; ++__s)
+				__h = 2 * __h + *__s;
+			return __h;
+		} else {
+			return SuperFastHash(__s, strlen(__s));
+		}
 	};
 };
 struct CStringPtrEquals

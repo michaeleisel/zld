@@ -159,15 +159,6 @@ private:
 	friend class ExportAtom<A>;
 	friend class ImportAtom<A>;
 
-	struct CStringHash {
-		std::size_t operator()(const char* __s) const {
-			unsigned long __h = 0;
-			for ( ; *__s; ++__s)
-				__h = 5 * __h + *__s;
-			return size_t(__h);
-		};
-	};
-
 protected:
 	struct AtomAndWeak { ld::Atom* atom; bool weakDef; bool tlv; pint_t address; };
 	struct Dependent {
@@ -182,7 +173,7 @@ protected:
 
 private:
 	using NameToAtomMap = LDMap<const char*, AtomAndWeak, ld::CStringHash, ld::CStringEquals>;
-	using NameSet = LDSet<const char*, CStringHash, ld::CStringEquals>;
+	using NameSet = LDSet<const char*, ld::CStringHash, ld::CStringEquals>;
 
 	std::pair<bool, bool>		hasWeakDefinitionImpl(const char* name) const;
 	bool						containsOrReExports(const char* name, bool& weakDef, bool& tlv, pint_t& addr) const;
