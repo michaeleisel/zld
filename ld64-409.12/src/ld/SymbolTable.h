@@ -52,14 +52,13 @@
 namespace ld {
 namespace tool {
 
-
 class SymbolTable : public ld::IndirectBindingTable
 {
 public:
 	typedef uint32_t IndirectBindingSlot;
 
 private:
-	typedef LDMap<const char*, IndirectBindingSlot, CStringHash, CStringPtrEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
+	typedef LDMap<LDString, IndirectBindingSlot, CLDStringHash, CLDStringEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
 
 	class ContentFuncs {
 	public:
