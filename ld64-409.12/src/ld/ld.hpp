@@ -369,6 +369,7 @@ public:
 	virtual uint32_t					cpuSubType() const		{ return 0; }
 	virtual uint32_t					subFileCount() const	{ return 1; }
 	virtual const VersionSet&			platforms() const		{ return _platforms; }
+	virtual void markSubFrameworksAsExported(const char *myLeaf) { }
     bool								fileExists() const     { return _modTime != 0; }
 	Type								type() const { return _type; }
 	virtual Bitcode*					getBitcode() const		{ return NULL; }
@@ -483,6 +484,15 @@ namespace dylib {
 				bool						willBeUpwardDylib() const		{ return _upward; }
 				void						setWillBeRemoved(bool value)	{ _dead = value; }
 				bool						willRemoved() const				{ return _dead; }
+		virtual void markSubFrameworksAsExported(const char *myLeaf) {
+			const char* childParent = parentUmbrella();
+			if ( childParent != NULL ) {
+				if ( strcmp(childParent, &myLeaf[1]) == 0 ) {
+					// mark that this dylib will be re-exported
+					setWillBeReExported();
+				}
+			}
+		}
 				
 		virtual void						processIndirectLibraries(DylibHandler* handler, bool addImplicitDylibs) = 0;
 		virtual bool						providedExportAtom() const = 0;
@@ -1276,69 +1286,65 @@ size_t rem;
     return hash;
 }
 
-static unsigned long long
-c64(unsigned long long __C, unsigned long long __D) {
-	return _mm_crc32_u64(__C, __D);
+typedef struct {
+	const char *str;
+	size_t length;
+} LDString;
+
+static inline LDString LDStringCreate(const char *str) {
+	return (LDString){
+		.str = str,
+		.length = strlen(str),
+	};
 }
 
-static unsigned int
-c32(unsigned int __C, unsigned int __D) {
-	return _mm_crc32_u32(__C, __D);
+static inline size_t CRCHash(const char *__s, size_t len) {
+	uint32_t __h = 0;
+	int curr = len;
+	uint64_t *chunks = (uint64_t *)__s;
+	while (curr >= 8) {
+		__h = (uint32_t)_mm_crc32_u64((uint64_t)__h, *chunks);
+		chunks++;
+		curr -= 8;
+	}
+	if (curr >= 4) {
+		uint32_t *bits = (uint32_t *)(__s + len - curr);
+		__h = _mm_crc32_u32(__h, *bits);
+		curr -= 4;
+	}
+	if (curr >= 2) {
+		uint16_t *bits = (uint16_t *)(__s + len - curr);
+		__h = _mm_crc32_u16(__h, *bits);
+		curr -= 2;
+	}
+	if (curr >= 1) {
+		__h = _mm_crc32_u8(__h, __s[len - 1]);
+	}
+	return (size_t)__h;
 }
+
+struct CLDStringHash {
+	size_t operator()(LDString __s) const {
+		return CRCHash(__s.str, __s.length);
+	}
+};
 
 // utility classes for using LDMap with c-strings
 struct CStringHash {
 	size_t operator()(const char* __s) const {
-		//c64(0, 0);
-		//c32(0, 0);
-		const int z = 0;
-		if (z == 0) {
-			/*int piece = (int)__h;
-			char c;
-			while ((c = *__s) && ((ptrdiff_t)__s & 0x7)) {
-				__h = _mm_crc32_u8(__h, c);
-				__s++;
-			}
-			if ((ptrdiff_t)__s & 0x4 && len >= 4) {
-				uint32_t *bits = (uint32_t *)(__s);
-				__s += 4;
-				len -= 4;
-				__h = _mm_crc32_u32(__h, *bits);
-				//curr -= 4;
-			}*/
-			int len = strlen(__s);
-			uint32_t __h = 0;
-			int curr = len;
-			uint64_t *chunks = (uint64_t *)__s;
-			while (curr >= 8) {
-				__h = (uint32_t)_mm_crc32_u64((uint64_t)__h, *chunks);
-				chunks++;
-				curr -= 8;
-			}
-			if (curr >= 4) {
-				uint32_t *bits = (uint32_t *)(__s + len - curr);
-				__h = _mm_crc32_u32(__h, *bits);
-				curr -= 4;
-			}
-			if (curr >= 2) {
-				uint16_t *bits = (uint16_t *)(__s + len - curr);
-				__h = _mm_crc32_u16(__h, *bits);
-				curr -= 2;
-			}
-			if (curr >= 1) {
-    			__h = _mm_crc32_u8(__h, __s[len - 1]);
-			}
-			return (size_t)__h;
-		} else if (z == 1) {
-			size_t __h = 0;
-			for ( ; *__s; ++__s)
-				__h = 2 * __h + *__s;
-			return __h;
-		} else {
-			return SuperFastHash(__s, strlen(__s));
-		}
+		int len = strlen(__s);
+		return CRCHash(__s, len);
 	};
 };
+
+struct CLDStringEquals
+{
+	bool operator()(LDString left, LDString right) const {
+		return left.length == right.length
+		  && (left.str == right.str || strcmp(left.str, right.str) == 0);
+    }
+};
+
 struct CStringPtrEquals
 {
 	bool operator()(const char* left, const char* right) const { return left == right || (strcmp(left, right) == 0); }

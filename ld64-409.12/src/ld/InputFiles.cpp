@@ -746,16 +746,7 @@ void InputFiles::createIndirectDylibs()
 		const char* myLeaf = strrchr(_options.installPath(), '/');
 		if ( myLeaf != NULL ) {
 			for (std::vector<class ld::File*>::const_iterator it=_inputFiles.begin(); it != _inputFiles.end(); it++) {
-				ld::dylib::File* dylibReader = dynamic_cast<ld::dylib::File*>(*it);
-				if ( dylibReader != NULL ) {
-					const char* childParent = dylibReader->parentUmbrella();
-					if ( childParent != NULL ) {
-						if ( strcmp(childParent, &myLeaf[1]) == 0 ) {
-							// mark that this dylib will be re-exported
-							dylibReader->setWillBeReExported();
-						}
-					}
-				}
+				(*it)->markSubFrameworksAsExported(myLeaf);
 			}
 		}
 	}

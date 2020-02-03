@@ -343,6 +343,11 @@ bool File<A>::memberHasObjCCategories(const Entry* member) const
 	return mach_o::relocatable::hasObjC2Categories(member->content());
 }
 
+static size_t nFound = 0;
+
+__attribute__((destructor)) void yoooo() {
+	printf("zz %ld\n", nFound);
+}
 
 template <typename A>
 typename File<A>::MemberState& File<A>::makeObjectFileForMember(const Entry* member) const
@@ -393,6 +398,7 @@ typename File<A>::MemberState& File<A>::makeObjectFileForMember(const Entry* mem
 		const char* mPath = strdup(memberPath);
 		// see if member is mach-o file
 		ld::File::Ordinal ordinal = this->ordinal().archiveOrdinalWithMemberIndex(memberIndex);
+		nFound++;
 		ld::relocatable::File* result = mach_o::relocatable::parse(member->content(), member->contentSize(), 
 																	mPath, member->modificationTime(), 
 																	ordinal, _objOpts);

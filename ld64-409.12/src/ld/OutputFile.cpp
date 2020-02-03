@@ -3503,7 +3503,7 @@ void OutputFile::buildSymbolTable(ld::Internal& state)
 
 	for (const auto &it : hiddenSymbols) {
 		for (const auto &symbol :  it.second)
-			warning("linker symbol '%s' hides a non-existent symbol '%s'", symbol.c_str(), it.first.c_str());
+			;//warning("linker symbol '%s' hides a non-existent symbol '%s'", symbol.c_str(), it.first.c_str());
 	}
 }
 
