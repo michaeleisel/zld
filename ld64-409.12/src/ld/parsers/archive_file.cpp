@@ -28,12 +28,16 @@
 #include <sys/param.h>
 #include <mach-o/ranlib.h>
 #include <ar.h>
+#include <iostream>
+#include <sstream>
+#include <fstream>
 
 #include <vector>
 #include <set>
 #include <map>
 #include <algorithm>
 #include <unordered_map>
+#include <dispatch/dispatch.h>
 
 #include "MachOFileAbstraction.hpp"
 #include "Architectures.hpp"
@@ -41,6 +45,13 @@
 #include "macho_relocatable_file.h"
 #include "lto_file.h"
 #include "archive_file.h"
+
+template <class A>
+void pp(LDSet<A> set) {
+	for (auto e: set) {
+		std::cout << e << "\n";
+	}
+}
 
 
 namespace archive {
@@ -79,6 +90,9 @@ public:
 															ld::File::Ordinal ord, const ParserOptions& opts);
 	virtual											~File() {}
 
+	virtual void dumpMembersParsed(std::ofstream &stream) const;
+	virtual void parseInParallel(std::vector <void *>&members) const;
+	virtual void insertMembersToParse(std::vector<void *> &members, LDSet<std::string> set) const ;
 	// overrides of ld::File
 	virtual bool										forEachAtom(ld::File::AtomHandler&) const;
 	virtual bool										justInTimeforEachAtom(const char* name, ld::File::AtomHandler&) const;
@@ -125,6 +139,7 @@ private:
 #ifdef SYMDEF_64
 	void											buildHashTable64();
 #endif
+	mutable LDSet<std::string>						_membersParsed;
 	const uint8_t*									_archiveFileContent;
 	uint64_t										_archiveFilelength;
 	const struct ranlib*							_tableOfContents;
@@ -134,6 +149,7 @@ private:
 	uint32_t										_tableOfContentCount;
 	const char*										_tableOfContentStrings;
 	mutable MemberToStateMap						_instantiatedEntries;
+	mutable std::mutex _mutex;
 	NameToOffsetMap									_hashTable;
 	const bool										_forceLoadAll;
 	const bool										_forceLoadObjC;
@@ -343,42 +359,45 @@ bool File<A>::memberHasObjCCategories(const Entry* member) const
 	return mach_o::relocatable::hasObjC2Categories(member->content());
 }
 
-static size_t nFound = 0;
+/*static size_t nFound = 0;
 
 __attribute__((destructor)) void yoooo() {
 	printf("zz %ld\n", nFound);
-}
+}*/
 
 template <typename A>
 typename File<A>::MemberState& File<A>::makeObjectFileForMember(const Entry* member) const
 {
 	uint32_t memberIndex = 0;
-	// in case member was instantiated earlier but not needed yet
-	typename MemberToStateMap::iterator pos = _instantiatedEntries.find(member);
-	if ( pos == _instantiatedEntries.end() ) {
-		// Have to find the index of this member
-		const Entry* start;
-		uint32_t index;
-		if (_instantiatedEntries.size() == 0) {
-			start = (Entry*)&_archiveFileContent[8];
-			index = 1;
-		} else {
-			MemberState &lastKnown = _instantiatedEntries.rbegin()->second;
-			start = lastKnown.entry->next();
-			index = lastKnown.index+1;
-		}
-		for (const Entry* p=start; p <= member; p = p->next(), index++) {
-			MemberState state = {NULL, p, false, false, index};
-			_instantiatedEntries[p] = state;
-			if (member == p) {
-				memberIndex = index;
-			}
-		}
-	} else {
-		MemberState& state = pos->second;
-		if (state.file)
-			return state;
-		memberIndex = state.index;
+	{
+		std::scoped_lock<std::mutex> guard(_mutex);
+    	// in case member was instantiated earlier but not needed yet
+    	typename MemberToStateMap::iterator pos = _instantiatedEntries.find(member);
+    	if ( pos == _instantiatedEntries.end() ) {
+    		// Have to find the index of this member
+    		const Entry* start;
+    		uint32_t index;
+    		if (_instantiatedEntries.size() == 0) {
+    			start = (Entry*)&_archiveFileContent[8];
+    			index = 1;
+    		} else {
+    			MemberState &lastKnown = _instantiatedEntries.rbegin()->second;
+    			start = lastKnown.entry->next();
+    			index = lastKnown.index+1;
+    		}
+    		for (const Entry* p=start; p <= member; p = p->next(), index++) {
+    			MemberState state = {NULL, p, false, false, index};
+    			_instantiatedEntries[p] = state;
+    			if (member == p) {
+    				memberIndex = index;
+    			}
+    		}
+    	} else {
+    		MemberState& state = pos->second;
+    		if (state.file)
+    			return state;
+    		memberIndex = state.index;
+    	}
 	}
 	assert(memberIndex != 0);
 	char memberName[256];
@@ -390,34 +409,41 @@ typename File<A>::MemberState& File<A>::makeObjectFileForMember(const Entry* mem
 	strcat(memberPath, ")");
 	//fprintf(stderr, "using %s from %s\n", memberName, this->path());
 	try {
-		// range check
-		if ( member > (Entry*)(_archiveFileContent+_archiveFilelength) )
-			throwf("corrupt archive, member starts past end of file");										
-		if ( (member->content() + member->contentSize()) > (_archiveFileContent+_archiveFilelength) )
-			throwf("corrupt archive, member contents extends past end of file");										
+		ld::File::Ordinal ordinal = Ordinal::NullOrdinal();
 		const char* mPath = strdup(memberPath);
-		// see if member is mach-o file
-		ld::File::Ordinal ordinal = this->ordinal().archiveOrdinalWithMemberIndex(memberIndex);
-		nFound++;
-		ld::relocatable::File* result = mach_o::relocatable::parse(member->content(), member->contentSize(), 
+		{
+    		std::scoped_lock<std::mutex> guard(_mutex);
+    		// range check
+    		if ( member > (Entry*)(_archiveFileContent+_archiveFilelength) )
+    			throwf("corrupt archive, member starts past end of file");
+    		if ( (member->content() + member->contentSize()) > (_archiveFileContent+_archiveFilelength) )
+    			throwf("corrupt archive, member contents extends past end of file");
+    		// see if member is mach-o file
+    		ordinal = this->ordinal().archiveOrdinalWithMemberIndex(memberIndex);
+		}
+		ld::relocatable::File* result = mach_o::relocatable::parse(member->content(), member->contentSize(),
 																	mPath, member->modificationTime(), 
 																	ordinal, _objOpts);
-		if ( result != NULL ) {
-			MemberState state = {result, member, false, false, memberIndex};
-			_instantiatedEntries[member] = state;
-			return _instantiatedEntries[member];
+		{
+    		std::scoped_lock<std::mutex> guard(_mutex);
+    		_membersParsed.insert(std::string(memberName));
+    		if ( result != NULL ) {
+    			MemberState state = {result, member, false, false, memberIndex};
+    			_instantiatedEntries[member] = state;
+    			return _instantiatedEntries[member];
+    		}
+    		// see if member is llvm bitcode file
+    		result = lto::parse(member->content(), member->contentSize(),
+    								mPath, member->modificationTime(), ordinal,
+    								_objOpts.architecture, _objOpts.subType, _logAllFiles, _objOpts.verboseOptimizationHints);
+    		if ( result != NULL ) {
+    			MemberState state = {result, member, false, false, memberIndex};
+    			_instantiatedEntries[member] = state;
+    			return _instantiatedEntries[member];
+    		}
+    
+    		throwf("archive member '%s' with length %d is not mach-o or llvm bitcode", memberName, member->contentSize());
 		}
-		// see if member is llvm bitcode file
-		result = lto::parse(member->content(), member->contentSize(), 
-								mPath, member->modificationTime(), ordinal, 
-								_objOpts.architecture, _objOpts.subType, _logAllFiles, _objOpts.verboseOptimizationHints);
-		if ( result != NULL ) {
-			MemberState state = {result, member, false, false, memberIndex};
-			_instantiatedEntries[member] = state;
-			return _instantiatedEntries[member];
-		}
-			
-		throwf("archive member '%s' with length %d is not mach-o or llvm bitcode", memberName, member->contentSize());
 	}
 	catch (const char* msg) {
 		throwf("in %s, %s", memberPath, msg);
@@ -515,6 +541,65 @@ bool File<A>::forEachAtom(ld::File::AtomHandler& handler) const
 		}
 	}
 	return didSome;
+}
+
+template <typename A>
+void File<A>::dumpMembersParsed(std::ofstream &stream) const {
+	if (_membersParsed.empty()) {
+		return;
+	}
+	
+	stream << path() << "\n";
+	for (auto name : _membersParsed) {
+		stream << "\t" << name << "\n";
+	}
+}
+
+// Should be static, but is not
+template <typename A>
+void File<A>::parseInParallel(std::vector <void *>&members) const {
+	//static_cast<std::vector<Entry *>&>(members);
+}
+
+template <typename A>
+void File<A>::insertMembersToParse(std::vector<void *> &members, LDSet<std::string> set) const {
+	LDSet<uint64_t> offsets;
+	for (auto &[k, v] : _hashTable) {
+		offsets.insert(v);
+	}
+	char name[256];
+	dispatch_group_t group = dispatch_group_create();
+	dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0);
+	for (auto offset : offsets) {
+		Entry *member = (Entry *)(&_archiveFileContent[offset]);
+		member->getName(name, sizeof(name));
+		if (set.contains(std::string(name))) {
+			dispatch_group_async(group, queue, ^{
+				makeObjectFileForMember(member);
+			});
+			//members.push_back((void *)entry);
+			/*ld::relocatable::File* result = mach_o::relocatable::parse(member->content(), member->contentSize(),
+																	   mPath, member->modificationTime(),
+																	   ordinal, _objOpts);
+			MemberState state = {result, member, false, false, memberIndex};*/
+		}
+	}
+	dispatch_group_wait(group, INT_MAX);
+	/*std::ostringstream os;
+	std::array<char, 128> buffer;
+    std::string result;
+	os << "/usr/bin/ar -t -v" << path();
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(os.str().c_str(), "r"), pclose);
+	while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        result += buffer.data();
+    }
+	std::istringstream input(result);
+	for (std::string line; std::getline(input, line); ) {
+		std::string skip;
+		size_t size = 0;
+		input >> skip >> size;
+	}
+	return result;*/
 }
 
 template <typename A>

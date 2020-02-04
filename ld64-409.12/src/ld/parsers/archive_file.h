@@ -30,6 +30,8 @@
 
 namespace archive {
 
+void parseInParallel(std::vector <void *>&members);
+	
 struct ParserOptions {
 	mach_o::relocatable::ParserOptions	objOpts;
 	bool								forceLoadThisArchive;
