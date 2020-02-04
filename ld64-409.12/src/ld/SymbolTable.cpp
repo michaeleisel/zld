@@ -625,36 +625,10 @@ static int nfoundz = 0;
 // find existing or create new slot
 SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name, FastFileMap *seenPerFile)
 {
-	//if (name[1] == 'o' && (lastObjcMsgSend == name || strcmp(name, "_objcMsgSend"))) {
-	//}
-	/*if (strcmp(name, "_objc_msgSend") == 0 || strcmp(name, "_objc_storeStrong") == 0 || strcmp(name, "_objc_release") == 0) {
-		foundz++;
-	} else {
-		nfoundz++;
-	}*/
-	/*if (strstr(name, "_objc") == name) {
-		foundz++;
-	} else {
-		nfoundz++;
-	}*/
-	/*if (seenPerFile) {
-    	auto filePos = seenPerFile->fileMap->find(name);
-    	if (filePos != seenPerFile->fileMap->end()) {
-    		return filePos->second;
-    	}
-	}*/
 	LDString string = LDStringCreate(name);
 	NameToSlot::iterator pos = _byNameTable.find(string);
 	if ( pos != _byNameTable.end() )  {
 		IndirectBindingSlot slot = pos->second;
-		/*if (pos->first != name) {
-        	auto nh = _byNameTable.extract(name);
-    		nh.key() = name;
-			_byNameTable.insert(std::move(nh));
-		}*/
-		/*if (seenPerFile) {
-    		(*(seenPerFile->fileMap))[name] = slot;
-		}*/
 		return slot;
 	}
 	// create new slot for this name
@@ -662,7 +636,6 @@ SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name, 
 	_indirectBindingTable.push_back(NULL);
 	_byNameTable[string] = slot;
 	_byNameReverseTable[slot] = name;
-	//nfoundz++;
 	return slot;
 }
 

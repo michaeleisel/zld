@@ -1321,6 +1321,7 @@
 				PRODUCT_NAME = ld;
 				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
+				STRIP_INSTALLED_PRODUCT = NO;
 				TOOLCHAINS = osx;
 				VERSIONING_SYSTEM = "apple-generic";
 				WARNING_CFLAGS = "-Wall";
@@ -1412,7 +1413,7 @@
 				PRODUCT_NAME = ld;
 				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
-				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
 				TOOLCHAINS = osx;
 				VALID_ARCHS = "x86_64 i386 ppc";
@@ -1708,7 +1709,7 @@
 				PRODUCT_NAME = ld;
 				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
-				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
 				TOOLCHAINS = osx;
 				VALID_ARCHS = "x86_64 i386 ppc";

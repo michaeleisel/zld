@@ -484,7 +484,7 @@ namespace dylib {
 				bool						willBeUpwardDylib() const		{ return _upward; }
 				void						setWillBeRemoved(bool value)	{ _dead = value; }
 				bool						willRemoved() const				{ return _dead; }
-		virtual void markSubFrameworksAsExported(const char *myLeaf) {
+		void markSubFrameworksAsExported(const char *myLeaf) {
 			const char* childParent = parentUmbrella();
 			if ( childParent != NULL ) {
 				if ( strcmp(childParent, &myLeaf[1]) == 0 ) {
@@ -538,6 +538,9 @@ namespace archive {
 												: ld::File(pth, modTime, ord, Archive) { }
 		virtual								~File() {}
 		virtual bool						justInTimeDataOnlyforEachAtom(const char* name, AtomHandler&) const = 0;
+		virtual void insertMembersToParse(std::vector<void *> &members, LDSet<std::string> set) const = 0;
+    	virtual void dumpMembersParsed(std::ofstream &stream) const = 0;
+		virtual void parseInParallel(std::vector <void *>&members) const = 0;
 	};
 } // namespace archive 
 

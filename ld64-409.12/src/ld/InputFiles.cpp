@@ -43,6 +43,7 @@
 #include <sys/sysctl.h>
 #include <libkern/OSAtomic.h>
 
+#include <fstream>
 #include <string>
 #include <map>
 #include <set>
@@ -1316,6 +1317,56 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 	}
 }
 
+
+void InputFiles::preParseLibraries() const {
+	std::string line;
+	std::ifstream infile("/tmp/cache-o");
+	LDSet<std::string> currentSet;
+	LDMap<std::string, LDSet<std::string>> map;
+	std::string currentLib;
+	std::getline(infile, currentLib);
+	while (std::getline(infile, line)) {
+		if (line[0] == '\t') {
+			line.erase(0, 1);
+			currentSet.insert(line);
+		} else {
+			map[currentLib] = currentSet;
+			currentLib = line;
+			currentSet = LDSet<std::string>();
+		}
+	}
+	map[currentLib] = currentSet;
+	std::vector<void *> members;
+    for (std::vector<LibraryInfo>::const_iterator it=_searchLibraries.begin(); it != _searchLibraries.end(); ++it) {
+		auto lib = *it;
+		if (lib.isDylib()) {
+			auto dylib = lib.dylib();
+			auto it = map.find(dylib->path());
+			if (it == map.end()) {
+				continue;
+			}
+			//dylib->insertFilesToLoad();
+		} else {
+			auto archiveFile = lib.archive();
+			auto it = map.find(archiveFile->path());
+			if (it == map.end()) {
+				continue;
+			}
+			archiveFile->insertMembersToParse(members, it->second);
+		}
+	}
+}
+
+void InputFiles::dumpMembersParsed(std::ofstream &stream) const {
+    for (std::vector<LibraryInfo>::const_iterator it=_searchLibraries.begin(); it != _searchLibraries.end(); ++it) {
+		auto lib = *it;
+		if (lib.isDylib()) {
+		} else {
+			auto archive = lib.archive();
+			archive->dumpMembersParsed(stream);
+		}
+	}
+}
 
 bool InputFiles::searchLibraries(const char* name, bool searchDylibs, bool searchArchives, bool dataSymbolOnly, ld::File::AtomHandler& handler) const
 {
