@@ -44,6 +44,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		4CD5F34923E9DA3800270B2F /* zone.c in Sources */ = {isa = PBXBuildFile; fileRef = 4CD5F34823E9DA3800270B2F /* zone.c */; };
 		83046A851C8FF2F700024A7E /* objcimageinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83046A841C8FF2D000024A7E /* objcimageinfo.cpp */; };
 		B028FCF21A9E7C3F00E3584B /* bitcode_bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B028FCF11A9E7C3F00E3584B /* bitcode_bundle.cpp */; };
 		B3B672421406D42800A376BB /* Snapshot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3B672411406D42800A376BB /* Snapshot.cpp */; };
@@ -267,7 +268,11 @@
 /* Begin PBXFileReference section */
 		4C7D5B8323D8D46B006E515E /* hash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hash.h; path = "../../examples/abseil-cpp/absl/hash/hash.h"; sourceTree = "<group>"; };
 		4C7D5B8623D8F336006E515E /* libhash2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhash2.a; path = ../../examples/build/libhash2.a; sourceTree = "<group>"; };
-		4CBE443423D793D00084D187 /* libjemalloc_pic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjemalloc_pic.a; path = ../../jemalloc/lib/libjemalloc_pic.a; sourceTree = "<group>"; };
+		4CD5F34823E9DA3800270B2F /* zone.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = zone.c; sourceTree = "<group>"; };
+		4CF05E8E23EB005B009C0C95 /* libsystem_malloc.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsystem_malloc.tbd; path = usr/lib/system/libsystem_malloc.tbd; sourceTree = SDKROOT; };
+		4CF05E9023EB0093009C0C95 /* libSystem.B.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libSystem.B.tbd; path = usr/lib/libSystem.B.tbd; sourceTree = SDKROOT; };
+		4CF05E9323EB0151009C0C95 /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/System.framework; sourceTree = DEVELOPER_DIR; };
+		4CF05E9523EB0201009C0C95 /* libsystem_malloc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsystem_malloc.dylib; path = ../../../../../usr/lib/system/libsystem_malloc.dylib; sourceTree = "<group>"; };
 		83046A831C8FF23E00024A7E /* objcimageinfo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = objcimageinfo; sourceTree = BUILT_PRODUCTS_DIR; };
 		83046A841C8FF2D000024A7E /* objcimageinfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = objcimageinfo.cpp; path = src/other/objcimageinfo.cpp; sourceTree = "<group>"; };
 		B028FCF01A9E7B4A00E3584B /* bitcode_bundle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bitcode_bundle.h; sourceTree = "<group>"; };
@@ -428,6 +433,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4CF05E8D23EB005B009C0C95 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4CF05E9523EB0201009C0C95 /* libsystem_malloc.dylib */,
+				4CF05E9323EB0151009C0C95 /* System.framework */,
+				4CF05E9023EB0093009C0C95 /* libSystem.B.tbd */,
+				4CF05E8E23EB005B009C0C95 /* libsystem_malloc.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F9023C2C06D5A227001BBF46 = {
 			isa = PBXGroup;
 			children = (
@@ -436,6 +452,7 @@
 				F9B813B00EC27B9E00F94C13 /* other */,
 				F9B8137E0EC2651200F94C13 /* doc */,
 				F9023C3A06D5A23E001BBF46 /* Products */,
+				4CF05E8D23EB005B009C0C95 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -570,7 +587,6 @@
 				F9AA687A10572E27003E3539 /* InputFiles.cpp */,
 				4C7D5B8623D8F336006E515E /* libhash2.a */,
 				4C7D5B8323D8D46B006E515E /* hash.h */,
-				4CBE443423D793D00084D187 /* libjemalloc_pic.a */,
 				F9AA687B10572E27003E3539 /* InputFiles.h */,
 				F9AA5FCC103F5CD1003E3539 /* ld.hpp */,
 				F9023C3F06D5A254001BBF46 /* ld.cpp */,
@@ -591,6 +607,7 @@
 				F98565241E98090F00528B1C /* dwarf2.h */,
 				B3B672411406D42800A376BB /* Snapshot.cpp */,
 				B3B672441406D44300A376BB /* Snapshot.h */,
+				4CD5F34823E9DA3800270B2F /* zone.c */,
 			);
 			name = ld;
 			sourceTree = "<group>";
@@ -1015,6 +1032,7 @@
 				F9AA69C110583E19003E3539 /* Resolver.cpp in Sources */,
 				F989D30D106826020014B60C /* OutputFile.cpp in Sources */,
 				F9AA65111051BD2B003E3539 /* stubs.cpp in Sources */,
+				4CD5F34923E9DA3800270B2F /* zone.c in Sources */,
 				F9AA6786105700C2003E3539 /* opaque_section_file.cpp in Sources */,
 				F9AA67B610570C41003E3539 /* dtrace_dof.cpp in Sources */,
 				F98498A310AE2159009E9878 /* compact_unwind.cpp in Sources */,
@@ -1288,6 +1306,7 @@
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
 					"/Users/michael/projects/examples/abseil-cpp",
+					/usr/local/include,
 				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../lib/";
@@ -1296,6 +1315,8 @@
 					"$(PROJECT_DIR)",
 					/Users/michael/projects/jemalloc/lib,
 					/Users/michael/projects/examples/build,
+					"$(SDKROOT)/usr/lib/system",
+					/usr/lib/system,
 				);
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
 				LLVM_LTO = NO;
@@ -1382,6 +1403,7 @@
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
 					"/Users/michael/projects/examples/abseil-cpp",
+					/usr/local/include,
 				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../lib/";
@@ -1390,6 +1412,8 @@
 					"$(PROJECT_DIR)",
 					/Users/michael/projects/jemalloc/lib,
 					/Users/michael/projects/examples/build,
+					"$(SDKROOT)/usr/lib/system",
+					/usr/lib/system,
 				);
 				LLVM_LTO = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
@@ -1398,6 +1422,7 @@
 					"$(OTHER_CPLUSPLUSFLAGS)",
 				);
 				OTHER_LDFLAGS = (
+					"$(inherited)",
 					"-stdlib=libc++",
 					"-lxar",
 					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
@@ -1532,7 +1557,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = "-Wl,-all_load";
+				OTHER_LDFLAGS = (
+					"-Wl,-U,_malloc_default_purgeable_zone",
+					"-Wl,-undefined,dynamic_lookup",
+				);
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -1562,7 +1590,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				OTHER_LDFLAGS = "-Wl,-all_load";
+				OTHER_LDFLAGS = (
+					"-Wl,-U,_malloc_default_purgeable_zone",
+					"-Wl,-undefined,dynamic_lookup",
+				);
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -1610,7 +1641,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				OTHER_LDFLAGS = "-Wl,-all_load";
+				OTHER_LDFLAGS = (
+					"-Wl,-U,_malloc_default_purgeable_zone",
+					"-Wl,-undefined,dynamic_lookup",
+				);
 				SDKROOT = macosx;
 			};
 			name = "Release-assert";
@@ -1679,6 +1713,7 @@
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
 					"/Users/michael/projects/examples/abseil-cpp",
+					/usr/local/include,
 				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../lib/";
@@ -1687,6 +1722,8 @@
 					"$(PROJECT_DIR)",
 					/Users/michael/projects/jemalloc/lib,
 					/Users/michael/projects/examples/build,
+					"$(SDKROOT)/usr/lib/system",
+					/usr/lib/system,
 				);
 				LLVM_LTO = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
