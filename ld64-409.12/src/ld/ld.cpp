@@ -816,9 +816,10 @@ ld::Internal::FinalSection* InternalState::getFinalSection(const ld::Section& in
 				const ld::Section& outSect = FinalSection::outputSection(inputSection, _options.mergeZeroFill());
 				pos = _sectionInToFinalMap.find(&outSect);
 				if ( pos != _sectionInToFinalMap.end() ) {
-					_sectionInToFinalMap[&inputSection] = pos->second;
+					auto finalSection = pos->second;
+					_sectionInToFinalMap[&inputSection] = finalSection;
 					//fprintf(stderr, "_sectionInToFinalMap[%p] = %p\n", &inputSection, pos->second);
-					return pos->second;
+					return finalSection;
 				}
 				else if ( outSect != inputSection ) {
 					// new output section created, but not in map
