@@ -235,6 +235,8 @@ bool Layout::Comparer::operator()(const ld::Atom* left, const ld::Atom* right)
 	}
 #endif
 	
+	return false;
+	
 	// sort by .o order
 	const ld::File* leftFile = left->file();
 	const ld::File* rightFile = right->file();

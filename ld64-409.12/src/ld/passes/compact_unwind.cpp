@@ -384,20 +384,29 @@ void UnwindInfoAtom<A>::findCommonEncoding(const std::vector<UnwindEntry>& entri
 	if (_s_log) fprintf(stderr, "findCommonEncoding() %lu common encodings found\n", commonEncodings.size()); 
 }
 
+static const size_t kEntryCount = 100;
+static LSDAEntry sEntries[kEntryCount];
 
 template <typename A>
 void UnwindInfoAtom<A>::makeLsdaIndex(const std::vector<UnwindEntry>& entries, std::vector<LSDAEntry>& lsdaIndex, LDOrderedMap<const ld::Atom*, uint32_t>& lsdaIndexOffsetMap)
 {
+	static size_t index = 0;
 	for(std::vector<UnwindEntry>::const_iterator it=entries.begin(); it != entries.end(); ++it) {
 		lsdaIndexOffsetMap[it->func] = lsdaIndex.size() * sizeof(unwind_info_section_header_lsda_index_entry);
-		if ( it->lsda != NULL ) {
-			LSDAEntry entry;
-			entry.func = it->func;
-			entry.lsda = it->lsda;
-			lsdaIndex.push_back(entry);
+		if ( it->lsda == NULL ) {
+			return;
+		}
+		sEntries[index].func = it->func;
+		sEntries[index].lsda = it->lsda;
+		//lsdaIndex.push_back(entry);
+		index++;
+		if (index >= kEntryCount) {
+			lsdaIndex.insert(lsdaIndex.end(), &(sEntries[0]), &(sEntries[index]));
+			index = 0;
 		}
 	}
-	if (_s_log) fprintf(stderr, "makeLsdaIndex() %lu LSDAs found\n", lsdaIndex.size()); 
+	lsdaIndex.insert(lsdaIndex.end(), &(sEntries[0]), &(sEntries[index]));
+	if (_s_log) fprintf(stderr, "makeLsdaIndex() %lu LSDAs found\n", lsdaIndex.size());
 }
 
 
