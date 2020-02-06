@@ -268,7 +268,6 @@
 /* Begin PBXFileReference section */
 		4C7D5B8323D8D46B006E515E /* hash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hash.h; path = "../../examples/abseil-cpp/absl/hash/hash.h"; sourceTree = "<group>"; };
 		4C7D5B8623D8F336006E515E /* libhash2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhash2.a; path = ../../examples/build/libhash2.a; sourceTree = "<group>"; };
-		4CD5F34823E9DA3800270B2F /* zone.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = zone.c; sourceTree = "<group>"; };
 		4CF05E8E23EB005B009C0C95 /* libsystem_malloc.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsystem_malloc.tbd; path = usr/lib/system/libsystem_malloc.tbd; sourceTree = SDKROOT; };
 		4CF05E9023EB0093009C0C95 /* libSystem.B.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libSystem.B.tbd; path = usr/lib/libSystem.B.tbd; sourceTree = SDKROOT; };
 		4CF05E9323EB0151009C0C95 /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/System.framework; sourceTree = DEVELOPER_DIR; };
@@ -607,7 +606,6 @@
 				F98565241E98090F00528B1C /* dwarf2.h */,
 				B3B672411406D42800A376BB /* Snapshot.cpp */,
 				B3B672441406D44300A376BB /* Snapshot.h */,
-				4CD5F34823E9DA3800270B2F /* zone.c */,
 			);
 			name = ld;
 			sourceTree = "<group>";
@@ -1032,7 +1030,6 @@
 				F9AA69C110583E19003E3539 /* Resolver.cpp in Sources */,
 				F989D30D106826020014B60C /* OutputFile.cpp in Sources */,
 				F9AA65111051BD2B003E3539 /* stubs.cpp in Sources */,
-				4CD5F34923E9DA3800270B2F /* zone.c in Sources */,
 				F9AA6786105700C2003E3539 /* opaque_section_file.cpp in Sources */,
 				F9AA67B610570C41003E3539 /* dtrace_dof.cpp in Sources */,
 				F98498A310AE2159009E9878 /* compact_unwind.cpp in Sources */,
