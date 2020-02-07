@@ -858,6 +858,9 @@ void Atom<A>::setFile(const ld::File* f) {
 template <typename A>
 const ld::File* Atom<A>::file() const
 {
+	if (_s_fileOverride.empty()) {
+		return &sect().file();
+	}
 	LDMap<const ld::Atom*, const ld::File*>::iterator pos = _s_fileOverride.find(this);
 	if ( pos != _s_fileOverride.end() )
 		return pos->second;
@@ -3748,7 +3751,7 @@ void Parser<A>::parseDebugInfo()
 				uint32_t curAtomOffset = 0;
 				uint32_t curAtomAddress = 0;
 				uint32_t curAtomSize = 0;
-				LDOrderedMap<uint32_t,const char*>	dwarfIndexToFile;
+				LDMap<uint32_t,const char*>	dwarfIndexToFile;
 				if ( lines != NULL ) {
 					while ( line_next(lines, &result, line_stop_pc) ) {
 						//fprintf(stderr, "curAtom=%p, result.pc=0x%llX, result.line=%llu, result.end_of_sequence=%d,"
@@ -3809,7 +3812,7 @@ void Parser<A>::parseDebugInfo()
 							}
 						}
 						const char* filename;
-						LDOrderedMap<uint32_t,const char*>::iterator pos = dwarfIndexToFile.find(result.file);
+						LDMap<uint32_t,const char*>::iterator pos = dwarfIndexToFile.find(result.file);
 						if ( pos == dwarfIndexToFile.end() ) {
 							filename = line_file(lines, result.file);
 							dwarfIndexToFile[result.file] = filename;

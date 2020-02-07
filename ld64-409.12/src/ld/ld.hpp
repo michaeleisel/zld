@@ -300,6 +300,11 @@ public:
 	{
 	public:
 		const uint64_t getNumber() const { return _ordinal; };
+		const uint16_t	partition() const		{ return (_ordinal>>48)&0xffff; }
+		const uint16_t	majorIndex() const		{ return (_ordinal>>32)&0xffff; }
+		const uint16_t	minorIndex() const		{ return (_ordinal>>16)&0xffff; }
+		const uint16_t	counter() const			{ return (_ordinal>>00)&0xffff; }
+
 	private:
 		// The actual numeric ordinal. Lower values have higher precedence and a zero value is invalid.
 		// The 64 bit ordinal is broken into 4 16 bit chunks. The high 16 bits are a "partition" that
@@ -314,11 +319,6 @@ public:
 			_ordinal = ((uint64_t)partition<<48) | ((uint64_t)majorIndex<<32) | ((uint64_t)minorIndex<<16) | ((uint64_t)counter<<0);
 		}
 		
-		const uint16_t	partition() const		{ return (_ordinal>>48)&0xffff; }
-		const uint16_t	majorIndex() const		{ return (_ordinal>>32)&0xffff; }
-		const uint16_t	minorIndex() const		{ return (_ordinal>>16)&0xffff; }
-		const uint16_t	counter() const			{ return (_ordinal>>00)&0xffff; }
-
 		const Ordinal nextMajorIndex()		const { assert(majorIndex() < 0xffff); return Ordinal(_ordinal+((uint64_t)1<<32)); }
 		const Ordinal nextMinorIndex()		const { assert(minorIndex() < 0xffff); return Ordinal(_ordinal+((uint64_t)1<<16)); }
 		const Ordinal nextCounter()		const { assert(counter() < 0xffff); return Ordinal(_ordinal+((uint64_t)1<<0)); }
@@ -419,7 +419,8 @@ namespace relocatable {
 		struct AstTimeAndPath { uint64_t time; std::string path; };
 
 											File(const char* pth, time_t modTime, Ordinal ord)
-												: ld::File(pth, modTime, ord, Reloc) { }
+												: ld::File(pth, modTime, ord, Reloc) {
+												}
 		virtual								~File() {}
 		virtual DebugInfoKind				debugInfo() const = 0;
 		virtual const char*					debugInfoPath() const { return path(); }
