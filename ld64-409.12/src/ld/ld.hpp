@@ -48,7 +48,7 @@
 #define LDOrderedMap absl::btree_map
 #define LDMap absl::flat_hash_map
 #define LDSet absl::flat_hash_set
-#define LDOrderedSet std::set
+#define LDOrderedSet absl::btree_set
 
 struct CPointerHash {
 	std::size_t operator()(const char* __s) const {
@@ -1386,7 +1386,7 @@ public:
 		bool							hasExternalRelocs;
 	};
 	
-	typedef LDOrderedMap<const ld::Atom*, FinalSection*>	AtomToSection;
+	typedef LDMap<const ld::Atom*, FinalSection*>	AtomToSection;
 
 	virtual uint64_t					assignFileOffsets() = 0;
 	virtual void						setSectionSizesAndAlignments() = 0;

@@ -315,7 +315,7 @@ public:
 	uint32_t								_globalSymbolsCount;
 	uint32_t								_importSymbolsStartIndex;
 	uint32_t								_importSymbolsCount;
-	LDOrderedMap<const ld::Atom*, uint32_t>		_atomToSymbolIndex;
+	LDMap<const ld::Atom*, uint32_t>		_atomToSymbolIndex;
 	std::vector<RebaseInfo>					_rebaseInfo;
 	std::vector<BindingInfo>				_bindingInfo;
 	std::vector<BindingInfo>				_lazyBindingInfo;
