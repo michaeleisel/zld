@@ -844,11 +844,11 @@ private:
 												_lineInfoCount			: kLineInfoCountBits,
 												_unwindInfoCount		: kUnwindInfoCountBits;
 												
-	static LDOrderedMap<const ld::Atom*, const ld::File*> _s_fileOverride;
+	static LDMap<const ld::Atom*, const ld::File*> _s_fileOverride;
 };
 
 template <typename A>
-LDOrderedMap<const ld::Atom*, const ld::File*> Atom<A>::_s_fileOverride;
+LDMap<const ld::Atom*, const ld::File*> Atom<A>::_s_fileOverride;
 
 template <typename A>
 void Atom<A>::setFile(const ld::File* f) {
@@ -858,7 +858,7 @@ void Atom<A>::setFile(const ld::File* f) {
 template <typename A>
 const ld::File* Atom<A>::file() const
 {
-	LDOrderedMap<const ld::Atom*, const ld::File*>::iterator pos = _s_fileOverride.find(this);
+	LDMap<const ld::Atom*, const ld::File*>::iterator pos = _s_fileOverride.find(this);
 	if ( pos != _s_fileOverride.end() )
 		return pos->second;
 		
