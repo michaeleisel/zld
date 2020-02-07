@@ -871,7 +871,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n    cd \"${TARGET_BUILD_DIR}\"\n    cd ..\n    mkdir -p lib\n    cd lib\n    ln -s -f \"${DT_TOOLCHAIN_DIR}/usr/lib/libLTO.dylib\"\n    ln -s -f \"${DT_TOOLCHAIN_DIR}/usr/lib/libtapi.dylib\"\n    ln -s -f \"${DT_TOOLCHAIN_DIR}/usr/lib/libswiftDemangle.dylib\"\nfi\n\n";
+			shellScript = "\n    cd \"${TARGET_BUILD_DIR}\"\n    cd ..\n    mkdir -p lib\n    cd lib\n    ln -s -f \"${DT_TOOLCHAIN_DIR}/usr/lib/libLTO.dylib\"\n    ln -s -f \"${DT_TOOLCHAIN_DIR}/usr/lib/libtapi.dylib\"\n    ln -s -f \"${DT_TOOLCHAIN_DIR}/usr/lib/libswiftDemangle.dylib\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F96D5367094A2754008E9EE8 /* ShellScript */ = {

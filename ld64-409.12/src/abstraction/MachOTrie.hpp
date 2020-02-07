@@ -50,7 +50,7 @@ static size_t sBuckets[5];
 
 __attribute__((destructor)) static void asdfasdfsad() {
 	for (int i = 0; i < 5; i++) {
-		printf("f: %ld\n", sBuckets[i]);
+		//printf("f: %ld\n", sBuckets[i]);
 	}
 }
 

@@ -584,7 +584,7 @@ void File<A>::insertMembersToParse(std::vector<void *> &members, LDSet<std::stri
 			MemberState state = {result, member, false, false, memberIndex};*/
 		}
 	}
-	dispatch_group_wait(group, INT_MAX);
+	dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 	/*std::ostringstream os;
 	std::array<char, 128> buffer;
     std::string result;

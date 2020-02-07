@@ -298,6 +298,8 @@ public:
 	//
 	class Ordinal
 	{
+	public:
+		const uint64_t getNumber() const { return _ordinal; };
 	private:
 		// The actual numeric ordinal. Lower values have higher precedence and a zero value is invalid.
 		// The 64 bit ordinal is broken into 4 16 bit chunks. The high 16 bits are a "partition" that
@@ -1344,7 +1346,7 @@ struct CLDStringEquals
 {
 	bool operator()(LDString left, LDString right) const {
 		return left.length == right.length
-		  && (left.str == right.str || strcmp(left.str, right.str) == 0);
+		  && (left.str == right.str || memcmp(left.str, right.str, left.length) == 0);
     }
 };
 
