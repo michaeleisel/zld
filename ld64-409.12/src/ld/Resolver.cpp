@@ -825,6 +825,8 @@ void Resolver::convertReferencesToIndirect(const ld::Atom& atom, FastFileMap *fi
 	SymbolTable::IndirectBindingSlot slot;
 	const ld::Atom* dummy;
 	ld::Fixup::iterator end = atom.fixupsEnd();
+	int count = 0;
+	int count2 = 0;
 	for (ld::Fixup::iterator fit=atom.fixupsBegin(); fit != end; ++fit) {
 		if ( fit->kind == ld::Fixup::kindLinkerOptimizationHint )
 			_internal.someObjectHasOptimizationHints = true;
@@ -847,11 +849,13 @@ void Resolver::convertReferencesToIndirect(const ld::Atom& atom, FastFileMap *fi
 						assert(0 && "wrong combine type for bind by content");
 						break;
 					case ld::Atom::combineByNameAndContent:
+    					count2++;
 						slot = _symbolTable.findSlotForContent(fit->u.target, &dummy);
 						fit->binding = ld::Fixup::bindingsIndirectlyBound;
 						fit->u.bindingIndex = slot;
 						break;
 					case ld::Atom::combineByNameAndReferences:
+    					count2++;
 						slot = _symbolTable.findSlotForReferences(fit->u.target, &dummy);
 						fit->binding = ld::Fixup::bindingsIndirectlyBound;
 						fit->u.bindingIndex = slot;
@@ -864,6 +868,7 @@ void Resolver::convertReferencesToIndirect(const ld::Atom& atom, FastFileMap *fi
 				break;
 		}
 	}
+	//printf("z %d %d\n", count, count2);
 }
 
 
