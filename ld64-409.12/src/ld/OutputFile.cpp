@@ -5686,8 +5686,6 @@ void OutputFile::writeJSONEntry(ld::Internal& state)
 	}
 }
 
-//static size_t zzcount = 0;
-	
 // used to sort atoms with debug notes
 class DebugNoteSorter
 {
@@ -5697,21 +5695,22 @@ public:
 		// first sort by reader
 		ld::File::Ordinal leftFileOrdinal  = left->file()->ordinal();
 		ld::File::Ordinal rightFileOrdinal = right->file()->ordinal();
-		/*zzcount++;
-		printf("%llu, %llu, %llu, %llu\n", left->file()->ordinal().getNumber() >> 48, left->file()->ordinal().getNumber() >> 32 & 0xF, left->file()->ordinal().getNumber() >> 16 & 0xF, left->file()->ordinal().getNumber() & 0xF);
-		if (zzcount > 3000) {
-			abort();
-		}*/
 		if ( leftFileOrdinal!= rightFileOrdinal)
 			return (leftFileOrdinal < rightFileOrdinal);
 
 		// then sort by atom objectAddress
-		uint64_t leftAddr  = left->finalAddress();
-		uint64_t rightAddr = right->finalAddress();
-		return leftAddr < rightAddr;
+		return left->finalAddress() < right->finalAddress();
 	}
 };
 
+class DebugNoteSorter2
+{
+public:
+	bool operator()(const ld::Atom* left, const ld::Atom* right) const
+	{
+		return left->finalAddress() < right->finalAddress();
+	}
+};
 
 const char* OutputFile::assureFullPath(const char* path)
 {
@@ -5802,9 +5801,35 @@ void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 			}
 		}
 	}
-	
+
 	// sort by file ordinal then atom ordinal
-	std::sort(atomsNeedingDebugNotes.begin(), atomsNeedingDebugNotes.end(), DebugNoteSorter());
+	uint16_t partitionMask = 0;
+	uint16_t maxMajorIndex = 0;
+	for (auto atom : atomsNeedingDebugNotes) {
+		auto ordinal = atom->file()->ordinal();
+		partitionMask |= ordinal.partition();
+		if (ordinal.majorIndex() > maxMajorIndex) {
+    		maxMajorIndex = ordinal.majorIndex();
+		}
+	}
+	if (partitionMask == 0 && maxMajorIndex > 1000) {
+    	std::sort(atomsNeedingDebugNotes.begin(), atomsNeedingDebugNotes.end(), DebugNoteSorter());
+	} else {
+		std::vector<const ld::Atom *> buckets[maxMajorIndex + 1];
+    	for (auto atom : atomsNeedingDebugNotes) {
+			auto idx = atom->file()->ordinal().majorIndex();
+			buckets[idx].push_back(atom);
+		}
+		std::vector<const ld::Atom *> finalSorted;
+		finalSorted.reserve(atomsNeedingDebugNotes.size());
+		for (size_t i = 0; i <= maxMajorIndex; i++) {
+			auto bucket = buckets[i];
+			std::sort(bucket.begin(), bucket.end(), DebugNoteSorter2());
+			finalSorted.insert(finalSorted.end(), bucket.begin(), bucket.end());
+		}
+		atomsNeedingDebugNotes = finalSorted;
+	}
+	//printf("234 %hu\n", maxMajorIndex);
 
 	// <rdar://problem/17689030> Add -add_ast_path option to linker which add N_AST stab entry to output
 	LDOrderedSet<std::string> seenAstPaths;

@@ -92,11 +92,11 @@ private:
 	void						makePersonalityIndexes(std::vector<UnwindEntry>& entries, 
 														LDOrderedMap<const ld::Atom*, uint32_t>& personalityIndexMap);
 	void						findCommonEncoding(const std::vector<UnwindEntry>& entries, 
-													LDOrderedMap<compact_unwind_encoding_t, unsigned int>& commonEncodings);
+													LDMap<compact_unwind_encoding_t, unsigned int>& commonEncodings);
 	void						makeLsdaIndex(const std::vector<UnwindEntry>& entries, std::vector<LSDAEntry>& lsdaIndex, 
 																LDOrderedMap<const ld::Atom*, uint32_t>& lsdaIndexOffsetMap);
 	unsigned int				makeCompressedSecondLevelPage(const std::vector<UnwindEntry>& uniqueInfos,   
-													const LDOrderedMap<compact_unwind_encoding_t,unsigned int> commonEncodings,  
+													const LDMap<compact_unwind_encoding_t,unsigned int> commonEncodings,
 													uint32_t pageSize, unsigned int endIndex, uint8_t*& pageEnd);
 	unsigned int				makeRegularSecondLevelPage(const std::vector<UnwindEntry>& uniqueInfos, uint32_t pageSize,  
 															unsigned int endIndex, uint8_t*& pageEnd);
@@ -148,7 +148,7 @@ UnwindInfoAtom<A>::UnwindInfoAtom(const std::vector<UnwindEntry>& entries, uint6
 	}
 
 	// put the most common encodings into the common table, but at most 127 of them
-	LDOrderedMap<compact_unwind_encoding_t, unsigned int> commonEncodings;
+	LDMap<compact_unwind_encoding_t, unsigned int> commonEncodings;
 	findCommonEncoding(uniqueEntries, commonEncodings);
 	
 	// build lsda index
@@ -232,7 +232,7 @@ UnwindInfoAtom<A>::UnwindInfoAtom(const std::vector<UnwindEntry>& entries, uint6
 	
 	// copy common encodings
 	uint32_t* commonEncodingsTable = (uint32_t*)&_header[commonEncodingsArraySectionOffset];
-	for (LDOrderedMap<uint32_t, unsigned int>::iterator it=commonEncodings.begin(); it != commonEncodings.end(); ++it)
+	for (LDMap<uint32_t, unsigned int>::iterator it=commonEncodings.begin(); it != commonEncodings.end(); ++it)
 		E::set32(commonEncodingsTable[it->second], it->first);
 		
 	// make references for personality entries
@@ -351,16 +351,16 @@ void UnwindInfoAtom<A>::makePersonalityIndexes(std::vector<UnwindEntry>& entries
 
 template <typename A>
 void UnwindInfoAtom<A>::findCommonEncoding(const std::vector<UnwindEntry>& entries, 
-											LDOrderedMap<compact_unwind_encoding_t, unsigned int>& commonEncodings)
+											LDMap<compact_unwind_encoding_t, unsigned int>& commonEncodings)
 {
 	// scan infos to get frequency counts for each encoding
-	LDOrderedMap<compact_unwind_encoding_t, unsigned int> encodingsUsed;
+	LDMap<compact_unwind_encoding_t, unsigned int> encodingsUsed;
 	unsigned int mostCommonEncodingUsageCount = 0;
 	for(std::vector<UnwindEntry>::const_iterator it=entries.begin(); it != entries.end(); ++it) {
 		// never put dwarf into common table
 		if ( encodingMeansUseDwarf(it->encoding) )
 			continue;
-		LDOrderedMap<compact_unwind_encoding_t, unsigned int>::iterator pos = encodingsUsed.find(it->encoding);
+		LDMap<compact_unwind_encoding_t, unsigned int>::iterator pos = encodingsUsed.find(it->encoding);
 		if ( pos == encodingsUsed.end() ) {
 			encodingsUsed[it->encoding] = 1;
 		}
@@ -372,7 +372,7 @@ void UnwindInfoAtom<A>::findCommonEncoding(const std::vector<UnwindEntry>& entri
 	}
 	// put the most common encodings into the common table, but at most 127 of them
 	for(unsigned int usages=mostCommonEncodingUsageCount; usages > 1; --usages) {
-		for (LDOrderedMap<compact_unwind_encoding_t, unsigned int>::iterator euit=encodingsUsed.begin(); euit != encodingsUsed.end(); ++euit) {
+		for (LDMap<compact_unwind_encoding_t, unsigned int>::iterator euit=encodingsUsed.begin(); euit != encodingsUsed.end(); ++euit) {
 			if ( euit->second == usages ) {
 				unsigned int sz = commonEncodings.size();
 				if ( sz < 127 ) {
@@ -638,7 +638,7 @@ unsigned int UnwindInfoAtom<A>::makeRegularSecondLevelPage(const std::vector<Unw
 
 template <typename A>
 unsigned int UnwindInfoAtom<A>::makeCompressedSecondLevelPage(const std::vector<UnwindEntry>& uniqueInfos,   
-													const LDOrderedMap<compact_unwind_encoding_t,unsigned int> commonEncodings,  
+													const LDMap<compact_unwind_encoding_t,unsigned int> commonEncodings,
 													uint32_t pageSize, unsigned int endIndex, uint8_t*& pageEnd)
 {
 	if (_s_log) fprintf(stderr, "makeCompressedSecondLevelPage(pageSize=%u, endIndex=%u)\n", pageSize, endIndex);
@@ -658,7 +658,7 @@ unsigned int UnwindInfoAtom<A>::makeCompressedSecondLevelPage(const std::vector<
 		const UnwindEntry& info = uniqueInfos[index--];
 		// compute encoding index
 		unsigned int encodingIndex;
-		LDOrderedMap<compact_unwind_encoding_t, unsigned int>::const_iterator pos = commonEncodings.find(info.encoding);
+		LDMap<compact_unwind_encoding_t, unsigned int>::const_iterator pos = commonEncodings.find(info.encoding);
 		if ( pos != commonEncodings.end() ) {
 			encodingIndex = pos->second;
 			if (_s_log) fprintf(stderr, "makeCompressedSecondLevelPage(): funcIndex=%d, re-use commonEncodings[%d]=0x%08X\n", index, encodingIndex, info.encoding);
@@ -744,7 +744,7 @@ unsigned int UnwindInfoAtom<A>::makeCompressedSecondLevelPage(const std::vector<
 			encodingIndex = pageSpecificEncodings[info.encoding+i];
 		}
 		else {
-			LDOrderedMap<uint32_t, unsigned int>::const_iterator pos = commonEncodings.find(info.encoding);
+			LDMap<uint32_t, unsigned int>::const_iterator pos = commonEncodings.find(info.encoding);
 			if ( pos != commonEncodings.end() ) 
 				encodingIndex = pos->second;
 			else 
