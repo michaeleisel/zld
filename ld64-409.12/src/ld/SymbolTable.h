@@ -49,6 +49,7 @@
 //#include "absl/container/flat_hash_map.h"
 //#include "absl/container/btree_map.h"
 #include <sparsehash/dense_hash_map>
+#include <deque>
 
 namespace ld {
 namespace tool {
@@ -60,7 +61,8 @@ public:
 	//~SymbolTable();
 
 private:
-	typedef google::dense_hash_map<LDString, IndirectBindingSlot, CLDStringHash, CLDStringEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
+	typedef google::dense_hash_map<LDString *, IndirectBindingSlot, CLDStringPointerHash, CLDStringPointerEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
+	std::deque<LDString> _stringCache;
 
 	class ContentFuncs {
 	public:

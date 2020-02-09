@@ -1332,6 +1332,12 @@ static inline LDString LDStringCreate(const char *str) {
 	};
 }
 
+struct CLDStringPointerHash {
+	size_t operator()(LDString *__s) const {
+		return __s->hash;
+	}
+};
+
 struct CLDStringHash {
 	size_t operator()(LDString __s) const {
 		return __s.hash;
@@ -1344,6 +1350,16 @@ struct CStringHash {
 		int len = strlen(__s);
 		return CRCHash(__s, len);
 	};
+};
+
+struct CLDStringPointerEquals
+{
+	bool operator()(LDString *leftPtr, LDString *rightPtr) const {
+		LDString left = *leftPtr;
+		LDString right = *rightPtr;
+		return left.hash == right.hash && left.length == right.length
+		&& (left.str == right.str || memcmp(left.str, right.str, left.length) == 0);
+	}
 };
 
 struct CLDStringEquals

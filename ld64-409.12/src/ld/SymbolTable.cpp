@@ -66,7 +66,8 @@ SymbolTable::SymbolTable(const Options& opts, std::vector<const ld::Atom*>& ibt)
 	string.str = NULL;
 	string.length = 0;
 	string.hash = 0;
-	_byNameTable.set_empty_key(string);
+	_stringCache.emplace_back(string);
+	_byNameTable.set_empty_key(&(_stringCache.back()));
 	_byNameTable.min_load_factor(0.0);
 	_s_indirectBindingTable = this;
 }
@@ -551,7 +552,7 @@ void SymbolTable::undefines(std::vector<const char*>& undefs)
 	for (NameToSlot::iterator it=_byNameTable.begin(); it != _byNameTable.end(); ++it) {
 		//fprintf(stderr, "  _byNameTable[%s] = slot %d which has atom %p\n", it->first, it->second, _indirectBindingTable[it->second]);
 		if ( _indirectBindingTable[it->second] == NULL )
-			undefs.push_back(it->first.str);
+			undefs.push_back(it->first->str);
 	}
 	// sort so that undefines are in a stable order (not dependent on hashing functions)
 	struct StrcmpSorter strcmpSorter;
@@ -563,7 +564,7 @@ void SymbolTable::tentativeDefs(std::vector<const char*>& tents)
 {
 	// return all names in _byNameTable that have no associated atom
 	for (NameToSlot::iterator it=_byNameTable.begin(); it != _byNameTable.end(); ++it) {
-		const char* name = it->first.str;
+		const char* name = it->first->str;
 		const ld::Atom* atom = _indirectBindingTable[it->second];
 		if ( (atom != NULL) && (atom->definition() == ld::Atom::definitionTentative) )
 			tents.push_back(name);
@@ -576,7 +577,7 @@ void SymbolTable::mustPreserveForBitcode(LDSet<const char*>& syms)
 {
 	// return all names in _byNameTable that have no associated atom
 	for (const auto &entry: _byNameTable) {
-		const char* name = entry.first.str;
+		const char* name = entry.first->str;
 		const ld::Atom* atom = _indirectBindingTable[entry.second];
 		if ( (atom == NULL) || (atom->definition() == ld::Atom::definitionProxy) )
 			syms.insert(name);
@@ -587,7 +588,7 @@ void SymbolTable::mustPreserveForBitcode(LDSet<const char*>& syms)
 bool SymbolTable::hasName(const char* name)			
 {
 	LDString string = LDStringCreate(name);
-	NameToSlot::iterator pos = _byNameTable.find(string);
+	NameToSlot::iterator pos = _byNameTable.find(&string);
 	if ( pos == _byNameTable.end() ) 
 		return false;
 	return (_indirectBindingTable[pos->second] != NULL); 
@@ -636,15 +637,18 @@ static int nfoundz = 0;
 SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name, FastFileMap *seenPerFile)
 {
 	LDString string = LDStringCreate(name);
-	NameToSlot::iterator pos = _byNameTable.find(string);
-	if ( pos != _byNameTable.end() )  {
+	//auto start = _byNameTable.begin(iter);
+	NameToSlot::iterator pos = _byNameTable.find(&string);
+	if ( pos != _byNameTable.end() ) {
 		IndirectBindingSlot slot = pos->second;
+		pos->first->str = name;
 		return slot;
 	}
 	// create new slot for this name
 	SymbolTable::IndirectBindingSlot slot = _indirectBindingTable.size();
 	_indirectBindingTable.push_back(NULL);
-	_byNameTable[string] = slot;
+	_stringCache.emplace_back(string);
+	_byNameTable[&(_stringCache.back())] = slot;
 	auto diff = slot - _byNameReverseTable.size();
 	for (unsigned long i = 0; i < diff; i++) {
 		//printf("bak\n");
@@ -668,12 +672,12 @@ void SymbolTable::removeDeadAtoms()
 				// <rdar://problem/16025786> need to completely remove dead atoms from symbol table
 				_byNameReverseTable[slot] = NULL;
 				// can't remove while iterating, do it after iteration
-				namesToRemove.push_back(it->first);
+				namesToRemove.push_back(*it->first);
 			}
 		}
 	}
 	for (std::vector<LDString>::iterator it = namesToRemove.begin(); it != namesToRemove.end(); ++it) {
-		_byNameTable.erase(*it);
+		_byNameTable.erase(&(*it));
 	}
 
 	// remove dead atoms from _nonLazyPointerTable
@@ -948,7 +952,8 @@ void SymbolTable::removeDeadUndefs(std::vector<const ld::Atom*>& allAtoms, const
 				const char* name = atom->name();
 				_indirectBindingTable[slot] = NULL;
 				_byNameReverseTable[slot] = NULL;
-				_byNameTable.erase(LDStringCreate(name));
+				auto string = LDStringCreate(name);
+				_byNameTable.erase(&string);
 				allAtoms.erase(std::remove(allAtoms.begin(), allAtoms.end(), atom), allAtoms.end());
 			}
 		}
