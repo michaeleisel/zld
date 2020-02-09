@@ -169,9 +169,9 @@ void OutputFile::write(ld::Internal& state)
 	//dispatch_group_enter(group);
 	dispatch_group_async(group, queue, ^{
 		this->buildSymbolTable(state);
+		this->updateLINKEDITAddresses(state);
 	});
 	dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
-	this->updateLINKEDITAddresses(state);
 	//dispatch_group_notify(group, dispatch_get_main_queue(), ^{
 	this->generateLinkEditInfo(state);
 	if ( _options.sharedRegionEncodingV2() )
