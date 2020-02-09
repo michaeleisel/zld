@@ -541,9 +541,9 @@ namespace archive {
 												: ld::File(pth, modTime, ord, Archive) { }
 		virtual								~File() {}
 		virtual bool						justInTimeDataOnlyforEachAtom(const char* name, AtomHandler&) const = 0;
-		virtual void insertMembersToParse(std::vector<void *> &members, LDSet<std::string> set) const = 0;
     	virtual void dumpMembersParsed(std::ofstream &stream) const = 0;
-		virtual void parseInParallel(std::vector <void *>&members) const = 0;
+		virtual std::vector<void *> membersToParse(LDSet<std::string> &set) const = 0;
+		virtual void parseMember(void *member) const = 0;
 	};
 } // namespace archive 
 

@@ -42,6 +42,7 @@
 #include <mach-o/fat.h>
 #include <sys/sysctl.h>
 #include <libkern/OSAtomic.h>
+#include <Foundation/Foundation.h>
 
 #include <fstream>
 #include <string>
@@ -1336,7 +1337,20 @@ void InputFiles::preParseLibraries() const {
 		}
 	}
 	map[currentLib] = currentSet;
-	std::vector<void *> members;
+	auto queue = [[NSOperationQueue alloc] init];
+	queue.qualityOfService = NSQualityOfServiceUserInteractive;
+	// initialize info for parsing input files on worker threads
+	unsigned int ncpus;
+	int mib[2];
+	size_t len = sizeof(ncpus);
+	mib[0] = CTL_HW;
+	mib[1] = HW_NCPU;
+	auto res = sysctl(mib, 2, &ncpus, &len, NULL, 0);
+	if (res != 0) {
+		ncpus = 1;
+	}
+	queue.maxConcurrentOperationCount = ncpus;
+
     for (std::vector<LibraryInfo>::const_iterator it=_searchLibraries.begin(); it != _searchLibraries.end(); ++it) {
 		auto lib = *it;
 		if (lib.isDylib()) {
@@ -1352,9 +1366,15 @@ void InputFiles::preParseLibraries() const {
 			if (it == map.end()) {
 				continue;
 			}
-			archiveFile->insertMembersToParse(members, it->second);
+			auto members = archiveFile->membersToParse(it->second);
+			for (auto member : members) {
+				[queue addOperationWithBlock:^{
+    				archiveFile->parseMember(member);
+				}];
+			}
 		}
 	}
+	[queue waitUntilAllOperationsAreFinished];
 }
 
 void InputFiles::dumpMembersParsed(std::ofstream &stream) const {

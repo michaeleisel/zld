@@ -38,6 +38,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <dispatch/dispatch.h>
+#include <sys/sysctl.h>
 
 #include "MachOFileAbstraction.hpp"
 #include "Architectures.hpp"
@@ -45,6 +46,8 @@
 #include "macho_relocatable_file.h"
 #include "lto_file.h"
 #include "archive_file.h"
+//#include <Foundation/Foundation.h>
+#include <QuartzCore/QuartzCore.h>
 
 template <class A>
 void pp(LDSet<A> set) {
@@ -91,8 +94,8 @@ public:
 	virtual											~File() {}
 
 	virtual void dumpMembersParsed(std::ofstream &stream) const;
-	virtual void parseInParallel(std::vector <void *>&members) const;
-	virtual void insertMembersToParse(std::vector<void *> &members, LDSet<std::string> set) const ;
+	virtual std::vector<void *> membersToParse(LDSet<std::string> &set) const;
+	virtual void parseMember(void *member) const;
 	// overrides of ld::File
 	virtual bool										forEachAtom(ld::File::AtomHandler&) const;
 	virtual bool										justInTimeforEachAtom(const char* name, ld::File::AtomHandler&) const;
@@ -555,36 +558,32 @@ void File<A>::dumpMembersParsed(std::ofstream &stream) const {
 	}
 }
 
-// Should be static, but is not
 template <typename A>
-void File<A>::parseInParallel(std::vector <void *>&members) const {
-	//static_cast<std::vector<Entry *>&>(members);
+void File<A>::parseMember(void *member) const {
+	makeObjectFileForMember((const Entry *)member);
 }
 
 template <typename A>
-void File<A>::insertMembersToParse(std::vector<void *> &members, LDSet<std::string> set) const {
+std::vector<void *> File<A>::membersToParse(LDSet<std::string> &set) const {
+	auto start = CACurrentMediaTime();
 	LDSet<uint64_t> offsets;
 	for (auto &[k, v] : _hashTable) {
 		offsets.insert(v);
 	}
 	char name[256];
-	dispatch_group_t group = dispatch_group_create();
-	dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0);
+	//dispatch_group_t group = dispatch_group_create();
+	//dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0);
+	std::vector<void *> membersToParse;
 	for (auto offset : offsets) {
 		Entry *member = (Entry *)(&_archiveFileContent[offset]);
 		member->getName(name, sizeof(name));
 		if (set.count(std::string(name)) != 0) {
-			dispatch_group_async(group, queue, ^{
-				makeObjectFileForMember(member);
-			});
-			//members.push_back((void *)entry);
-			/*ld::relocatable::File* result = mach_o::relocatable::parse(member->content(), member->contentSize(),
-																	   mPath, member->modificationTime(),
-																	   ordinal, _objOpts);
-			MemberState state = {result, member, false, false, memberIndex};*/
+			membersToParse.push_back(member);
 		}
 	}
-	dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+	auto end = CACurrentMediaTime();
+	printf("asdff %lf\n", end - start);
+	return membersToParse;
 	/*std::ostringstream os;
 	std::array<char, 128> buffer;
     std::string result;

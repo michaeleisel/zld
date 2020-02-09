@@ -64,12 +64,12 @@
 		F9AA44DC1294885F00CB8390 /* branch_shim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9AA44DA1294885F00CB8390 /* branch_shim.cpp */; };
 		F9AA65111051BD2B003E3539 /* stubs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9AA65101051BD2B003E3539 /* stubs.cpp */; };
 		F9AA65891051E750003E3539 /* macho_relocatable_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9AA65871051E750003E3539 /* macho_relocatable_file.cpp */; };
-		F9AA65DD1051EC4A003E3539 /* archive_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9AA65D71051EC4A003E3539 /* archive_file.cpp */; };
+		F9AA65DD1051EC4A003E3539 /* archive_file.mm in Sources */ = {isa = PBXBuildFile; fileRef = F9AA65D71051EC4A003E3539 /* archive_file.mm */; };
 		F9AA65DE1051EC4A003E3539 /* lto_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9AA65D91051EC4A003E3539 /* lto_file.cpp */; };
 		F9AA65DF1051EC4A003E3539 /* macho_dylib_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9AA65DB1051EC4A003E3539 /* macho_dylib_file.cpp */; };
 		F9AA6786105700C2003E3539 /* opaque_section_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9AA6784105700C2003E3539 /* opaque_section_file.cpp */; };
 		F9AA67B610570C41003E3539 /* dtrace_dof.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9AA67B510570C41003E3539 /* dtrace_dof.cpp */; };
-		F9AA687C10572E27003E3539 /* InputFiles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9AA687A10572E27003E3539 /* InputFiles.cpp */; };
+		F9AA687C10572E27003E3539 /* InputFiles.mm in Sources */ = {isa = PBXBuildFile; fileRef = F9AA687A10572E27003E3539 /* InputFiles.mm */; };
 		F9AA69B610583C0C003E3539 /* SymbolTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9AA69B410583C0C003E3539 /* SymbolTable.cpp */; };
 		F9AA69C110583E19003E3539 /* Resolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9AA69BF10583E19003E3539 /* Resolver.cpp */; };
 		F9AA6FF910618CD2003E3539 /* macho_relocatable_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9AA65871051E750003E3539 /* macho_relocatable_file.cpp */; };
@@ -324,7 +324,7 @@
 		F9AA65101051BD2B003E3539 /* stubs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stubs.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA65871051E750003E3539 /* macho_relocatable_file.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = macho_relocatable_file.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA65881051E750003E3539 /* macho_relocatable_file.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = macho_relocatable_file.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
-		F9AA65D71051EC4A003E3539 /* archive_file.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = archive_file.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
+		F9AA65D71051EC4A003E3539 /* archive_file.mm */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = archive_file.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA65D81051EC4A003E3539 /* archive_file.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = archive_file.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA65D91051EC4A003E3539 /* lto_file.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lto_file.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA65DA1051EC4A003E3539 /* lto_file.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = lto_file.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
@@ -334,7 +334,7 @@
 		F9AA6785105700C2003E3539 /* opaque_section_file.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = opaque_section_file.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA67B410570C41003E3539 /* dtrace_dof.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = dtrace_dof.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA67B510570C41003E3539 /* dtrace_dof.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dtrace_dof.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
-		F9AA687A10572E27003E3539 /* InputFiles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = InputFiles.cpp; path = src/ld/InputFiles.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
+		F9AA687A10572E27003E3539 /* InputFiles.mm */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = InputFiles.mm; path = src/ld/InputFiles.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA687B10572E27003E3539 /* InputFiles.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; name = InputFiles.h; path = src/ld/InputFiles.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA69B410583C0C003E3539 /* SymbolTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SymbolTable.cpp; path = src/ld/SymbolTable.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA69B510583C0C003E3539 /* SymbolTable.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; name = SymbolTable.h; path = src/ld/SymbolTable.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
@@ -539,7 +539,7 @@
 				F91B7B0218987D5F0099486F /* libunwind */,
 				F9AA6784105700C2003E3539 /* opaque_section_file.cpp */,
 				F9AA6785105700C2003E3539 /* opaque_section_file.h */,
-				F9AA65D71051EC4A003E3539 /* archive_file.cpp */,
+				F9AA65D71051EC4A003E3539 /* archive_file.mm */,
 				F9AA65D81051EC4A003E3539 /* archive_file.h */,
 				F9AA65D91051EC4A003E3539 /* lto_file.cpp */,
 				F9AA65DA1051EC4A003E3539 /* lto_file.h */,
@@ -583,7 +583,7 @@
 				F9AA69C010583E19003E3539 /* Resolver.h */,
 				F9AA69B410583C0C003E3539 /* SymbolTable.cpp */,
 				F9AA69B510583C0C003E3539 /* SymbolTable.h */,
-				F9AA687A10572E27003E3539 /* InputFiles.cpp */,
+				F9AA687A10572E27003E3539 /* InputFiles.mm */,
 				4C7D5B8623D8F336006E515E /* libhash2.a */,
 				4C7D5B8323D8D46B006E515E /* hash.h */,
 				F9AA687B10572E27003E3539 /* InputFiles.h */,
@@ -1021,11 +1021,11 @@
 				F9C0D4BD06DD28D2001C7193 /* Options.cpp in Sources */,
 				F9023C4E06D5A272001BBF46 /* ld.cpp in Sources */,
 				F9AA65891051E750003E3539 /* macho_relocatable_file.cpp in Sources */,
-				F9AA65DD1051EC4A003E3539 /* archive_file.cpp in Sources */,
+				F9AA65DD1051EC4A003E3539 /* archive_file.mm in Sources */,
 				F9AA65DE1051EC4A003E3539 /* lto_file.cpp in Sources */,
 				F9AA65DF1051EC4A003E3539 /* macho_dylib_file.cpp in Sources */,
 				F9EA7584097882F3008B4F1D /* debugline.c in Sources */,
-				F9AA687C10572E27003E3539 /* InputFiles.cpp in Sources */,
+				F9AA687C10572E27003E3539 /* InputFiles.mm in Sources */,
 				F9AA69B610583C0C003E3539 /* SymbolTable.cpp in Sources */,
 				F9AA69C110583E19003E3539 /* Resolver.cpp in Sources */,
 				F989D30D106826020014B60C /* OutputFile.cpp in Sources */,
@@ -1324,6 +1324,7 @@
 					"$(OTHER_CPLUSPLUSFLAGS)",
 				);
 				OTHER_LDFLAGS = (
+					"$(inherited)",
 					"-stdlib=libc++",
 					"-lxar",
 					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
