@@ -46,10 +46,10 @@
 #include "absl/hash/hash.h"*/
 #include <nmmintrin.h>
 
-#define LDOrderedMap std::map
-#define LDMap std::unordered_map
-#define LDSet std::unordered_set
-#define LDOrderedSet std::set
+#define LDOrderedMap std::map //absl::btree_map
+#define LDMap std::unordered_map //absl::flat_hash_map
+#define LDSet std::unordered_set //absl::flat_hash_set
+#define LDOrderedSet std::set //absl::btree_set
 
 struct CPointerHash {
 	std::size_t operator()(const char* __s) const {
@@ -1295,14 +1295,8 @@ size_t rem;
 typedef struct {
 	const char *str;
 	size_t length;
+	size_t hash;
 } LDString;
-
-static inline LDString LDStringCreate(const char *str) {
-	return (LDString){
-		.str = str,
-		.length = strlen(str),
-	};
-}
 
 static inline size_t CRCHash(const char *__s, size_t len) {
 	uint32_t __h = 0;
@@ -1329,9 +1323,18 @@ static inline size_t CRCHash(const char *__s, size_t len) {
 	return (size_t)__h;
 }
 
+static inline LDString LDStringCreate(const char *str) {
+	auto length = strlen(str);
+	return (LDString){
+		.str = str,
+		.length = length,
+		.hash = CRCHash(str, length),
+	};
+}
+
 struct CLDStringHash {
 	size_t operator()(LDString __s) const {
-		return CRCHash(__s.str, __s.length);
+		return __s.hash;
 	}
 };
 
@@ -1346,7 +1349,7 @@ struct CStringHash {
 struct CLDStringEquals
 {
 	bool operator()(LDString left, LDString right) const {
-		return left.length == right.length
+		return left.hash == right.hash && left.length == right.length
 		  && (left.str == right.str || memcmp(left.str, right.str, left.length) == 0);
     }
 };

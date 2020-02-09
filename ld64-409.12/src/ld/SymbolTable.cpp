@@ -60,10 +60,20 @@ static ld::IndirectBindingTable*	_s_indirectBindingTable = NULL;
 
 
 SymbolTable::SymbolTable(const Options& opts, std::vector<const ld::Atom*>& ibt) 
-	: _options(opts), _cstringTable(6151), _indirectBindingTable(ibt), _hasExternalTentativeDefinitions(false)
-{  
+	: _options(opts), _byNameTable(405000), _cstringTable(6151), _indirectBindingTable(ibt), _hasExternalTentativeDefinitions(false)
+{
+	LDString string;
+	string.str = NULL;
+	string.length = 0;
+	string.hash = 0;
+	_byNameTable.set_empty_key(string);
+	_byNameTable.min_load_factor(0.0);
 	_s_indirectBindingTable = this;
 }
+
+/*SymbolTable::~SymbolTable() {
+	printf("~%ld\n", _byNameTable.size());
+}*/
 
 
 size_t SymbolTable::ContentFuncs::operator()(const ld::Atom* atom) const
@@ -635,7 +645,12 @@ SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name, 
 	SymbolTable::IndirectBindingSlot slot = _indirectBindingTable.size();
 	_indirectBindingTable.push_back(NULL);
 	_byNameTable[string] = slot;
-	_byNameReverseTable[slot] = name;
+	auto diff = slot - _byNameReverseTable.size();
+	for (unsigned long i = 0; i < diff; i++) {
+		//printf("bak\n");
+		_byNameReverseTable.push_back(NULL);
+	}
+	_byNameReverseTable.push_back(name);
 	return slot;
 }
 
@@ -651,7 +666,7 @@ void SymbolTable::removeDeadAtoms()
 				//fprintf(stderr, "removing from symbolTable[%u] %s\n", slot, atom->name());
 				_indirectBindingTable[slot] = NULL;
 				// <rdar://problem/16025786> need to completely remove dead atoms from symbol table
-				_byNameReverseTable.erase(slot);
+				_byNameReverseTable[slot] = NULL;
 				// can't remove while iterating, do it after iteration
 				namesToRemove.push_back(it->first);
 			}
@@ -890,11 +905,14 @@ const char*	SymbolTable::indirectName(IndirectBindingSlot slot) const
 		return target->name();
 	}
 	// handle case when by-name reference is indirected and no atom yet in _byNameTable
-	SlotToName::const_iterator pos = _byNameReverseTable.find(slot);
-	if ( pos != _byNameReverseTable.end() )
-		return pos->second;
-	assert(0);
-	return NULL;
+	if ( slot >= 0 && slot < _byNameReverseTable.size()) {
+		auto name = _byNameReverseTable[slot];
+		if (name != NULL) {
+			return name;
+		}
+	}
+    assert(0);
+    return NULL;
 }
 
 const ld::Atom* SymbolTable::indirectAtom(IndirectBindingSlot slot) const
@@ -929,7 +947,7 @@ void SymbolTable::removeDeadUndefs(std::vector<const ld::Atom*>& allAtoms, const
 			if ( (atom != nullptr) && (atom->definition() == ld::Atom::definitionProxy) && (keep.count(atom) == 0) ) {
 				const char* name = atom->name();
 				_indirectBindingTable[slot] = NULL;
-				_byNameReverseTable.erase(slot);
+				_byNameReverseTable[slot] = NULL;
 				_byNameTable.erase(LDStringCreate(name));
 				allAtoms.erase(std::remove(allAtoms.begin(), allAtoms.end(), atom), allAtoms.end());
 			}

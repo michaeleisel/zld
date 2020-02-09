@@ -47,7 +47,6 @@
 #include "lto_file.h"
 #include "archive_file.h"
 //#include <Foundation/Foundation.h>
-#include <QuartzCore/QuartzCore.h>
 
 template <class A>
 void pp(LDSet<A> set) {
@@ -565,7 +564,7 @@ void File<A>::parseMember(void *member) const {
 
 template <typename A>
 std::vector<void *> File<A>::membersToParse(LDSet<std::string> &set) const {
-	auto start = CACurrentMediaTime();
+	//auto start = CACurrentMediaTime();
 	LDSet<uint64_t> offsets;
 	for (auto &[k, v] : _hashTable) {
 		offsets.insert(v);
@@ -581,8 +580,8 @@ std::vector<void *> File<A>::membersToParse(LDSet<std::string> &set) const {
 			membersToParse.push_back(member);
 		}
 	}
-	auto end = CACurrentMediaTime();
-	printf("asdff %lf\n", end - start);
+	//auto end = CACurrentMediaTime();
+	//printf("asdff %lf\n", end - start);
 	return membersToParse;
 	/*std::ostringstream os;
 	std::array<char, 128> buffer;

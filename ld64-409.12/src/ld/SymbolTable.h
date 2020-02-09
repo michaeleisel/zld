@@ -48,6 +48,7 @@
 #include "ld.hpp"
 //#include "absl/container/flat_hash_map.h"
 //#include "absl/container/btree_map.h"
+#include <sparsehash/dense_hash_map>
 
 namespace ld {
 namespace tool {
@@ -56,9 +57,10 @@ class SymbolTable : public ld::IndirectBindingTable
 {
 public:
 	typedef uint32_t IndirectBindingSlot;
+	//~SymbolTable();
 
 private:
-	typedef LDMap<LDString, IndirectBindingSlot, CLDStringHash, CLDStringEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
+	typedef google::dense_hash_map<LDString, IndirectBindingSlot, CLDStringHash, CLDStringEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
 
 	class ContentFuncs {
 	public:
@@ -88,7 +90,7 @@ private:
 	};
 	typedef LDMap<const ld::Atom*, IndirectBindingSlot, UTF16StringHashFuncs, UTF16StringHashFuncs> UTF16StringToSlot;
 
-	typedef LDMap<IndirectBindingSlot, const char*> SlotToName;
+	typedef std::vector<const char*> SlotToName;
 	typedef LDMap<const char*, CStringToSlot*, CStringHash, CStringEquals> NameToMap;
     
     typedef std::vector<const ld::Atom *> DuplicatedSymbolAtomList;
