@@ -44,8 +44,6 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		4C7D5B8223D8D24C006E515E /* libhash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C7D5B8123D8D24C006E515E /* libhash.a */; };
-		4CBE443723D79B240084D187 /* libjemalloc_pic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CBE443423D793D00084D187 /* libjemalloc_pic.a */; };
 		83046A851C8FF2F700024A7E /* objcimageinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83046A841C8FF2D000024A7E /* objcimageinfo.cpp */; };
 		B028FCF21A9E7C3F00E3584B /* bitcode_bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B028FCF11A9E7C3F00E3584B /* bitcode_bundle.cpp */; };
 		B3B672421406D42800A376BB /* Snapshot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3B672411406D42800A376BB /* Snapshot.cpp */; };
@@ -389,8 +387,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4CBE443723D79B240084D187 /* libjemalloc_pic.a in Frameworks */,
-				4C7D5B8223D8D24C006E515E /* libhash.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

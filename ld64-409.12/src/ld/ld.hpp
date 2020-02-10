@@ -39,9 +39,9 @@
 
 #include "configure.h"
 
-#define LDOrderedMap absl::btree_map
-#define LDMap absl::flat_hash_map
-#define LDSet absl::flat_hash_set
+#define LDOrderedMap std::map
+#define LDMap std::unordered_map
+#define LDSet std::unordered_set
 
 namespace ld {
 
