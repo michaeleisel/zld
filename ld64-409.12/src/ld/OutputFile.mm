@@ -42,6 +42,8 @@
 #include <dlfcn.h>
 #include <mach-o/dyld.h>
 #include <mach-o/fat.h>
+#include <dispatch/dispatch.h>
+#include <algorithm>
 
 #include <string>
 #include <map>
@@ -155,9 +157,18 @@ void OutputFile::write(ld::Internal& state)
 	this->setLoadCommandsPadding(state);
 	_fileSize = state.assignFileOffsets();
 	this->assignAtomAddresses(state);
-	this->synthesizeDebugNotes(state);
-	this->buildSymbolTable(state);
-	this->generateLinkEditInfo(state);
+	dispatch_group_t group = dispatch_group_create();
+	//auto queue = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0);
+	dispatch_queue_attr_t attr = DISPATCH_QUEUE_SERIAL;
+	auto queue = dispatch_queue_create("asdf", attr);
+	dispatch_group_async(group, queue, ^{
+    	this->synthesizeDebugNotes(state);
+		this->buildSymbolTable(state);
+	});
+	dispatch_group_async(group, queue, ^{
+    	this->generateLinkEditInfo(state);
+	});
+	dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 	if ( _options.sharedRegionEncodingV2() )
 		this->makeSplitSegInfoV2(state);
 	else
