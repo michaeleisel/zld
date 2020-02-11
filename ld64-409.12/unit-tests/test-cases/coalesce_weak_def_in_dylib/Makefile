@@ -33,7 +33,7 @@ run: all-${FILEARCH}
 all-ppc:
 	${PASS_IFF} true
 
-all-arm:
+all-arm64:
 	${PASS_IFF} true
 	
 all-i386: all-real

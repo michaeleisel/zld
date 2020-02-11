@@ -38,6 +38,7 @@ all-armv6: hasnl
 
 all-armv7: hasnl
 
+all-arm64: all-true
 all-x86_64: all-true
 
 all-true:

@@ -41,7 +41,7 @@ test-x86_64:
 test-ppc:
 	${PASS_IFF_ERROR} ${CC} ${CCFLAGS} -DSHRINK=4 test.c --save-temps -o test-${ARCH} 2>/dev/null
 
-test-arm:
+test-arm64:
 	${PASS_IFF_ERROR} ${CC} ${CCFLAGS} -DSHRINK=4 test.c --save-temps -o test-${ARCH} 2>/dev/null
 
 clean:

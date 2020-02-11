@@ -33,9 +33,13 @@ LLVMAR  = /usr/local/bin/llvm-ar
 # Test the we set the stack execution bit properly.
 
 
+# all: fourteen
+
 all: zero one two three four five six seven eight nine ten \
-    eleven twelve thirteen fourteen fifteen sixteen seventeen \
-	eighteen nineteen 
+    eleven twelve thirteen fifteen sixteen seventeen \
+	nineteen 
+
+unused: eighteen fourteen 
 
 zero:
 	#

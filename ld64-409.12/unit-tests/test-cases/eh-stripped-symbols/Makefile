@@ -15,7 +15,7 @@ endif
 all: all-${FILEARCH}
 all-i386: all-zce
 all-x86_64: all-zce
-all-arm: all-good
+all-arm64: all-good
 
 all-zce:
 	${CXX} ${CCXXFLAGS} main.cxx -g -c -o main1.o -Os

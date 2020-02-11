@@ -39,6 +39,7 @@ all-i386: hasnl
 all-armv6: hasnl
 
 all-armv7: hasnl
+all-arm64: hasnl
 
 all-x86_64: all-true
 

@@ -3,7 +3,7 @@
 SHELL = /bin/sh
 
 # set default to be host
-ARCH ?= "x86_64"
+ARCH ?= x86_64
 
 # set default to be all
 VALID_ARCHS ?= "x86_64 arm64"
@@ -138,13 +138,13 @@ endif
 ifeq ($(ARCH),arm64)
   LDFLAGS := -syslibroot $(IOS_SDK)
   AS = $(shell xcrun -f as) -arch ${ARCH} -miphoneos-version-min=5.0
-  CC  = $(shell xcrun --sdk iphoneos.internal -find clang) -arch ${ARCH} -ccc-install-dir ${LD_PATH} -miphoneos-version-min=9.0 -isysroot $(IOS_SDK)
-  CXX = $(shell xcrun --sdk iphoneos.internal -find clang++) -arch ${ARCH} -ccc-install-dir ${LD_PATH} -miphoneos-version-min=9.0 -isysroot $(IOS_SDK)
+  CC  = $(shell xcrun -find clang) -arch ${ARCH} -ccc-install-dir ${LD_PATH} -miphoneos-version-min=9.0 -isysroot $(IOS_SDK)
+  CXX = $(shell xcrun -find clang++) -arch ${ARCH} -ccc-install-dir ${LD_PATH} -miphoneos-version-min=9.0 -isysroot $(IOS_SDK)
   VERSION_NEW_LINKEDIT = -miphoneos-version-min=7.0
   VERSION_OLD_LINKEDIT = -miphoneos-version-min=3.0
   LD_SYSROOT = -syslibroot $(IOS_SDK)
   LD_NEW_LINKEDIT = -ios_version_min 7.0
-  OTOOL =  $(shell xcrun --sdk iphoneos.internal -find otool)
+  OTOOL =  $(shell xcrun -find otool)
 else
   FILEARCH = $(ARCH)
 endif

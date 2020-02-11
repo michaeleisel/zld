@@ -37,6 +37,8 @@ all-ppc64: all-true
 
 all-i386: all-true
 
+all-arm64: all-true
+
 all-true:
 	${PASS_IFF} true
 

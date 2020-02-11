@@ -42,6 +42,7 @@ test-x86_64:
 
 test-armv6: test-arm
 test-armv7: test-arm
+test-arm64: test-arm
 
 test-arm:
 	${CC_ARM}  foo.c -arch armv4t -c -o foo-v4.o

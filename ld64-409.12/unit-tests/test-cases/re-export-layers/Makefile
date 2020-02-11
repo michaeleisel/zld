@@ -35,6 +35,7 @@ all-i386: all-new all-old
 all-x86_64: all-new all-old
 all-armv6: all-new 
 all-armv7: all-new 
+all-arm64: all-new 
 
 
 all-new:	

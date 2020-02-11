@@ -41,7 +41,7 @@ all:
 	${CXX} ${CCXXFLAGS} foobar.o main.o -o main
 	${FAIL_IF_BAD_MACHO} main
 	nm -ap main | ./stabs-filter.pl > main.stabs
-	${PASS_IFF} diff main.stabs expected-stabs
+	${PASS_IFF} diff -w main.stabs expected-stabs
 	
 
 clean:

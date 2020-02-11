@@ -96,22 +96,23 @@ sub process_entry
 	my $line1;
 	foreach $line1 (@{$$tbl{stdout}})
 	{
-	    printf "stdout: %s\n", $line1;
+	    printf "%s\n", $line1;
 	}
 	foreach $line1 (@{$$tbl{stderr}})
 	{
-	    printf "stderr: %s\n", $line1;
+	    printf "%s\n", $line1;
 	}
+        printf "###########################";
 	return;
     }
 
     #if there was any output to stderr, mark this as a failure
-    foreach $line (@{$$tbl{stderr}})
-    {
-	printf "%-40s FAIL spurious stderr failure: %s\n", $test_name, $line;
-	$total_count++;
-	return;
-    }
+    #foreach $line (@{$$tbl{stderr}})
+    #{
+    #printf "%-40s FAIL spurious stderr failure: %s\n", $test_name, $line;
+    #$total_count++;
+    #return;
+    #}
 
     # scan all stdout looking for lines that start with PASS or FAIL
     my $seen_result = 0;
