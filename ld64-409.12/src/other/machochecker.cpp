@@ -111,13 +111,25 @@ private:
 	typedef typename A::P::E				E;
 	typedef typename A::P::uint_t			pint_t;
 	
+	
+	struct CStringHash {
+		size_t operator()(const char* __s) const {
+			size_t hash = 5381;
+			while (*__s) {
+				hash = hash * 5 + *__s;
+				__s++;
+			}
+			return hash;
+		};
+	};
+
 	// utility classes for using LDMap with c-strings
 	struct CStringEquals
 	{
 		bool operator()(const char* left, const char* right) const { return (strcmp(left, right) == 0); }
 	};
 
-	typedef LDSet<const char*, CStringHash, CStringEquals>  StringSet;
+	typedef std::unordered_set<const char*, CStringHash, CStringEquals>  StringSet;
 
 												MachOChecker(const uint8_t* fileContent, uint32_t fileLength, const char* path, const char* verifierDstRoot);
 	void										checkMachHeader();
@@ -1476,7 +1488,7 @@ void MachOChecker<A>::checkRelocations()
 {
 	// external relocations should be sorted to minimize dyld symbol lookups
 	// therefore every reloc with the same r_symbolnum value should be contiguous 
-	LDOrderedSet<uint32_t> previouslySeenSymbolIndexes;
+	std::set<uint32_t> previouslySeenSymbolIndexes;
 	uint32_t lastSymbolIndex = 0xFFFFFFFF;
 	const macho_relocation_info<P>* const externRelocsEnd = &fExternalRelocations[fExternalRelocationsCount];
 	for (const macho_relocation_info<P>* reloc = fExternalRelocations; reloc < externRelocsEnd; ++reloc) {

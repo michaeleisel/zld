@@ -1,0 +1,63 @@
+name:     CIE
+size:     0x18
+align:    0 mod 1
+scope:    translation-unit
+symbol:   not in final linked images
+attrs:    
+
+name:     _foo
+size:     0x6
+align:    0 mod 16
+scope:    global
+symbol:   in
+attrs:    
+unwind:   0x00000000 -> 0x00000006: 0x01000000
+
+name:     _a
+size:     0x4
+align:    0 mod 4
+scope:    global
+symbol:   in
+attrs:    
+
+name:     _b
+size:     0x4
+align:    0 mod 4
+scope:    global
+symbol:   in
+attrs:    
+
+name:     _c
+size:     0x4
+align:    0 mod 4
+scope:    global
+symbol:   in
+attrs:    
+
+name:     _pa
+size:     0x8
+align:    0 mod 8
+scope:    global
+symbol:   in
+attrs:    
+fixups:
+    0x0000 store 64-bit little endian address of by-name(_a)
+
+name:     _pb
+size:     0x8
+align:    0 mod 8
+scope:    global
+symbol:   in
+attrs:    
+fixups:
+    0x0000 store 64-bit little endian address of by-name(_b)
+
+name:     _pc
+size:     0x8
+align:    0 mod 8
+scope:    global
+symbol:   in
+attrs:    
+fixups:
+    0x0000 store 64-bit little endian address of by-name(_c)
+

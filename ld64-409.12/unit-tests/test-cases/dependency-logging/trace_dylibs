@@ -1,0 +1,35 @@
+[Logging for XBS] Used dynamic library: /Users/michael/projects/ld64/ld64-409.12/unit-tests/test-cases/dependency-logging/libfoo.dylib
+[Logging for XBS] Used dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/libSystem.B.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libcache.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libcommonCrypto.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libcompiler_rt.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libcopyfile.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libcorecrypto.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libdispatch.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libdyld.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libkeymgr.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/liblaunch.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libmacho.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libquarantine.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libremovefile.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_asl.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_blocks.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_c.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_configuration.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_coreservices.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_darwin.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_dnssd.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_info.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_kernel.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_m.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_malloc.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_networkextension.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_notify.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_platform.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_pthread.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_sandbox.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_secinit.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_symptoms.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libsystem_trace.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libunwind.tbd
+[Logging for XBS] Used indirect dynamic library: /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/lib/system/libxpc.tbd

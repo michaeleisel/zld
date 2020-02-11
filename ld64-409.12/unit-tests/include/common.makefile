@@ -3,10 +3,10 @@
 SHELL = /bin/sh
 
 # set default to be host
-ARCH ?= $(shell arch)
+ARCH ?= "x86_64"
 
 # set default to be all
-VALID_ARCHS ?= "i386 x86_64 armv6"
+VALID_ARCHS ?= "x86_64 arm64"
 
 
 MYDIR=$(shell cd ../../bin;pwd)
@@ -55,14 +55,14 @@ export PATH
 export COMPILER_PATH
 export GCC_EXEC_PREFIX=garbage
 
-IOS_SDK = $(shell xcodebuild -sdk iphoneos.internal -version Path  2>/dev/null)
-OSX_SDK = $(shell xcodebuild -sdk macosx.internal -version Path  2>/dev/null)
+IOS_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk
+OSX_SDK = /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk
 ifeq ($(ARCH),ppc)
 	OSX_SDK = /Developer/SDKs/MacOSX10.6.sdk
 endif
 
-CC		= $(shell xcrun -find clang) -arch ${ARCH} -mmacosx-version-min=10.8 -isysroot $(OSX_SDK)
-AS		= $(shell xcrun -f as) -arch ${ARCH} -mmacosx-version-min=10.8
+CC		= $(shell xcrun -find clang) -arch ${ARCH} -mmacosx-version-min=10.14 -isysroot $(OSX_SDK)
+AS		= $(shell xcrun -f as) -arch ${ARCH} -mmacosx-version-min=10.14
 CCFLAGS = -Wall 
 LDFLAGS = -syslibroot $(OSX_SDK)
 ASMFLAGS =

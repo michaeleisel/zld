@@ -10,8 +10,8 @@ cd `echo "$0" | sed 's/run-all-unit-tests/test-cases/'`
 
 [ "$PROCTORRUN" ] && exec ../proctor-run
 
-all_archs="x86_64  i386"
-valid_archs="x86_64 i386"
+all_archs="x86_64"
+valid_archs="x86_64"
 ios_sdk_directory="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs"
 # only test arm code if iOS platform tools installed
 min_available_ios_sdk_version()

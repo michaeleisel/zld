@@ -1,0 +1,22 @@
+# Path: libfoobar.dylib
+# Arch: x86_64
+# Object files:
+[  0] linker synthesized
+[  1] foo.o
+[  2] foo2.o
+[  3] bar.o
+# Sections:
+# Address	Size    	Segment	Section
+0x00000F50	0x00000059	__TEXT	__text
+0x00000FAC	0x00000048	__TEXT	__unwind_info
+0x00001000	0x00000008	__DATA	__got
+0x00001008	0x00000004	__DATA	__common
+# Symbols:
+# Address	Size    	File  Name
+0x00000F50	0x00000020	[  1] __Z4testv
+0x00000F70	0x00000020	[  2] __Z5test2v
+0x00000F90	0x00000010	[  3] __Z4funcv
+0x00000FA0	0x00000009	[  3] __Z3fooi
+0x00000FAC	0x00000048	[  0] compact unwind info
+0x00001000	0x00000008	[  0] non-lazy-pointer-to-local: ___gxx_personality_v0
+0x00001008	0x00000004	[  1] _global

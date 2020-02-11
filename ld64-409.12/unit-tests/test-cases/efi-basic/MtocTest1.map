@@ -1,0 +1,28 @@
+# Path: MtocTest1.macho
+# Arch: x86_64
+# Object files:
+[  0] linker synthesized
+[  1] LibTest1.lib(LibTest1.obj)
+[  2] MtocTest1.lib(MtocTest1.obj)
+# Sections:
+# Address	Size    	Segment	Section
+0x00000240	0x00000036	__TEXT	__text
+0x00000276	0x0000001F	__TEXT	__cstring
+0x00000298	0x000000A8	__TEXT	__eh_frame
+0x00000340	0x00000008	__DATA	__data
+0x00000348	0x0000000C	__DATA	__common
+# Symbols:
+# Address	Size    	File  Name
+0x00000240	0x00000000	[  0] ___dso_handle
+0x00000240	0x00000006	[  1] _LibInit
+0x00000246	0x0000000D	[  1] _OutputString
+0x00000253	0x00000023	[  2] __ModuleEntryPoint
+0x00000276	0x0000001F	[  2] literal string: \nHello world via mtoc - reloc\n
+0x00000298	0x00000018	[  1] CIE
+0x000002B0	0x00000028	[  1] FDE for: _LibInit
+0x000002D8	0x00000028	[  1] FDE for: _OutputString
+0x00000300	0x00000018	[  2] CIE
+0x00000318	0x00000028	[  2] FDE for: __ModuleEntryPoint
+0x00000340	0x00000008	[  2] _gString
+0x00000348	0x00000008	[  1] _gS
+0x00000350	0x00000004	[  2] _gWhyAreUninitializedGlobalsBad

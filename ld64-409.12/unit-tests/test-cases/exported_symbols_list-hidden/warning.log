@@ -1,0 +1,2 @@
+ld: warning: cannot export hidden symbol _func_hidden1 from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/test-efa493.o
+ld: warning: cannot export hidden symbol _common_hidden1 from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/test-efa493.o
