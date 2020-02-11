@@ -62,13 +62,21 @@ static ld::IndirectBindingTable*	_s_indirectBindingTable = NULL;
 SymbolTable::SymbolTable(const Options& opts, std::vector<const ld::Atom*>& ibt) 
 	: _options(opts), _byNameTable(405000), _cstringTable(6151), _indirectBindingTable(ibt), _hasExternalTentativeDefinitions(false)
 {
-	LDString string;
-	string.str = NULL;
-	string.length = 0;
-	string.hash = 0;
-	_stringCache.emplace_back(string);
+	LDString emptyString;
+	emptyString.str = NULL;
+	emptyString.length = 0;
+	emptyString.hash = 0;
+	_stringCache.emplace_back(emptyString);
 	_byNameTable.set_empty_key(&(_stringCache.back()));
-	_byNameTable.min_load_factor(0.0);
+	LDString deleteString;
+	deleteString.str = NULL;
+	deleteString.length = -1;
+	deleteString.hash = 0;
+	_stringCache.emplace_back(deleteString);
+	_byNameTable.set_deleted_key(&(_stringCache.back()));
+	if (!opts.deadCodeStrip() && !opts.deadStripDylibs()) {
+    	_byNameTable.min_load_factor(0.0);
+	}
 	_s_indirectBindingTable = this;
 }
 
