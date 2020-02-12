@@ -158,14 +158,14 @@ void OutputFile::write(ld::Internal& state)
 	_fileSize = state.assignFileOffsets();
 	this->assignAtomAddresses(state);
 	dispatch_group_t group = dispatch_group_create();
-	//auto queue = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0);
-	dispatch_queue_attr_t attr = DISPATCH_QUEUE_SERIAL;
-	auto queue = dispatch_queue_create("asdf", attr);
+	auto queue = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0);
+	//dispatch_queue_attr_t attr = DISPATCH_QUEUE_SERIAL;
+	//auto queue = dispatch_queue_create("asdf", attr);
 	dispatch_group_async(group, queue, ^{
     	this->synthesizeDebugNotes(state);
-		this->buildSymbolTable(state);
 	});
 	dispatch_group_async(group, queue, ^{
+		this->buildSymbolTable(state);
     	this->generateLinkEditInfo(state);
 	});
 	dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
@@ -5694,6 +5694,25 @@ static time_t fileModTime(const char* path) {
 	return 0;
 }
 
+struct Asdf
+{
+	bool operator()(ld::Atom::LineInfo left, ld::Atom::LineInfo right) const {
+		return left.fileName == right.fileName;
+	}
+};
+
+struct LineInfoHash {
+	size_t operator()(ld::Atom::LineInfo li) const {
+		return (size_t)li.fileName;
+	};
+};
+
+struct LineInfoSorter {
+	bool operator() (ld::Atom::LineInfo left, ld::Atom::LineInfo right) {
+		return (ptrdiff_t)left.fileName < (ptrdiff_t)right.fileName;
+	}
+};
+
 
 void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 {
@@ -5787,6 +5806,7 @@ void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 		state.stabs.push_back(astStab);
 	}
 	
+	auto s1 = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
 	// synthesize "debug notes" and add them to master stabs vector
 	const char* dirPath = NULL;
 	const char* filename = NULL;

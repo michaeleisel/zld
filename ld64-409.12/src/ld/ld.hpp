@@ -1362,6 +1362,13 @@ struct CLDStringPointerEquals
 	}
 };
 
+struct CLDStringPtrEquals
+{
+	bool operator()(LDString left, LDString right) const {
+		return left.str == right.str;
+	}
+};
+
 struct CLDStringEquals
 {
 	bool operator()(LDString left, LDString right) const {
