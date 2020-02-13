@@ -54,6 +54,46 @@
 namespace ld {
 namespace tool {
 
+class TNode {
+public:
+	TNode() : _c(0), _slot(UINT_MAX), _lowerCaseNodes(NULL), _upperCaseNodes(NULL) {
+		;
+	};
+	char _c;
+	uint32_t _slot;
+	TNode *_lowerCaseNodes;
+	TNode *_upperCaseNodes;
+	std::vector<TNode> _children;
+	
+	TNode *fetch(const char *name) {
+		char c = *name;
+		if (c == '\0') {
+			return this;
+		}
+		if (isupper(c)) {
+			if (_upperCaseNodes == NULL) {
+				_upperCaseNodes = new TNode[26];
+			}
+			return _upperCaseNodes[c - 'A'].fetch(name);
+		} else if (islower(c)) {
+			if (_lowerCaseNodes == NULL) {
+				// todo: fix memory leak
+				_lowerCaseNodes = new TNode[26];
+			}
+			return _lowerCaseNodes[c - 'a'].fetch(name);
+		}
+		for (auto &child : _children) {
+			if (child._c == name[0]) {
+				return child.fetch(name + 1);
+			}
+		}
+		TNode node;
+		node._c = name[0];
+		_children.push_back(node);
+		return _children.back().fetch(name + 1);
+	}
+};
+
 class SymbolTable : public ld::IndirectBindingTable
 {
 public:
@@ -61,7 +101,8 @@ public:
 	//~SymbolTable();
 
 private:
-	typedef google::dense_hash_map<LDString *, IndirectBindingSlot, CLDStringPointerHash, CLDStringPointerEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
+	typedef google::dense_hash_map<std::string, IndirectBindingSlot> NameToSlot;
+	//typedef google::dense_hash_map<LDString *, IndirectBindingSlot, CLDStringPointerHash, CLDStringPointerEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
 	std::deque<LDString> _stringCache;
 
 	class ContentFuncs {
@@ -155,6 +196,7 @@ private:
 
 	const Options&					_options;
 	NameToSlot						_byNameTable;
+	TNode _trie;
 	SlotToName						_byNameReverseTable;
 	ContentToSlot					_literal4Table;
 	ContentToSlot					_literal8Table;
