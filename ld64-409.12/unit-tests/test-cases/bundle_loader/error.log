@@ -1,0 +1,2 @@
+ld: can't link with bundle (MH_BUNDLE) only dylibs (MH_DYLIB) file 'bundle.bundle' for architecture arm64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)

@@ -1,0 +1,8 @@
+0000000000000004 (common) (alignment 2^2) external _common_global2
+0000000000000004 (common) (alignment 2^2) private external _common_hidden1
+0000000000000004 (common) (alignment 2^2) private external _common_hidden2
+0000000000000018 (__TEXT,__text) external _func_global2
+0000000000000030 (__TEXT,__text) private external _func_hidden1
+0000000000000034 (__TEXT,__text) private external _func_hidden2
+0000000000000000 (__TEXT,__text) non-external ltmp0
+0000000000000040 (__LD,__compact_unwind) non-external ltmp2

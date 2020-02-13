@@ -1,0 +1,5 @@
+ld: warning: object file (main.o) was built for newer iOS version (9.0) than being linked (7.0)
+Undefined symbols for architecture arm64:
+  "__ZN3Foo4doitEv", referenced from:
+      _main in main.o
+ld: symbol(s) not found for architecture arm64

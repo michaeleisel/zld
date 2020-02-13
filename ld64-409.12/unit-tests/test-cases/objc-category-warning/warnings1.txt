@@ -1,0 +1,2 @@
+ld: warning: instance method 'instance_method' in category from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/cat-695700.o overrides method from class in /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/foo-66e57b.o
+ld: warning: meta method 'class_method' in category from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/cat-695700.o overrides method from class in /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/foo-66e57b.o
