@@ -101,8 +101,7 @@ public:
 	//~SymbolTable();
 
 private:
-	typedef google::dense_hash_map<std::string, IndirectBindingSlot> NameToSlot;
-	//typedef google::dense_hash_map<LDString *, IndirectBindingSlot, CLDStringPointerHash, CLDStringPointerEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
+	typedef google::dense_hash_map<LDString *, IndirectBindingSlot, CLDStringPointerHash, CLDStringPointerEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
 	std::deque<LDString> _stringCache;
 
 	class ContentFuncs {

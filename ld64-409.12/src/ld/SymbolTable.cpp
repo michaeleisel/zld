@@ -645,12 +645,7 @@ static int nfoundz = 0;
 SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name, FastFileMap *seenPerFile)
 {
 	LDString string = LDStringCreate(name);
-	//auto start = _byNameTable.begin(iter);
 	NameToSlot::iterator pos = _byNameTable.find(&string);
-	/*TNode *node = _trie.fetch(name);
-	if (node->_slot != UINT_MAX) {
-		return node->_slot;
-	}*/
 	if ( pos != _byNameTable.end() ) {
 		IndirectBindingSlot slot = pos->second;
 		pos->first->str = name;
