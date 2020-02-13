@@ -662,7 +662,6 @@ bool SymbolTableAtom<A>::hasStabs(uint32_t& ssos, uint32_t& ssoe, uint32_t& sos,
 	return ( (_stabsIndexStart != _stabsIndexEnd) || (_stabsStringsOffsetStart != _stabsStringsOffsetEnd) );
 }
 
-
 template <typename A>
 void SymbolTableAtom<A>::encode()
 {
@@ -714,10 +713,21 @@ void SymbolTableAtom<A>::encode()
 	}
 	_stabsIndexEnd = symbolIndex;
 	_stabsStringsOffsetEnd = this->_writer._stringPoolAtom->currentOffset();
+	typedef std::pair<const ld::Atom *, uint32_t> InsertPair;
+	std::vector<InsertPair> localInserts;
+	localInserts.reserve(localAtoms.size());
 	for (const ld::Atom* atom : localAtoms) {
+		if ( this->addLocal(atom, this->_writer._stringPoolAtom) ) {
+			//InsertPair p(atom, symbolIndex++);
+			auto p = InsertPair(atom, symbolIndex++);
+			localInserts.push_back(p);
+		}
+	}
+	this->_writer._atomToSymbolIndex.insert(localInserts.begin(), localInserts.end());
+	/*for (const ld::Atom* atom : localAtoms) {
 		if ( this->addLocal(atom, this->_writer._stringPoolAtom) )
 			this->_writer._atomToSymbolIndex[atom] = symbolIndex++;
-	}
+	}*/
 	this->_writer._localSymbolsCount = symbolIndex;
 }
 

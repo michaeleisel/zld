@@ -344,6 +344,7 @@ inline void makeTrie(const std::vector<Entry>& entries, std::vector<uint8_t>& ou
 	for (std::vector<Entry>::const_iterator it = entries.begin(); it != entries.end(); ++it) {
 		start.addOrderedNodes(it->name, orderedNodes);
 	}
+	orderedNodes[0];
 	
 	// assign each node in the vector an offset in the trie stream, iterating until all uleb128 sizes have stabilized
 	bool more;

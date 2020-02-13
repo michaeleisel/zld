@@ -44,6 +44,7 @@
 #include <mach-o/fat.h>
 #include <dispatch/dispatch.h>
 #include <algorithm>
+#include <Foundation/Foundation.h>
 
 #include <string>
 #include <map>
@@ -238,28 +239,37 @@ void OutputFile::assignAtomAddresses(ld::Internal& state)
 
 void OutputFile::updateLINKEDITAddresses(ld::Internal& state)
 {
+	auto queue = [[NSOperationQueue alloc] init];
+	queue.qualityOfService = NSQualityOfServiceUserInteractive;
+	// initialize info for parsing input files on worker threads
+	unsigned int ncpus;
+	int mib[2];
+	size_t len = sizeof(ncpus);
+	mib[0] = CTL_HW;
+	mib[1] = HW_NCPU;
+	auto res = sysctl(mib, 2, &ncpus, &len, NULL, 0);
+	if (res != 0) {
+		ncpus = 1;
+	}
+	queue.maxConcurrentOperationCount = ncpus;
 	if ( _options.makeCompressedDyldInfo() ) {
-		// build dylb rebasing info  
+		// build dylb rebasing info
 		assert(_rebasingInfoAtom != NULL);
 		_rebasingInfoAtom->encode();
-		
+
 		// build dyld binding info  
 		assert(_bindingInfoAtom != NULL);
 		_bindingInfoAtom->encode();
-		
+
 		// build dyld lazy binding info  
 		assert(_lazyBindingInfoAtom != NULL);
 		_lazyBindingInfoAtom->encode();
-		
+
 		// build dyld weak binding info  
 		assert(_weakBindingInfoAtom != NULL);
 		_weakBindingInfoAtom->encode();
-		
-		// build dyld export info  
-		assert(_exportInfoAtom != NULL);
-		_exportInfoAtom->encode();
 	}
-	
+
 	if ( _options.sharedRegionEligible() ) {
 		// build split seg info  
 		assert(_splitSegInfoAtom != NULL);
@@ -284,9 +294,21 @@ void OutputFile::updateLINKEDITAddresses(ld::Internal& state)
 		_optimizationHintsAtom->encode();
 	}
 	
+
+	if (_options.makeCompressedDyldInfo()) {
+    	// build dyld export info
+    	assert(_exportInfoAtom != NULL);
+    	[queue addOperationWithBlock:^{
+    		_exportInfoAtom->encode();
+    	}];
+	}
+	
 	// build classic symbol table
 	assert(_symbolTableAtom != NULL);
-	_symbolTableAtom->encode();
+	[queue addOperationWithBlock:^{
+		_symbolTableAtom->encode();
+	}];
+	[queue waitUntilAllOperationsAreFinished];
 	assert(_indirectSymbolTableAtom != NULL);
 	_indirectSymbolTableAtom->encode();
 
