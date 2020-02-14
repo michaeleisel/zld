@@ -2720,6 +2720,26 @@ void OutputFile::writeAtoms(ld::Internal& state, uint8_t* wholeBuffer)
 	uint64_t fileOffsetOfEndOfLastAtom = 0;
 	uint64_t mhAddress = 0;
 	bool lastAtomUsesNoOps = false;
+	typedef struct {
+		uint64_t fileOffsetOfEndOfLastAtom;
+		uint64_t mhAddress;
+		bool lastAtomUsesNoOps;
+	} WriteContext;
+	std::vector<WriteContext> contexts;
+	for (auto sit = state.sections.begin(); sit != state.sections.end(); ++sit) {
+		auto sect = *sit;
+		if (sect->type() == ld::Section::typeMachHeader)
+			mhAddress = sect->address;
+		if (takesNoDiskSpace(sect))
+			continue;
+		std::vector<const ld::Atom*>& atoms = sect->atoms;
+		for (auto ait = atoms.begin(); ait != atoms.end(); ++ait) {
+			auto atom = *ait;
+			if (atom->definition() == ld::Atom::definitionProxy)
+				continue;
+    		contexts.emplace_back(fileOffsetOfEndOfLastAtom, mhAddress, lastAtomUsesNoOps);
+		}
+	}
 	for (std::vector<ld::Internal::FinalSection*>::iterator sit = state.sections.begin(); sit != state.sections.end(); ++sit) {
 		ld::Internal::FinalSection* sect = *sit;
 		if ( sect->type() == ld::Section::typeMachHeader )
@@ -2729,24 +2749,31 @@ void OutputFile::writeAtoms(ld::Internal& state, uint8_t* wholeBuffer)
 		const bool sectionUsesNops = (sect->type() == ld::Section::typeCode);
 		//fprintf(stderr, "file offset=0x%08llX, section %s\n", sect->fileOffset, sect->sectionName());
 		std::vector<const ld::Atom*>& atoms = sect->atoms;
-		bool lastAtomWasThumb = false;
 		for (std::vector<const ld::Atom*>::iterator ait = atoms.begin(); ait != atoms.end(); ++ait) {
+		//for (size_t i = 0; i < atoms.size(); i++) {
 			const ld::Atom* atom = *ait;
+			//const ld::Atom* atom = atoms[i];
 			if ( atom->definition() == ld::Atom::definitionProxy )
 				continue;
+			const ld::Atom *prevAtom = NULL;
+			//for (int j = i - 1; j >= 0; j++) {
+			for (auto rait = std::make_reverse_iterator(ait); rait != atoms.rend(); rait++) {
+				auto prevPossibleAtom = *rait;
+				if (prevPossibleAtom->definition() != ld::Atom::definitionProxy) {
+					prevAtom = prevPossibleAtom;
+					break;
+				}
+			}
 			try {
 				uint64_t fileOffset = atom->finalAddress() - sect->address + sect->fileOffset;
 				// check for alignment padding between atoms
-				if ( (fileOffset != fileOffsetOfEndOfLastAtom) && lastAtomUsesNoOps ) {
-					this->copyNoOps(&wholeBuffer[fileOffsetOfEndOfLastAtom], &wholeBuffer[fileOffset], lastAtomWasThumb);
+				if ( (prevAtom && prevAtom->size() == 0) && lastAtomUsesNoOps ) {
+					this->copyNoOps(&wholeBuffer[fileOffsetOfEndOfLastAtom], &wholeBuffer[fileOffset], (prevAtom && prevAtom->isThumb()));
 				}
 				// copy atom content
 				atom->copyRawContent(&wholeBuffer[fileOffset]);
 				// apply fix ups
 				this->applyFixUps(state, mhAddress, atom, &wholeBuffer[fileOffset]);
-				fileOffsetOfEndOfLastAtom = fileOffset+atom->size();
-				lastAtomUsesNoOps = sectionUsesNops;
-				lastAtomWasThumb = atom->isThumb();
 			}
 			catch (const char* msg) {
 				if ( atom->file() != NULL )
