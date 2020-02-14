@@ -2730,14 +2730,10 @@ void OutputFile::processBuffer(const std::vector<AtomOperation> &buffer, ld::Int
 
 void OutputFile::writeAtoms(ld::Internal& state, uint8_t* wholeBuffer)
 {
-	NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-	queue.qualityOfService = NSQualityOfServiceUserInteractive;
-	queue.maxConcurrentOperationCount = 8;
 	// have each atom write itself
 	uint64_t fileOffsetOfEndOfLastAtom = 0;
 	uint64_t mhAddress = 0;
 	bool lastAtomUsesNoOps = false;
-	size_t bufferSize = 1000;
 	std::vector<AtomOperation> buffer;
 	for (std::vector<ld::Internal::FinalSection*>::iterator sit = state.sections.begin(); sit != state.sections.end(); ++sit) {
 		ld::Internal::FinalSection* sect = *sit;
@@ -2749,20 +2745,20 @@ void OutputFile::writeAtoms(ld::Internal& state, uint8_t* wholeBuffer)
 		//fprintf(stderr, "file offset=0x%08llX, section %s\n", sect->fileOffset, sect->sectionName());
 		std::vector<const ld::Atom*>& atoms = sect->atoms;
 		bool lastAtomWasThumb = false;
+		//NSMutableArray *operations = [NSMutableArray array];
 		for (std::vector<const ld::Atom*>::iterator ait = atoms.begin(); ait != atoms.end(); ++ait) {
 			const ld::Atom* atom = *ait;
 			if ( atom->definition() == ld::Atom::definitionProxy )
 				continue;
 			try {
 				uint64_t fileOffset = atom->finalAddress() - sect->address + sect->fileOffset;
-				if (buffer.size() < bufferSize) {
-    				buffer.emplace_back(atom, fileOffset, fileOffsetOfEndOfLastAtom, mhAddress, lastAtomUsesNoOps, lastAtomWasThumb);
-				} else {
+				buffer.emplace_back(atom, fileOffset, fileOffsetOfEndOfLastAtom, mhAddress, lastAtomUsesNoOps, lastAtomWasThumb);
+				/*if (buffer.size() >= bufferSize) {
     				//[queue addOperationWithBlock:^{
 						processBuffer(buffer, state, wholeBuffer);
     				//}];
 					buffer = std::vector<AtomOperation>();
-				}
+				}*/
 				fileOffsetOfEndOfLastAtom = fileOffset+atom->size();
 				lastAtomUsesNoOps = sectionUsesNops;
 				lastAtomWasThumb = atom->isThumb();
@@ -2774,10 +2770,29 @@ void OutputFile::writeAtoms(ld::Internal& state, uint8_t* wholeBuffer)
 					throwf("%s in '%s'", msg, atom->name());
 			}
 		}
-		[queue waitUntilAllOperationsAreFinished];
-		processBuffer(buffer, state, wholeBuffer);
 	}
-	
+	NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+	queue.qualityOfService = NSQualityOfServiceUserInteractive;
+	queue.maxConcurrentOperationCount = 8;
+	int stepSize = buffer.size() / queue.maxConcurrentOperationCount + 1;
+	for (size_t i = 0; i < (size_t)queue.maxConcurrentOperationCount; i++) {
+		std::vector<AtomOperation> &bufferCopy = buffer;
+		[queue addOperationWithBlock:^{
+			for (auto bufIter = bufferCopy.begin() + i * stepSize; bufIter != bufferCopy.begin() + std::min(bufferCopy.size(), (i + 1) * stepSize); bufIter++) {
+				auto op = *bufIter;
+				// check for alignment padding between atoms
+				if ( (op.fileOffset != op.fileOffsetOfEndOfLastAtom) && op.lastAtomUsesNoOps ) {
+					this->copyNoOps(&wholeBuffer[op.fileOffsetOfEndOfLastAtom], &wholeBuffer[op.fileOffset], op.lastAtomWasThumb);
+				}
+				// copy atom content
+				op.atom->copyRawContent(&wholeBuffer[op.fileOffset]);
+				// apply fix ups
+				this->applyFixUps(state, op.mhAddress, op.atom, &wholeBuffer[op.fileOffset]);
+			}
+		}];
+	}
+	[queue waitUntilAllOperationsAreFinished];
+
 	if ( _options.verboseOptimizationHints() ) {
 		//fprintf(stderr, "ADRP optimized away:   %d\n", sAdrpNA);
 		//fprintf(stderr, "ADRPs changed to NOPs: %d\n", sAdrpNoped);
