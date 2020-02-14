@@ -71,6 +71,23 @@
 #include "LinkEdit.hpp"
 #include "LinkEditClassic.hpp"
 
+extern "C" {
+void rpfree(void *ptr);
+void *rpmalloc(size_t size);
+}
+
+/*void * __attribute__((weak)) operator new(size_t size)
+{
+	void *ptr = rpmalloc(size);
+	return ptr;
+}
+  
+void __attribute__((weak)) operator delete(void * p) noexcept
+{
+    rpfree(p);
+}*/
+  
+
 namespace ld {
 namespace tool {
 

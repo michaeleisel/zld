@@ -265,6 +265,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4C63788B23F5FF4200EB13BA /* librpmallocwrap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = librpmallocwrap.dylib; path = ../../rpmalloc/bin/macos/release/librpmallocwrap.dylib; sourceTree = "<group>"; };
 		4C7D5B8323D8D46B006E515E /* hash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hash.h; path = "../../examples/abseil-cpp/absl/hash/hash.h"; sourceTree = "<group>"; };
 		4C7D5B8623D8F336006E515E /* libhash2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhash2.a; path = ../../examples/build/libhash2.a; sourceTree = "<group>"; };
 		4CF05E8E23EB005B009C0C95 /* libsystem_malloc.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsystem_malloc.tbd; path = usr/lib/system/libsystem_malloc.tbd; sourceTree = SDKROOT; };
@@ -581,6 +582,7 @@
 				F9AA69BF10583E19003E3539 /* Resolver.cpp */,
 				F9AA69C010583E19003E3539 /* Resolver.h */,
 				F9AA69B410583C0C003E3539 /* SymbolTable.cpp */,
+				4C63788B23F5FF4200EB13BA /* librpmallocwrap.dylib */,
 				F9AA69B510583C0C003E3539 /* SymbolTable.h */,
 				F9AA687A10572E27003E3539 /* InputFiles.mm */,
 				4C7D5B8623D8F336006E515E /* libhash2.a */,
@@ -1284,14 +1286,12 @@
 					/Users/michael/projects/examples/build,
 					"$(SDKROOT)/usr/lib/system",
 					/usr/lib/system,
+					/Users/michael/projects/rpmalloc/lib/macos/release,
 				);
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
 				LLVM_LTO = NO;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = (
-					"-stdlib=libc++",
-					"$(OTHER_CPLUSPLUSFLAGS)",
-				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-stdlib=libc++",
@@ -1370,12 +1370,10 @@
 					/Users/michael/projects/examples/build,
 					"$(SDKROOT)/usr/lib/system",
 					/usr/lib/system,
+					/Users/michael/projects/rpmalloc/lib/macos/release,
 				);
 				LLVM_LTO = NO;
-				OTHER_CPLUSPLUSFLAGS = (
-					"-stdlib=libc++",
-					"$(OTHER_CPLUSPLUSFLAGS)",
-				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-stdlib=libc++",
@@ -1695,12 +1693,10 @@
 					/Users/michael/projects/examples/build,
 					"$(SDKROOT)/usr/lib/system",
 					/usr/lib/system,
+					/Users/michael/projects/rpmalloc/lib/macos/release,
 				);
 				LLVM_LTO = NO;
-				OTHER_CPLUSPLUSFLAGS = (
-					"-stdlib=libc++",
-					"$(OTHER_CPLUSPLUSFLAGS)",
-				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
 				OTHER_LDFLAGS = (
 					"-stdlib=libc++",
 					"-lxar",
