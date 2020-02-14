@@ -153,7 +153,19 @@ public:
 	static void					dumpAtomsBySection(ld::Internal& state, bool);
 
 private:
+	struct AtomOperation {
+	public:
+		const Atom *atom;
+		uint64_t fileOffset;
+		uint64_t fileOffsetOfEndOfLastAtom;
+		uint64_t mhAddress;
+		bool lastAtomUsesNoOps;
+		bool lastAtomWasThumb;
+		AtomOperation(const Atom *atom, uint64_t fileOffset, uint64_t fileOffsetOfEndOfLastAtom, uint64_t mhAddress, bool lastAtomUsesNoOps, bool lastAtomWasThumb): atom(atom), fileOffset(fileOffset), fileOffsetOfEndOfLastAtom(fileOffsetOfEndOfLastAtom), mhAddress(mhAddress), lastAtomUsesNoOps(lastAtomUsesNoOps), lastAtomWasThumb(lastAtomWasThumb) {}
+	};
+
 	void						writeAtoms(ld::Internal& state, uint8_t* wholeBuffer);
+	void processBuffer(const std::vector<AtomOperation> &buffer, ld::Internal& state, uint8_t *wholeBuffer);
 	void updatePreviousLoopValues(ld::Internal& state, std::vector<ld::Internal::FinalSection*>::iterator& sit, uint64_t *fileOffsetOfEndOfLastAtom, bool *lastAtomUsesNoOps);
 	void						computeContentUUID(ld::Internal& state, uint8_t* wholeBuffer);
 	void						buildDylibOrdinalMapping(ld::Internal&);
