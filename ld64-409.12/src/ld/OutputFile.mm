@@ -23,6 +23,8 @@
  */
  
 
+#include "pstl/execution"
+#include "pstl/algorithm"
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -3536,8 +3538,8 @@ void OutputFile::buildSymbolTable(ld::Internal& state)
 	}
 	
 	// sort by name
-	std::sort(_exportedAtoms.begin(), _exportedAtoms.end(), AtomByNameSorter());
-	std::sort(_importedAtoms.begin(), _importedAtoms.end(), AtomByNameSorter());
+	std::sort(std::execution::par, _exportedAtoms.begin(), _exportedAtoms.end(), AtomByNameSorter());
+	std::sort(std::execution::par, _importedAtoms.begin(), _importedAtoms.end(), AtomByNameSorter());
 
 	LDOrderedMap<std::string, std::vector<std::string>> addedSymbols;
 	LDOrderedMap<std::string, std::vector<std::string>> hiddenSymbols;
@@ -5857,7 +5859,7 @@ void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 	}
 	
 	// sort by file ordinal then atom ordinal
-	std::sort(atomsNeedingDebugNotes.begin(), atomsNeedingDebugNotes.end(), DebugNoteSorter());
+	std::sort(std::execution::par, atomsNeedingDebugNotes.begin(), atomsNeedingDebugNotes.end(), DebugNoteSorter());
 
 	// <rdar://problem/17689030> Add -add_ast_path option to linker which add N_AST stab entry to output
 	LDOrderedSet<std::string> seenAstPaths;

@@ -44,6 +44,11 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		4C755DA923F772DA001D517E /* Sorter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C755DA723F772DA001D517E /* Sorter.cpp */; };
+		4C755DAB23F7746D001D517E /* libtbb.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C755DAA23F7746D001D517E /* libtbb.dylib */; };
+		4C755DAC23F7746D001D517E /* libtbb.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 4C755DAA23F7746D001D517E /* libtbb.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		4C755DAF23F7746F001D517E /* libtbbmalloc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */; };
+		4C755DB023F7746F001D517E /* libtbbmalloc.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		83046A851C8FF2F700024A7E /* objcimageinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83046A841C8FF2D000024A7E /* objcimageinfo.cpp */; };
 		B028FCF21A9E7C3F00E3584B /* bitcode_bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B028FCF11A9E7C3F00E3584B /* bitcode_bundle.cpp */; };
 		B3B672421406D42800A376BB /* Snapshot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3B672411406D42800A376BB /* Snapshot.cpp */; };
@@ -208,6 +213,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		4C755DAD23F7746D001D517E /* Embed Libraries */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				4C755DAC23F7746D001D517E /* libtbb.dylib in Embed Libraries */,
+				4C755DB023F7746F001D517E /* libtbbmalloc.dylib in Embed Libraries */,
+			);
+			name = "Embed Libraries";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F97F5025070D0B6300B9FCD7 /* copy man page */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 8;
@@ -266,6 +283,10 @@
 
 /* Begin PBXFileReference section */
 		4C63788B23F5FF4200EB13BA /* librpmallocwrap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = librpmallocwrap.dylib; path = ../../rpmalloc/bin/macos/release/librpmallocwrap.dylib; sourceTree = "<group>"; };
+		4C755DA723F772DA001D517E /* Sorter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Sorter.cpp; sourceTree = "<group>"; };
+		4C755DA823F772DA001D517E /* Sorter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Sorter.hpp; sourceTree = "<group>"; };
+		4C755DAA23F7746D001D517E /* libtbb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbb.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbb.dylib; sourceTree = "<group>"; };
+		4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbbmalloc.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbbmalloc.dylib; sourceTree = "<group>"; };
 		4C7D5B8323D8D46B006E515E /* hash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hash.h; path = "../../examples/abseil-cpp/absl/hash/hash.h"; sourceTree = "<group>"; };
 		4C7D5B8623D8F336006E515E /* libhash2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhash2.a; path = ../../examples/build/libhash2.a; sourceTree = "<group>"; };
 		4CF05E8E23EB005B009C0C95 /* libsystem_malloc.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsystem_malloc.tbd; path = usr/lib/system/libsystem_malloc.tbd; sourceTree = SDKROOT; };
@@ -391,6 +412,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C755DAB23F7746D001D517E /* libtbb.dylib in Frameworks */,
+				4C755DAF23F7746F001D517E /* libtbbmalloc.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -435,6 +458,8 @@
 		4CF05E8D23EB005B009C0C95 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */,
+				4C755DAA23F7746D001D517E /* libtbb.dylib */,
 				4CF05E9523EB0201009C0C95 /* libsystem_malloc.dylib */,
 				4CF05E9323EB0151009C0C95 /* System.framework */,
 				4CF05E9023EB0093009C0C95 /* libSystem.B.tbd */,
@@ -607,6 +632,8 @@
 				F98565241E98090F00528B1C /* dwarf2.h */,
 				B3B672411406D42800A376BB /* Snapshot.cpp */,
 				B3B672441406D44300A376BB /* Snapshot.h */,
+				4C755DA723F772DA001D517E /* Sorter.cpp */,
+				4C755DA823F772DA001D517E /* Sorter.hpp */,
 			);
 			name = ld;
 			sourceTree = "<group>";
@@ -671,6 +698,7 @@
 				F9023C3706D5A23E001BBF46 /* Frameworks */,
 				F97F5025070D0B6300B9FCD7 /* copy man page */,
 				F94E0A911CAC6B870092DC75 /* Add libtapi symlink */,
+				4C755DAD23F7746D001D517E /* Embed Libraries */,
 			);
 			buildRules = (
 				F9E8D4BE07FCAF2A00FD5801 /* PBXBuildRule */,
@@ -1024,6 +1052,7 @@
 				F9AA65891051E750003E3539 /* macho_relocatable_file.cpp in Sources */,
 				F9AA65DD1051EC4A003E3539 /* archive_file.mm in Sources */,
 				F9AA65DE1051EC4A003E3539 /* lto_file.cpp in Sources */,
+				4C755DA923F772DA001D517E /* Sorter.cpp in Sources */,
 				F9AA65DF1051EC4A003E3539 /* macho_dylib_file.cpp in Sources */,
 				F9EA7584097882F3008B4F1D /* debugline.c in Sources */,
 				F9AA687C10572E27003E3539 /* InputFiles.mm in Sources */,
@@ -1287,6 +1316,7 @@
 					"$(SDKROOT)/usr/lib/system",
 					/usr/lib/system,
 					/Users/michael/projects/rpmalloc/lib/macos/release,
+					/Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release,
 				);
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
 				LLVM_LTO = NO;
@@ -1371,6 +1401,7 @@
 					"$(SDKROOT)/usr/lib/system",
 					/usr/lib/system,
 					/Users/michael/projects/rpmalloc/lib/macos/release,
+					/Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release,
 				);
 				LLVM_LTO = NO;
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
@@ -1507,8 +1538,11 @@
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
 					/usr/local/include,
 					"/Users/michael/projects/ld64/ld64-409.12/src/ld",
+					/Users/michael/projects/parallelstl/stdlib,
+					/Users/michael/projects/parallelstl/include,
+					/Users/michael/projects/tbb/include,
 				);
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../lib/";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../lib/ /Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
@@ -1554,8 +1588,11 @@
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
 					/usr/local/include,
 					"/Users/michael/projects/ld64/ld64-409.12/src/ld",
+					/Users/michael/projects/parallelstl/stdlib,
+					/Users/michael/projects/parallelstl/include,
+					/Users/michael/projects/tbb/include,
 				);
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../lib/";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../lib/ /Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
@@ -1618,8 +1655,11 @@
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
 					/usr/local/include,
 					"/Users/michael/projects/ld64/ld64-409.12/src/ld",
+					/Users/michael/projects/parallelstl/stdlib,
+					/Users/michael/projects/parallelstl/include,
+					/Users/michael/projects/tbb/include,
 				);
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../lib/";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../lib/ /Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
@@ -1694,6 +1734,7 @@
 					"$(SDKROOT)/usr/lib/system",
 					/usr/lib/system,
 					/Users/michael/projects/rpmalloc/lib/macos/release,
+					/Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release,
 				);
 				LLVM_LTO = NO;
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
