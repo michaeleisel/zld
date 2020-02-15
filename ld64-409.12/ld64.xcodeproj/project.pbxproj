@@ -44,7 +44,6 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		4C755DA923F772DA001D517E /* Sorter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C755DA723F772DA001D517E /* Sorter.cpp */; };
 		4C755DAB23F7746D001D517E /* libtbb.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C755DAA23F7746D001D517E /* libtbb.dylib */; };
 		4C755DAC23F7746D001D517E /* libtbb.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 4C755DAA23F7746D001D517E /* libtbb.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		4C755DAF23F7746F001D517E /* libtbbmalloc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */; };
@@ -283,8 +282,6 @@
 
 /* Begin PBXFileReference section */
 		4C63788B23F5FF4200EB13BA /* librpmallocwrap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = librpmallocwrap.dylib; path = ../../rpmalloc/bin/macos/release/librpmallocwrap.dylib; sourceTree = "<group>"; };
-		4C755DA723F772DA001D517E /* Sorter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Sorter.cpp; sourceTree = "<group>"; };
-		4C755DA823F772DA001D517E /* Sorter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Sorter.hpp; sourceTree = "<group>"; };
 		4C755DAA23F7746D001D517E /* libtbb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbb.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbb.dylib; sourceTree = "<group>"; };
 		4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbbmalloc.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbbmalloc.dylib; sourceTree = "<group>"; };
 		4C7D5B8323D8D46B006E515E /* hash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hash.h; path = "../../examples/abseil-cpp/absl/hash/hash.h"; sourceTree = "<group>"; };
@@ -632,8 +629,6 @@
 				F98565241E98090F00528B1C /* dwarf2.h */,
 				B3B672411406D42800A376BB /* Snapshot.cpp */,
 				B3B672441406D44300A376BB /* Snapshot.h */,
-				4C755DA723F772DA001D517E /* Sorter.cpp */,
-				4C755DA823F772DA001D517E /* Sorter.hpp */,
 			);
 			name = ld;
 			sourceTree = "<group>";
@@ -694,10 +689,10 @@
 			buildPhases = (
 				F9E8DB4D11921594007B4D6A /* make configure.h */,
 				B3C7A09714295B60005FC714 /* make compile_stub string */,
+				F94E0A911CAC6B870092DC75 /* Add libtapi symlink */,
+				F97F5025070D0B6300B9FCD7 /* copy man page */,
 				F9023C3606D5A23E001BBF46 /* Sources */,
 				F9023C3706D5A23E001BBF46 /* Frameworks */,
-				F97F5025070D0B6300B9FCD7 /* copy man page */,
-				F94E0A911CAC6B870092DC75 /* Add libtapi symlink */,
 				4C755DAD23F7746D001D517E /* Embed Libraries */,
 			);
 			buildRules = (
@@ -1052,7 +1047,6 @@
 				F9AA65891051E750003E3539 /* macho_relocatable_file.cpp in Sources */,
 				F9AA65DD1051EC4A003E3539 /* archive_file.mm in Sources */,
 				F9AA65DE1051EC4A003E3539 /* lto_file.cpp in Sources */,
-				4C755DA923F772DA001D517E /* Sorter.cpp in Sources */,
 				F9AA65DF1051EC4A003E3539 /* macho_dylib_file.cpp in Sources */,
 				F9EA7584097882F3008B4F1D /* debugline.c in Sources */,
 				F9AA687C10572E27003E3539 /* InputFiles.mm in Sources */,

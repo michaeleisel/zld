@@ -1924,7 +1924,7 @@ void Resolver::buildArchivesList()
 void Resolver::dumpMembersParsed()
 {
 	std::ofstream stream;
-	stream.open("/tmp/cache-o");
+	stream.open(_options.cacheFilePath());
 	_inputFiles.dumpMembersParsed(stream);
 	stream.close();
 }

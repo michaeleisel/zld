@@ -630,7 +630,7 @@ void Layout::doPass()
 				break;
 			default:
 				if ( log ) fprintf(stderr, "sorting section %s\n", sect->sectionName());
-				std::sort(std::execution::par, sect->atoms.begin(), sect->atoms.end(), _comparer);
+				std::sort(/*std::execution::par, */sect->atoms.begin(), sect->atoms.end(), _comparer);
 				break;
 		}
 	}

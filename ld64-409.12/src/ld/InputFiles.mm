@@ -43,6 +43,8 @@
 #include <sys/sysctl.h>
 #include <libkern/OSAtomic.h>
 #include <Foundation/Foundation.h>
+#include "pstl/algorithm"
+#include "pstl/execution"
 
 #include <fstream>
 #include <string>
@@ -682,44 +684,69 @@ void InputFiles::addLinkerOptionLibraries(ld::Internal& state, ld::File::AtomHan
 		// process libraries specified in .o linker options
 		// fixme optimize with std::move?
 		CStringSet newLibraries = std::move(state.unprocessedLinkerOptionLibraries);
+		std::vector<std::pair<Options::FileInfo, const char *>> infosToParse;
 		state.unprocessedLinkerOptionLibraries.clear();
 		for (const char* libName : newLibraries) {
 			if ( state.linkerOptionLibraries.count(libName) )
 				continue;
-			try {
-				Options::FileInfo info = _options.findLibrary(libName);
-				if ( ! this->libraryAlreadyLoaded(info.path) ) {
-					_linkerOptionOrdinal = _linkerOptionOrdinal.nextLinkerOptionOrdinal();
-					info.ordinal = _linkerOptionOrdinal;
- 					//<rdar://problem/17787306> -force_load_swift_libs
-					info.options.fForceLoad = _options.forceLoadSwiftLibs() && (strncmp(libName, "swift", 5) == 0);
-					ld::File* reader = this->makeFile(info, true);
-					ld::dylib::File* dylibReader = dynamic_cast<ld::dylib::File*>(reader);
-					ld::archive::File* archiveReader = dynamic_cast<ld::archive::File*>(reader);
-					if ( dylibReader != NULL ) {
-						dylibReader->forEachAtom(handler);
-						dylibReader->setImplicitlyLinked();
-						dylibReader->setSpeculativelyLoaded();
-						this->addDylib(dylibReader, info);
-					}
-					else if ( archiveReader != NULL ) {
-						_searchLibraries.push_back(LibraryInfo(archiveReader));
-						_options.addDependency(Options::depArchive, archiveReader->path());
-						//<rdar://problem/17787306> -force_load_swift_libs
-						if (info.options.fForceLoad) {
-							archiveReader->forEachAtom(handler);
-						}
-					}
-					else {
-						throwf("linker option dylib at %s is not a dylib", info.path);
- 					}
- 				}
- 			}
-			catch (const char* msg) {
-				// <rdar://problem/40829444> only warn about missing auto-linked library if some missing symbol error happens later
-				state.missingLinkerOptionLibraries.insert(libName);
+			Options::FileInfo info = _options.findLibrary(libName);
+			if ( ! this->libraryAlreadyLoaded(info.path) ) {
+				_linkerOptionOrdinal = _linkerOptionOrdinal.nextLinkerOptionOrdinal();
+				info.ordinal = _linkerOptionOrdinal;
+				//<rdar://problem/17787306> -force_load_swift_libs
+				info.options.fForceLoad = _options.forceLoadSwiftLibs() && (strncmp(libName, "swift", 5) == 0);
+				infosToParse.emplace_back(info, libName);
 			}
-			state.linkerOptionLibraries.insert(libName);
+		}
+		typedef std::tuple<ld::File *, Options::FileInfo&, const char *> Triple;
+		std::vector<size_t> iz;
+		std::vector<Triple> readers;
+		readers.reserve(infosToParse.size());
+		std::transform(infosToParse.begin(), infosToParse.end(), std::back_inserter(readers), [&](auto &&pair) {
+			return Triple(NULL, pair.first, pair.second);
+		});
+		for (size_t i = 0; i < infosToParse.size(); i++) {
+			iz.push_back(i);
+		}
+		std::for_each(pstl::execution::par, iz.begin(), iz.end(), [&](auto &&idx) {
+			auto &pair = infosToParse[idx];
+			auto triple = Triple(this->makeFile(pair.first, true), pair.first, pair.second);
+			readers[idx] = triple;
+		});
+		/*std::transform(pstl::execution::par, iz.begin(), iz.end(), readers.begin(), [&](auto &&pair) {
+			return
+		});*/
+		/*std::transform(pstl::execution::par, infosToParse.begin(), infosToParse.end(), std::back_inserter(readers), [&](auto &&pair) {
+			return Triple(this->makeFile(pair.first, true), pair.first, pair.second);
+		});*/
+		//sleep(1);
+		for (auto &triple : readers) {
+			try {
+    			ld::dylib::File* dylibReader = dynamic_cast<ld::dylib::File*>(std::get<0>(triple));
+    			ld::archive::File* archiveReader = dynamic_cast<ld::archive::File*>(std::get<0>(triple));
+    			if ( dylibReader != NULL ) {
+    				dylibReader->forEachAtom(handler);
+    				dylibReader->setImplicitlyLinked();
+    				dylibReader->setSpeculativelyLoaded();
+    				this->addDylib(dylibReader, std::get<1>(triple));
+    			}
+    			else if ( archiveReader != NULL ) {
+    				_searchLibraries.push_back(LibraryInfo(archiveReader));
+    				_options.addDependency(Options::depArchive, archiveReader->path());
+    				//<rdar://problem/17787306> -force_load_swift_libs
+    				if (std::get<1>(triple).options.fForceLoad) {
+    					archiveReader->forEachAtom(handler);
+    				}
+    			}
+    			else {
+    				throwf("linker option dylib at %s is not a dylib", std::get<1>(triple).path);
+    			}
+    		}
+    		catch (const char* msg) {
+    			// <rdar://problem/40829444> only warn about missing auto-linked library if some missing symbol error happens later
+    			state.missingLinkerOptionLibraries.insert(std::get<2>(triple));
+    		}
+    		state.linkerOptionLibraries.insert(std::get<2>(triple));
 		}
 	}
 }
@@ -1321,7 +1348,7 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 
 void InputFiles::preParseLibraries() const {
 	std::string line;
-	std::ifstream infile("/tmp/cache-o");
+	std::ifstream infile(_options.cacheFilePath());
 	LDSet<std::string> currentSet;
 	LDMap<std::string, LDSet<std::string>> map;
 	std::string currentLib;

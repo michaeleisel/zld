@@ -282,6 +282,16 @@ public:
 	
 	typedef const char* const*	UndefinesIterator;
 
+	std::string cacheFilePath() const {
+		const char *path = outputFilePath();
+		size_t hash = 5183;
+		while (*path) {
+			hash = hash * 5 + *path;
+			path++;
+		}
+		return "/tmp/zld-" + std::to_string(hash);
+	}
+
 //	const ObjectFile::ReaderOptions&	readerOptions();
 	const char*							outputFilePath() const { return fOutputFile; }
 	const std::vector<FileInfo>&		getInputFiles() const { return fInputFiles; }
