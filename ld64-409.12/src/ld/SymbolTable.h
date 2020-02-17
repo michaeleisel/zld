@@ -98,7 +98,7 @@ class SymbolTable : public ld::IndirectBindingTable
 {
 public:
 	typedef uint32_t IndirectBindingSlot;
-	//~SymbolTable();
+	~SymbolTable();
 
 private:
 	typedef google::dense_hash_map<LDString *, IndirectBindingSlot, CLDStringPointerHash, CLDStringPointerEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
@@ -195,6 +195,7 @@ private:
 
 	const Options&					_options;
 	NameToSlot						_byNameTable;
+	google::dense_hash_map<const char *, size_t, CCharPtrHash>						_byNameTableFast;
 	TNode _trie;
 	SlotToName						_byNameReverseTable;
 	ContentToSlot					_literal4Table;

@@ -73,6 +73,9 @@ SymbolTable::SymbolTable(const Options& opts, std::vector<const ld::Atom*>& ibt)
 	deleteString.length = -1;
 	deleteString.hash = 0;
 	_stringCache.emplace_back(deleteString);
+	_byNameTableFast.set_empty_key(NULL);
+	_byNameTableFast.set_deleted_key((const char *)0x1);
+	_byNameTableFast.min_load_factor(0.0);
 	_byNameTable.set_deleted_key(&(_stringCache.back()));
 	if (!opts.deadCodeStrip() && !opts.deadStripDylibs()) {
     	_byNameTable.min_load_factor(0.0);
@@ -80,9 +83,18 @@ SymbolTable::SymbolTable(const Options& opts, std::vector<const ld::Atom*>& ibt)
 	_s_indirectBindingTable = this;
 }
 
-/*SymbolTable::~SymbolTable() {
-	printf("~%ld\n", _byNameTable.size());
-}*/
+SymbolTable::~SymbolTable() {
+	std::unordered_map<size_t, const char *> hashes;
+	for (auto &pair: _byNameTable) {
+		size_t hash = _byNameTable.hash_funct()(pair.first);
+		auto search = hashes.find(hash);
+		if (search != hashes.end() && strlen(search->second) == strlen(pair.first->str)) {
+			printf("confli: %s, %s\n", search->second, pair.first->str);
+		} else {
+			hashes[hash] = pair.first->str;
+		}
+	}
+}
 
 
 size_t SymbolTable::ContentFuncs::operator()(const ld::Atom* atom) const
@@ -644,15 +656,20 @@ static int nfoundz = 0;
 // find existing or create new slot
 SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name, FastFileMap *seenPerFile)
 {
+	/*auto fastPos = _byNameTableFast.find(name);
+	if ( fastPos != _byNameTableFast.end() ) {
+		return fastPos->second;
+	}*/
 	LDString string = LDStringCreate(name);
 	NameToSlot::iterator pos = _byNameTable.find(&string);
 	if ( pos != _byNameTable.end() ) {
 		IndirectBindingSlot slot = pos->second;
-		pos->first->str = name;
+		//_byNameTableFast[name] = slot;
 		return slot;
 	}
 	// create new slot for this name
 	SymbolTable::IndirectBindingSlot slot = _indirectBindingTable.size();
+	//_byNameTableFast[name] = slot;
 	//node->_slot = slot;
 	_indirectBindingTable.push_back(NULL);
 	_stringCache.emplace_back(string);

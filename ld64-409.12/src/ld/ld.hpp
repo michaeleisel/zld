@@ -1299,7 +1299,7 @@ typedef struct {
 } LDString;
 
 static inline size_t CRCHash(const char *__s, size_t len) {
-	uint32_t __h = 0;
+	uint32_t __h = 5183;
 	int curr = len;
 	uint64_t *chunks = (uint64_t *)__s;
 	while (curr >= 8) {
@@ -1332,6 +1332,19 @@ static inline LDString LDStringCreate(const char *str) {
 	};
 }
 
+struct CCharPtrHash {
+	size_t operator()(const char *c) const {
+		return _mm_crc32_u64(5183, (size_t)c);
+	}
+};
+
+struct CCharPtrEquals
+{
+	bool operator()(const char *a, const char *b) const {
+		return a == b;
+	}
+};
+
 struct CLDStringPointerHash {
 	size_t operator()(LDString *__s) const {
 		return __s->hash;
@@ -1355,10 +1368,17 @@ struct CStringHash {
 struct CLDStringPointerEquals
 {
 	bool operator()(LDString *leftPtr, LDString *rightPtr) const {
-		LDString left = *leftPtr;
-		LDString right = *rightPtr;
-		return left.hash == right.hash && left.length == right.length
-		&& (left.str == right.str || memcmp(left.str, right.str, left.length) == 0);
+		if (leftPtr->hash != rightPtr->hash) {
+			return false;
+		}
+		if (leftPtr->length == -1) {
+			leftPtr->length = strlen(leftPtr->str);
+		}
+		if (rightPtr->length == -1) {
+			rightPtr->length = strlen(rightPtr->str);
+		}
+		return leftPtr->length == rightPtr->length;
+		//&& (left.str == right.str || memcmp(left.str, right.str, left.length) == 0);
 	}
 };
 
