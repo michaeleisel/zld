@@ -281,6 +281,7 @@ bool DyldInfoPrinter<arm64>::validFile(const uint8_t* fileContent)
 		case MH_BUNDLE:
 		case MH_DYLINKER:
 		case MH_KEXT_BUNDLE:
+		case MH_PRELOAD:
 			return true;
 		default:
 			return false;
@@ -331,8 +332,13 @@ DyldInfoPrinter<A>::DyldInfoPrinter(const uint8_t* fileContent, uint32_t fileLen
 				{
 				const macho_segment_command<P>* segCmd = (const macho_segment_command<P>*)cmd;
 				fSegments.push_back(segCmd);
-				if ( (segCmd->fileoff() == 0) && (segCmd->filesize() != 0) )
-					fBaseAddress = segCmd->vmaddr();
+				if (fHeader->filetype() == MH_PRELOAD) {
+					if ( (fFirstSegment == NULL) && (segCmd->filesize() != 0) )
+						fBaseAddress = segCmd->vmaddr();
+				} else {
+					if ( (segCmd->fileoff() == 0) && (segCmd->filesize() != 0) )
+						fBaseAddress = segCmd->vmaddr();
+				}
 				if ( fFirstSegment == NULL )
 					fFirstSegment = segCmd;
 				if ( (segCmd->initprot() & VM_PROT_WRITE) != 0 ) {
@@ -2334,7 +2340,7 @@ void DyldInfoPrinter<A>::printRelocRebaseInfo()
 					continue;
 				printf("rebase information (from __TEXT,__thread_starts):\n");
 				printf("segment  section          address     type\n");
-				const uint8_t* sectionContent = (uint8_t*)fHeader + segCmd->fileoff() + sect->offset();
+				const uint8_t* sectionContent = (uint8_t*)fHeader + sect->offset();
 				uint32_t *threadStarts = (uint32_t*)sectionContent;
 				uint32_t *threadEnds = (uint32_t*)(sectionContent + sect->size());
 				uint32_t threadStartsHeader = threadStarts[0];
