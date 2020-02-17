@@ -2790,7 +2790,7 @@ void OutputFile::writeAtoms(ld::Internal& state, uint8_t* wholeBuffer)
 				// copy atom content
 				op.atom->copyRawContent(&wholeBuffer[op.fileOffset]);
 				// apply fix ups
-				this->applyFixUps(state, op.baseAddress, op.atom, &wholeBuffer[op.fileOffset]);
+				this->applyFixUps(state, op.mhAddress, op.atom, &wholeBuffer[op.fileOffset]);
 			}
 		}];
 	}
