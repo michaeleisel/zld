@@ -1,4 +1,4 @@
-.Dd March 7, 2011
+.Dd March 7, 2018
 .Dt ld 1
 .Os Darwin
 .Sh NAME
@@ -274,7 +274,7 @@ a later version enables the linker to assumes features of that OS in the output 
 .Ar version
 is an iOS version number such as 3.1 or 4.0
 .It Fl image_base Ar address
-Specifies the perferred load address for a dylib or bundle. The argument
+Specifies the preferred load address for a dylib or bundle. The argument
 .Ar address
 is a hexadecimal number with an optional leading 0x.  By choosing non-overlapping address for all
 dylibs and bundles that a program loads, launch time can be improved because dyld will not need to
@@ -541,6 +541,8 @@ Otherwise, the reverse map will be written to a file at
 .Bl -tag
 .It Fl v
 Prints the version of the linker.
+.It Fl version_details
+Prints the version info about the linker in JSON
 .It Fl no_weak_imports
 Error if any symbols are weak imports (i.e. allowed to be unresolved (NULL) at runtime). Useful for config based
 projects that assume they are built and run on the same OS version.
