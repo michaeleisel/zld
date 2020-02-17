@@ -866,17 +866,31 @@ static bool endsWith(const char* str, const char* suffix)
 	return false;
 }
 
+
+static bool sharedCacheEligiblePath(const char* path)
+{
+	return ( (strncmp(path, "/usr/lib/", 9) == 0)
+			|| (strncmp(path, "/System/Library/", 16) == 0)
+			|| (strncmp(path, "/System/iOSSupport/usr/lib/", 27) == 0)
+			|| (strncmp(path, "/System/iOSSupport/System/Library/", 34) == 0)
+			);
+}
+
 template <typename A>
 void MachOChecker<A>::verify()
 {
-	if ( endsWith(fPath, "_asan.dylib") || endsWith(fPath, "_asan") || endsWith(fPath, "_debug.dylib") || endsWith(fPath, "_debug") )
-		fIsDebugVariant = true;
+	static const char* debugSuffixes[] = { "_asan.dylib", "_asan", "_debug.dylib", "_debug", "_profile", "_profile.dylib",
+											"_trace", "_trace.dylib", "_tsan", "_tsan.dylib", "_ubsan" , "_ubsan.dylib" };
+	for (const char* suffix : debugSuffixes) {
+		if ( endsWith(fPath, suffix) )
+			fIsDebugVariant = true;
+	}
 
 	if ( (fDstRoot != NULL) && (strlen(fDstRoot) < strlen(fPath)) ) {
 		const char* installLocationInDstRoot = &fPath[strlen(fDstRoot)];
 		if ( installLocationInDstRoot[0] != '/' )
 			--installLocationInDstRoot;
-		if ( (strncmp(installLocationInDstRoot, "/usr/lib/", 9) == 0) || (strncmp(installLocationInDstRoot, "/System/Library/", 16) == 0) ) {
+		if ( sharedCacheEligiblePath(installLocationInDstRoot) ) {
 			if ( !fIsDebugVariant && (strstr(fPath, ".app/") == NULL) ) {
 				verifyInstallName();
 				verifyNoRpaths();

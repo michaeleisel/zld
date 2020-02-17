@@ -648,12 +648,15 @@ void Resolver::doFile(const ld::File& file)
 					throwf("embedded dylibs/frameworks are only supported on iOS 8.0 and later (%s)", depInstallName);
 			}
 		}
-		if ( _options.sharedRegionEligible() ) {
+		if ( _options.sharedRegionEligible() && !_options.debugVariant() ) {
 			assert(depInstallName != NULL);
 			if ( depInstallName[0] == '@' ) {
 				warning("invalid -install_name (%s) in dependent dylib (%s). Dylibs/frameworks which might go in dyld shared cache "
 						"cannot link with dylib that uses @rpath, @loader_path, etc.", depInstallName, dylibFile->path());
-			} else if ( (strncmp(depInstallName, "/usr/lib/", 9) != 0) && (strncmp(depInstallName, "/System/Library/", 16) != 0) ) {
+			} else if ( (strncmp(depInstallName, "/usr/lib/", 9) != 0)
+					   && (strncmp(depInstallName, "/System/Library/", 16) != 0)
+					   && (strncmp(depInstallName, "/System/iOSSupport/usr/lib/", 27) != 0)
+					   && (strncmp(depInstallName, "/System/iOSSupport/System/Library/", 34) != 0) ) {
 				warning("invalid -install_name (%s) in dependent dylib (%s). Dylibs/frameworks which might go in dyld shared cache "
 						"cannot link with dylibs that won't be in the shared cache", depInstallName, dylibFile->path());
 			}

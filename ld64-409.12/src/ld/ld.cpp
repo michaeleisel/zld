@@ -89,6 +89,20 @@ extern "C" double log2 ( double );
 #include "parsers/lto_file.h"
 #include "parsers/opaque_section_file.h"
 
+const ld::Platform ld::basePlatform(const ld::Platform& platform)  {
+	switch(platform) {
+		case ld::kPlatform_iOSMac:
+		case ld::kPlatform_iOSSimulator:
+			return ld::kPlatform_iOS;
+		case ld::kPlatform_watchOSSimulator:
+			return kPlatform_watchOS;
+		case ld::kPlatform_tvOSSimulator:
+			return ld::kPlatform_tvOS;
+		default:
+			return platform;
+	}
+}
+
 const ld::VersionSet ld::File::_platforms;
 
 struct PerformanceStatistics {
@@ -1314,11 +1328,6 @@ const char* dyld_lazy_dylib_path_fix(const char* path)
 }
 
 
-void je_zone_register(void);
-
-__attribute__((constructor)) void a() {
-	//je_zone_register();
-}
 
 int main(int argc, const char* argv[])
 {

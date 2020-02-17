@@ -1233,35 +1233,44 @@ PropertyListAtom<A>::PropertyListAtom(ld::Internal& state, const ld::Atom* baseP
 
 
 template <typename A>
-void scanCategories(ld::Internal& state, 
-					bool& haveCategoriesWithNonNullClassProperties, 
-					bool& haveCategoriesWithoutClassPropertyStorage)
+bool scanCategories(ld::Internal& state)
 {
-	haveCategoriesWithNonNullClassProperties = false;
-	haveCategoriesWithoutClassPropertyStorage = false;
-	
+	bool warned = false;
+	bool haveCategoriesWithoutClassPropertyStorage = false;
 	for (std::vector<ld::Internal::FinalSection*>::iterator sit=state.sections.begin(); sit != state.sections.end(); ++sit) {
 		ld::Internal::FinalSection* sect = *sit;
 		if ( sect->type() == ld::Section::typeObjC2CategoryList ) {
+			const char* aFileWithCategorysWithNonNullClassProperties = nullptr;
 			for (std::vector<const ld::Atom*>::iterator ait=sect->atoms.begin(); ait != sect->atoms.end(); ++ait) {
 				const ld::Atom* categoryListElementAtom = *ait;
+
 				bool hasAddend;
 				const ld::Atom* categoryAtom = ObjCData<A>::getPointerInContent(state, categoryListElementAtom, 0, &hasAddend);
 				
 				if (Category<A>::getClassProperties(state, categoryAtom)) {
-					haveCategoriesWithNonNullClassProperties = true;
-					// fprintf(stderr, "category in file %s has non-null class properties\n", categoryAtom->safeFilePath());
+					aFileWithCategorysWithNonNullClassProperties = categoryAtom->safeFilePath();
 				}
 
 				if ( const ld::relocatable::File* objFile = dynamic_cast<const ld::relocatable::File*>(categoryAtom->file()) ) {
 					if ( !objFile->objcHasCategoryClassPropertiesField() ) {
 						haveCategoriesWithoutClassPropertyStorage = true;
-						// fprintf(stderr, "category in file %s has no storage for class properties\n", categoryAtom->safeFilePath());
+						if ( aFileWithCategorysWithNonNullClassProperties ) {
+							// Complain about mismatched category ABI.
+							// These can't be combined into a single linkage unit because there is only one size indicator for all categories in the file.
+							// If there is a mismatch then we don't set the HasCategoryClassProperties bit in the output file,
+							// which has at runtime causes any class property metadata that was present to be ignored.
+							if ( !warned ) {
+								warning("Incompatible Objective-C category definitions. Some category metadata may be lost. '%s' and '%s built with different compilers",
+										aFileWithCategorysWithNonNullClassProperties, categoryAtom->safeFilePath());
+								warned = true;
+							}
+						}
 					}
 				}
 			}
 		}
 	}
+	return haveCategoriesWithoutClassPropertyStorage;
 }
 
 
@@ -1280,17 +1289,7 @@ void doPass(const Options& opts, ld::Internal& state)
 
 	// Search for surviving categories that have a non-null class properties field.
 	// Search for surviving categories that do not have storage for the class properties field.
-	bool haveCategoriesWithNonNullClassProperties;
-	bool haveCategoriesWithoutClassPropertyStorage;
-	scanCategories<A>(state, haveCategoriesWithNonNullClassProperties, haveCategoriesWithoutClassPropertyStorage);
-
-	// Complain about mismatched category ABI.
-	// These can't be combined into a single linkage unit because there is only one size indicator for all categories in the file.
-	// If there is a mismatch then we don't set the HasCategoryClassProperties bit in the output file, 
-	// which has at runtime causes any class property metadata that was present to be ignored.
-	if (haveCategoriesWithNonNullClassProperties  &&  haveCategoriesWithoutClassPropertyStorage) {
-		warning("Some object files have incompatible Objective-C category definitions. Some category metadata may be lost. All files containing Objective-C categories should be built using the same compiler.");
-	}
+	 bool haveCategoriesWithoutClassPropertyStorage = scanCategories<A>(state);
 
 	// add image info atom
 	// The HasCategoryClassProperties bit is set as often as possible.

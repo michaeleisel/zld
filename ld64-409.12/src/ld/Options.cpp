@@ -49,6 +49,8 @@
 // from FunctionNameDemangle.h
 extern "C" size_t fnd_get_demangled_name(const char *mangledName, char *outputBuffer, size_t length);
 
+#define VAL(x) #x
+#define STRINGIFY(x) VAL(x)
 
 // upward dependency on lto::version()
 namespace lto {
@@ -60,7 +62,7 @@ namespace lto {
 // magic to place command line in crash reports
 const int crashreporterBufferSize = 2000;
 static char crashreporterBuffer[crashreporterBufferSize];
-#if 0
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
 	#include <CrashReporterClient.h>
 	// hack until ld does not need to build on 10.6 anymore
     struct crashreporter_annotations_t gCRAnnotations 
@@ -180,7 +182,7 @@ Options::Options(int argc, const char* argv[])
 	  fObjcGcCompaction(false), fObjCGc(false), fObjCGcOnly(false), 
 	  fDemangle(false), fTLVSupport(false), 
 	  fVersionLoadCommand(false), fVersionLoadCommandForcedOn(false), 
-	  fVersionLoadCommandForcedOff(false), fFunctionStartsLoadCommand(false),
+	  fVersionLoadCommandForcedOff(false), fForceLegacyVersionLoadCommands(false), fFunctionStartsLoadCommand(false),
 	  fFunctionStartsForcedOn(false), fFunctionStartsForcedOff(false),
 	  fDataInCodeInfoLoadCommand(false), fDataInCodeInfoLoadCommandForcedOn(false), fDataInCodeInfoLoadCommandForcedOff(false),
 	  fCanReExportSymbols(false), fObjcCategoryMerging(true), fPageAlignDataAtoms(false), 
@@ -188,7 +190,7 @@ Options::Options(int argc, const char* argv[])
 	  fSourceVersionLoadCommand(false),
 	  fSourceVersionLoadCommandForceOn(false), fSourceVersionLoadCommandForceOff(false), 
 	  fExportDynamic(false), fAbsoluteSymbols(false),
-	  fAllowSimulatorToLinkWithMacOSX(false), fKeepDwarfUnwind(true),
+	  fAllowSimulatorToLinkWithMacOSX(false), fSimulatorSupportDylib(false), fKeepDwarfUnwind(true),
 	  fKeepDwarfUnwindForcedOn(false), fKeepDwarfUnwindForcedOff(false),
 	  fVerboseOptimizationHints(false), fIgnoreOptimizationHints(false),
 	  fGenerateDtraceDOF(true), fAllowBranchIslands(true), fTraceSymbolLayout(false), 
@@ -3918,6 +3920,14 @@ void Options::parse(int argc, const char* argv[])
 	}
 }
 
+bool Options::shouldUseBuildVersion(ld::Platform plat, uint32_t minOSvers) const {
+	ld::Platform basePlatform = ld::basePlatform(plat);
+	if (!ld::supportsLCBuildVersion.contains(basePlatform)) return true; // Newer OSes than those listed in the version sets need to use LC_BUILD_VERSIOn
+	if (fForceLegacyVersionLoadCommands) return false;
+	if (isSimulatorSupportDylib() && plat != ld::Platform::kPlatform_iOSMac) return false;
+	return (minOSvers >= ld::supportsLCBuildVersion.minOS(basePlatform));
+}
+
 //
 // -syslibroot <path> is used for SDK support.
 // The rule is that all search paths (both explicit and default) are
@@ -3979,6 +3989,43 @@ void Options::buildSearchPaths(int argc, const char* argv[])
 					fprintf(stderr, "LTO support using: %s (static support for %d, runtime is %d)\n",
 							ltoVers, lto::static_api_version(), lto::runtime_api_version());
 				fprintf(stderr, "TAPI support using: %s\n", tapi::Version::getFullVersionAsString().c_str());
+				exit(0);
+			}
+		}
+		else if ( strcmp(argv[i], "-version_details") == 0 ) {
+			fVerbose = true;
+			extern const char ldVersionString[];
+			fprintf(stdout, "{\n");
+			fprintf(stdout, "\t\"version\": \"%s\",\n", STRINGIFY(LD64_VERSION_NUM));
+			fprintf(stdout, "\t\"architectures\": [\n");
+			char all_archs[] = ALL_SUPPORTED_ARCHS;
+			char* p = strtok(all_archs, " ");
+			int i = 0;
+			while (p) {
+				if (i++ > 0) {
+					fprintf(stdout, ",\n");
+				}
+				fprintf(stdout, "\t\t\"%s\"", p);
+				p = strtok(NULL, " ");
+			}
+			fprintf(stdout, "\n\t],\n");
+
+			const char* ltoVers = lto::version();
+			if ( ltoVers != NULL ) {
+				fprintf(stdout, "\t\"lto\": {\n");
+				fprintf(stdout, "\t\t\"runtime_api_version\": %d,\n", lto::runtime_api_version());
+				fprintf(stdout, "\t\t\"static_api_version\": %d,\n", lto::static_api_version());
+				fprintf(stdout, "\t\t\"version_string\": \"%s\"\n", ltoVers);
+				fprintf(stdout, "\t},\n");
+			}
+
+			fprintf(stdout, "\t\"tapi\": {\n");
+			fprintf(stdout, "\t\t\"version\": \"%s\",\n", tapi::Version::getAsString().c_str());
+			fprintf(stdout, "\t\t\"version_string\": \"%s\"\n", tapi::Version::getFullVersionAsString().c_str());
+			fprintf(stdout, "\t}\n");
+			fprintf(stdout, "}\n");
+			// if only -version_json specified, exit cleanly
+			if ( argc == 2 ) {
 				exit(0);
 			}
 		}
@@ -4153,6 +4200,10 @@ void Options::buildSearchPaths(int argc, const char* argv[])
 // this is run before the command line is parsed
 void Options::parsePreCommandLineEnvironmentSettings()
 {
+	if (getenv("LD_FORCE_LEGACY_VERSION_LOAD_CMDS") != NULL) {
+		fForceLegacyVersionLoadCommands = true;
+	}
+
 	if ((getenv("LD_TRACE_ARCHIVES") != NULL)
 		|| (getenv("RC_TRACE_ARCHIVES") != NULL))
 	    fTraceArchives = true;
@@ -4164,8 +4215,11 @@ void Options::parsePreCommandLineEnvironmentSettings()
 	}
 	
 	if ((getenv("LD_TRACE_DEPENDENTS") != NULL)) {
-		
-		fTraceEmitJSON = true;
+		fTraceEmitJSON 		 = true;
+		// <rdar://problem/43652680> ld64 should ignore LD_TRACE_ARCHIVES and LD_TRACE_DYLIBS if LD_TRACE_DEPENDENTS is set in the environment
+		fTraceArchives 		 = false;
+	    fTraceDylibs  		 = false;
+		fTraceIndirectDylibs = false;
 	}
 
 	if (getenv("RC_TRACE_DYLIB_SEARCHING") != NULL) {
@@ -4282,9 +4336,17 @@ void Options::parsePostCommandLineEnvironmentSettings()
 }
 
 
-static bool sharedCacheEligiblePath(const char* path)
+bool Options::sharedCacheEligiblePath(const char* path)
 {
-	return ( (strncmp(path, "/usr/lib/", 9) == 0) || (strncmp(path, "/System/Library/", 16) == 0) );
+	if ( (strncmp(path, "/usr/lib/", 9) == 0) || (strncmp(path, "/System/Library/", 16) == 0) )
+		return true;
+
+	uint32_t iosMacVers = platforms().minOS(ld::Platform::kPlatform_iOS);
+	if ( iosMacVers >= 0x000D0000 ) {
+		if ( (strncmp(path, "/System/iOSSupport/System/Library/", 34) == 0) || (strncmp(path, "/System/iOSSupport/usr/lib/", 27) == 0) )
+			return true;
+	}
+	return false;
 }
 
 void Options::reconfigureDefaults()
@@ -4544,6 +4606,9 @@ void Options::reconfigureDefaults()
 			// <rdar://problem/32525720> use v2 for ABI stable Swift dylibs on macOS
 			if ( strncmp(this->installPath(), "/System/Library/Frameworks/Swift/", 33) == 0 )
 				fSharedRegionEncodingV2 = true;
+			// <rdar://problem/40600799> use v2 for stable Swift dylibs in /usr/lib/swift/
+			if ( strncmp(this->installPath(), "/usr/lib/swift/", 15) == 0 )
+				fSharedRegionEncodingV2 = true;
 			// <rdar://problem/31428120> an other OS frameworks that use swift need v2
 			for (const char* searchPath  : fLibrarySearchPaths ) {
 				if ( strstr(searchPath, "xctoolchain/usr/lib/swift/macos") != NULL ) {
@@ -4551,9 +4616,26 @@ void Options::reconfigureDefaults()
 					break;
 				}
 			}
+
+			if ( fSharedRegionEncodingV2 && (fArchitecture == CPU_TYPE_I386) ) {
+				// Disable V2 on i386 as its not qualififed yet.
+				fSharedRegionEncodingV2 = false;
+			}
 		}
 		fIgnoreOptimizationHints = true;
 	}
+
+	if ( platforms().contains(ld::kPlatform_macOS) &&
+		((strcmp(installPath(), "/usr/lib/system/libsystem_kernel.dylib") == 0)
+		 || (strcmp( installPath(), "/usr/lib/system/libsystem_platform.dylib") == 0)
+		 || (strcmp( installPath(), "/usr/lib/system/libsystem_pthread.dylib") == 0)
+		 || (strcmp( installPath(), "/usr/lib/system/libsystem_platform_debug.dylib") == 0)
+		 || (strcmp( installPath(), "/usr/lib/system/libsystem_pthread_debug.dylib") == 0)
+		 || (strcmp( installPath(), "/System/Library/PrivateFrameworks/SiriUI.framework/Versions/A/SiriUI") == 0))) {
+			fSimulatorSupportDylib = true;
+		} else {
+			fSimulatorSupportDylib = false;
+		}
 
 	// <rdar://problem/5366363> -r -x implies -S
 	if ( (fOutputKind == Options::kObjectFile) && (fLocalSymbolHandling == kLocalSymbolsNone) )
@@ -4667,7 +4749,7 @@ void Options::reconfigureDefaults()
 			break;
 		case Options::kDyld:
 			// arm64e has support for compressed LINKEDIT.
-			if ( (fArchitecture == CPU_TYPE_ARM64) && (fSubArchitecture == CPU_SUBTYPE_ARM64E) )
+			if ( (fArchitecture == CPU_TYPE_ARM64) && (fSubArchitecture == CPU_SUBTYPE_ARM64_E) )
 				break;
 		case Options::kPreload:
 		case Options::kStaticExecutable:
@@ -5765,13 +5847,6 @@ void Options::checkIllegalOptionCombinations()
 		}
 	}
 
-	if (platforms().count() == 2) {
-		if (!platforms().minOS(ld::mac10_14))
-			throw "Zippered macOS version platform must be at least 10.14";
-		if (!platforms().minOS(ld::iOS_12_0))
-			throw "Zippered iosmac version platform must be at least 12.0";
-	}
-
 	if (platforms().contains(ld::kPlatform_iOSMac) && !platforms().minOS(ld::iOS_12_0)) {
 		throw "iosmac platform version must be at least 12.0";
 	}
@@ -5813,7 +5888,7 @@ void Options::checkForClassic(int argc, const char* argv[])
 	bool newLinker = false;
 	
 	// build command line buffer in case ld crashes
-#if 0
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
 	CRSetCrashLogMessage(crashreporterBuffer);
 #endif
 	const char* srcRoot = getenv("SRCROOT");

@@ -317,7 +317,7 @@ ld::File* InputFiles::makeFile(const Options::FileInfo& info, bool indirectDylib
 	objOpts.logAllFiles			= _options.logAllFiles();
 	objOpts.warnUnwindConversionProblems	= _options.needsUnwindInfoSection();
 	objOpts.keepDwarfUnwind		= _options.keepDwarfUnwind();
-	objOpts.forceDwarfConversion= (_options.outputKind() == Options::kDyld);
+	objOpts.forceDwarfConversion= false;
 	objOpts.neverConvertDwarf   = !_options.needsUnwindInfoSection();
 	objOpts.verboseOptimizationHints = _options.verboseOptimizationHints();
 	objOpts.armUsesZeroCostExceptions = _options.armUsesZeroCostExceptions();
@@ -735,12 +735,16 @@ void InputFiles::createIndirectDylibs()
 			if ( dylibsProcessed.count(*it) == 0 )
 				unprocessedDylibs.push_back(*it);
 		}
+		// <rdar://problem/42675402> ld64 output is not deterministic due to dylib processing order
+		std::sort(unprocessedDylibs.begin(), unprocessedDylibs.end(), [](const ld::dylib::File* lhs, const ld::dylib::File* rhs) {
+			return strcmp(lhs->path(), rhs->path()) < 0;
+		});
 		for (std::vector<ld::dylib::File*>::iterator it=unprocessedDylibs.begin(); it != unprocessedDylibs.end(); it++) {
 			dylibsProcessed.insert(*it);
 			(*it)->processIndirectLibraries(this, _options.implicitlyLinkIndirectPublicDylibs());
 		}
 	}
-	
+
 	// go back over original dylibs and mark sub frameworks as re-exported
 	if ( _options.outputKind() == Options::kDynamicLibrary ) {
 		const char* myLeaf = strrchr(_options.installPath(), '/');
@@ -1214,8 +1218,11 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 			pthread_cond_wait(&_newFileAvailable, &_parseLock);
 		}
 
-		if (_exception)
+		if (_exception) {
+			// <rdar://problem/16525216> the tool is erroring out.  wait for other threads to finish so we don't destruct global objects out from under them
+			sleep(1);
 			throw _exception;
+		}
 
 		// The input file is parsed. Assimilate it and call its atom iterator.
 		if (_s_logPThreads) printf("consuming slot %lu\n", fileIndex);
@@ -1268,8 +1275,11 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 			asprintf((char**)&_exception, "%s file '%s'", msg, file->path());
 		}
 	}
-	if (_exception)
+	if (_exception) {
+		// <rdar://problem/16525216> the tool is erroring out.  wait for other threads to finish so we don't destruct global objects out from under them
+		sleep(1);
 		throw _exception;
+	}
 
 	markExplicitlyLinkedDylibs();
 	addLinkerOptionLibraries(state, handler);
@@ -1514,7 +1524,7 @@ void InputFiles::dylibs(ld::Internal& state)
 
 void InputFiles::archives(ld::Internal& state)
 {
-	for (const std::string path :  _archiveFilePaths) {
+	for (const std::string& path :  _archiveFilePaths) {
 		
 		state.archivePaths.push_back(path);
 	}

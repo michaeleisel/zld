@@ -32,6 +32,7 @@ namespace ld {
 class Bitcode {
 public:
     Bitcode(const uint8_t* content, uint32_t size) : _content(content), _size(size) { }
+    virtual ~Bitcode() { }
 
     virtual bool isMarker() const                               { return _size <= 1 ; }
     virtual const uint8_t* getContent() const                   { return _content; }

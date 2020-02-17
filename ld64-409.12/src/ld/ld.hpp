@@ -58,6 +58,8 @@ enum Platform {
 	kPlatform_watchOSSimulator=9
 };
 
+const ld::Platform basePlatform(const ld::Platform& platform);
+
 typedef std::set<Platform> PlatformSet;
 
 //
@@ -113,20 +115,6 @@ public:
 
 	bool minOS(const Version& version) const {
 		return minOS(version.first) >= version.second;
-	}
-
-	const ld::Platform basePlatform(const ld::Platform& platform) const {
-		switch(platform) {
-			case kPlatform_iOSMac:
-			case kPlatform_iOSSimulator:
-				return kPlatform_iOS;
-			case kPlatform_watchOSSimulator:
-				return kPlatform_watchOS;
-			case kPlatform_tvOSSimulator:
-				return kPlatform_tvOS;
-			default:
-				return platform;
-		}
 	}
 
 	bool minOS(const ld::VersionSet& requiredMinVersions) const {
@@ -464,6 +452,7 @@ namespace dylib {
 		virtual bool						hasWeakExternals() const = 0;
 		virtual bool						deadStrippable() const = 0;
 		virtual bool						hasWeakDefinition(const char* name) const = 0;
+		virtual bool						hasDefinition(const char* name) const = 0;
 		virtual bool						hasPublicInstallName() const = 0;
 		virtual bool						allSymbolsAreWeakImported() const = 0;
 		virtual bool						installPathVersionSpecific() const { return false; }
@@ -1100,9 +1089,8 @@ public:
 	void									setSectionStartAddress(uint64_t a) { assert(_mode == modeSectionOffset); _address += a; _mode = modeFinalAddress; }
 	uint64_t								sectionOffset() const		{ assert(_mode == modeSectionOffset); return _address; }
 	uint64_t								finalAddress() const		{ assert(_mode == modeFinalAddress); return _address; }
-#ifndef NDEBUG
 	bool									finalAddressMode() const    { return (_mode == modeFinalAddress); }
-#endif
+
 	virtual const File*						file() const = 0;
 	// Return the original file this atom belongs to, for instance for an LTO atom,
 	// file() would return the LTO MachO file instead of the original bitcode file.
@@ -1185,7 +1173,8 @@ protected:
 
 class IndirectBindingTable
 {
-public:	
+public:
+	virtual 					~IndirectBindingTable() { }
 	virtual const char*			indirectName(uint32_t bindingIndex) const = 0;
 	virtual const ld::Atom*		indirectAtom(uint32_t bindingIndex) const = 0;
 };

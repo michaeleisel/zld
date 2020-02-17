@@ -237,6 +237,11 @@ bool File<A>::validMachOFile(const uint8_t* fileContent, uint64_t fileLength, co
 template <typename A>
 bool File<A>::validLTOFile(const uint8_t* fileContent, uint64_t fileLength, const mach_o::relocatable::ParserOptions& opts)
 {
+	if ( fileLength < 32 )
+		return false;
+	uint32_t magic = *((uint32_t*)fileContent);
+	if ( (magic == MH_MAGIC) || (magic == MH_MAGIC_64) )
+		return false;
 	return lto::isObjectFile(fileContent, fileLength, opts.architecture, opts.subType);
 }
 

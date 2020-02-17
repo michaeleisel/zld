@@ -59,6 +59,7 @@ void throwf(const char* format, ...)
 class AbstractRebaser
 {
 public:
+	virtual										~AbstractRebaser() { }
 	virtual cpu_type_t							getArchitecture() const = 0;
 	virtual uint64_t							getBaseAddress() const = 0;
 	virtual uint64_t							getVMSize() const = 0;

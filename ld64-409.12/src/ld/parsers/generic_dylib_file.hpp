@@ -143,6 +143,7 @@ public:
 	virtual bool							hasWeakExternals() const override final	{ return _hasWeakExports; }
 	virtual bool							deadStrippable() const override final { return _deadStrippable; }
 	virtual bool							hasWeakDefinition(const char* name) const override final;
+    virtual bool                            hasDefinition(const char* name) const override final;
 	virtual bool							hasPublicInstallName() const override final { return _hasPublicInstallName; }
 	virtual bool							allSymbolsAreWeakImported() const override final;
 	virtual bool							installPathVersionSpecific() const override final { return _installPathOverride; }
@@ -183,6 +184,7 @@ private:
 	using NameSet = std::unordered_set<const char*, CStringHash, ld::CStringEquals>;
 
 	std::pair<bool, bool>		hasWeakDefinitionImpl(const char* name) const;
+    bool                        hasDefinitionImpl(const char* name) const;
 	bool						containsOrReExports(const char* name, bool& weakDef, bool& tlv, pint_t& addr) const;
 	void						assertNoReExportCycles(ReExportChain*) const;
 
@@ -275,6 +277,23 @@ std::pair<bool, bool> File<A>::hasWeakDefinitionImpl(const char* name) const
 }
 
 template <typename A>
+bool File<A>::hasDefinitionImpl(const char* name) const
+{
+    const auto pos = _atoms.find(name);
+    if ( pos != this->_atoms.end() )
+        return true;
+
+    // look in re-exported libraries.
+    for (const auto &dep : _dependentDylibs) {
+        if ( dep.reExport ) {
+            if ( dep.dylib->hasDefinitionImpl(name) )
+                return true;
+        }
+    }
+    return false;
+}
+
+template <typename A>
 bool File<A>::hasWeakDefinition(const char* name) const
 {
 	// If we are supposed to ignore this export, then pretend we don't have it.
@@ -282,6 +301,16 @@ bool File<A>::hasWeakDefinition(const char* name) const
 		return false;
 
 	return hasWeakDefinitionImpl(name).second;
+}
+
+template <typename A>
+bool File<A>::hasDefinition(const char* name) const
+{
+    // If we are supposed to ignore this export, then pretend we don't have it.
+    if ( _ignoreExports.count(name) != 0 )
+        return false;
+
+    return hasDefinitionImpl(name);
 }
 
 template <typename A>
