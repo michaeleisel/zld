@@ -303,7 +303,8 @@ bool SymbolTableAtom<A>::addLocal(const ld::Atom* atom, StringPoolAtom* pool)
 			symbolName = anonName;
 		}
 	}
-	entry.set_n_strx(pool->add(symbolName));
+	// <rdar://problem/43388350> ER: Coalesce the string pools for the symbol table when linking objects together
+	entry.set_n_strx(pool->addUnique(symbolName));
 
 	// set n_type
 	uint8_t type = N_SECT;

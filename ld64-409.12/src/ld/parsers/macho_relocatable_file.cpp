@@ -1450,6 +1450,11 @@ const char* Parser<arm64>::fileKind(const uint8_t* fileContent)
 		return NULL;
 	if ( header->cputype() != CPU_TYPE_ARM64 )
 		return NULL;
+	for (const ArchInfo* t=archInfoArray; t->archName != NULL; ++t) {
+		if ( (t->cpuType == CPU_TYPE_ARM) && ((cpu_subtype_t)header->cpusubtype() == t->cpuSubType) ) {
+			return t->archName;
+		}
+	}
 	return "arm64";
 }
 #endif
@@ -1766,7 +1771,10 @@ typename A::P::uint_t Parser<A>::realAddr(typename A::P::uint_t addr)
 	uint32_t _name##_count = 1; \
 	uint32_t _name##_stack_count = _actual_count; \
 	if ( _actual_count > _maxCount ) { \
-		_name = (_type*)malloc(sizeof(_type) * _actual_count); \
+		uint32_t allocSize;  \
+		if ( __builtin_mul_overflow(_actual_count, sizeof(_type), &allocSize) ) \
+			throw "STACK_ALLOC_IF_SMALL allocation overflow"; \
+		_name = (_type*)malloc(allocSize); \
 		_name##_stack_count = 1; \
 	} \
 	else \
@@ -3366,7 +3374,7 @@ uint32_t Parser<A>::indirectSymbol(uint32_t indirectIndex)
 template <typename A>
 const macho_nlist<typename A::P>& Parser<A>::symbolFromIndex(uint32_t index)
 {
-	if ( index >= _symbolCount )
+	if ( index > _symbolCount )
 		throw "symbol index out of range";
 	return _symbols[index];
 }
@@ -4536,16 +4544,6 @@ bool CFISection<A>::needsRelocating()
 	return false;
 }
 
-uint32_t read32(const char *buffer) {
-	uint32_t u = 0;
-	memcpy(&u, buffer, sizeof(u));
-	return u;
-}
-
-void write32(char *buffer, uint32_t u) {
-	memcpy(buffer, &u, sizeof(u));
-}
-
 template <>
 void CFISection<x86_64>::cfiParse(class Parser<x86_64>& parser, uint8_t* buffer,
 									libunwind::CFI_Atom_Info<CFISection<x86_64>::OAS> cfiArray[],
@@ -4588,17 +4586,10 @@ void CFISection<x86_64>::cfiParse(class Parser<x86_64>& parser, uint8_t* buffer,
 				p64 = (uint64_t*)&buffer[reloc->r_address()];
 				E::set64(*p64, value + E::get64(*p64));
 				break;
-			case 2: {
-				if (true) {
-    				uint32_t v = value + read32((const char *)(&buffer[reloc->r_address()]));
-    				write32((char *)(&buffer[reloc->r_address()]), v);
-				} else {
-    				/*p32 = (uint32_t*)&buffer[reloc->r_address()];
-    				//std::reverse(&buffer[reloc->r_address()], &buffer[reloc->r_address()] + 4);
-    				E::set32(*p32, value + E::get32(*p32));*/
-				}
+			case 2:
+				p32 = (uint32_t*)&buffer[reloc->r_address()];
+				E::set32(*p32, value + E::get32(*p32));
 				break;
-			}
 			default:
 				fprintf(stderr, "CFISection::cfiParse() unexpected relocation size at r_address=0x%08X\n", reloc->r_address());
 				break;
@@ -8110,6 +8101,11 @@ const char* archName(const uint8_t* fileContent)
 	if ( mach_o::relocatable::Parser<arm>::validFile(fileContent, false, 0) ) {
 		return mach_o::relocatable::Parser<arm>::fileKind(fileContent);
 	}
+#if SUPPORT_ARCH_arm64
+	if ( mach_o::relocatable::Parser<arm64>::validFile(fileContent, false, 0) ) {
+		return mach_o::relocatable::Parser<arm64>::fileKind(fileContent);
+	}
+#endif
 	return NULL;
 }
 

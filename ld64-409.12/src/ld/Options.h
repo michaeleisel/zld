@@ -162,7 +162,7 @@ public:
         // The use pattern for FileInfo is to create one on the stack in a leaf function and return
         // it to the calling frame by copy. Therefore the copy constructor steals the path string from
         // the source, which dies with the stack frame.
-        FileInfo(FileInfo const &other) : path(other.path), modTime(other.modTime), options(other.options), ordinal(other.ordinal), fromFileList(other.fromFileList), isInlined(other.isInlined), inputFileSlot(-1), readyToParse(false) { ((FileInfo&)other).path = NULL; };
+        FileInfo(FileInfo const &other) : path(other.path), modTime(other.modTime), options(other.options), ordinal(other.ordinal), fromFileList(other.fromFileList), isInlined(other.isInlined), inputFileSlot(-1) { ((FileInfo&)other).path = NULL; };
 
 		FileInfo &operator=(FileInfo other) {
 			std::swap(path, other.path);
@@ -177,7 +177,7 @@ public:
 		}
 
         // Create an empty FileInfo. The path can be set implicitly by checkFileExists().
-        FileInfo() : path(NULL), modTime(-1), options(), fromFileList(false), isInlined(false), readyToParse(false) {};
+        FileInfo() : path(NULL), modTime(-1), options(), fromFileList(false), isInlined(false) {};
         
         // Create a FileInfo for a specific path, but does not stat the file.
         FileInfo(const char *_path) : path(strdup(_path)), modTime(-1), options(), fromFileList(false), isInlined(false) {};
@@ -449,6 +449,7 @@ public:
 	bool						objcGc() const { return fObjCGc; }
 	bool						objcGcOnly() const { return fObjCGcOnly; }
 	bool						canUseThreadLocalVariables() const { return fTLVSupport; }
+	bool						shouldUseBuildVersion(ld::Platform plat, uint32_t minOSvers) const;
 	bool						addVersionLoadCommand() const { return fVersionLoadCommand && (platforms().count() != 0); }
 	bool						addFunctionStarts() const { return fFunctionStartsLoadCommand; }
 	bool						addDataInCodeInfo() const { return fDataInCodeInfoLoadCommand; }
@@ -512,6 +513,7 @@ public:
 	bool						needsSourceVersionLoadCommand() const { return fSourceVersionLoadCommand; }
 	bool						canUseAbsoluteSymbols() const { return fAbsoluteSymbols; }
 	bool						allowSimulatorToLinkWithMacOSX() const { return fAllowSimulatorToLinkWithMacOSX; }
+	bool						isSimulatorSupportDylib() const { return fSimulatorSupportDylib; }
 	uint64_t					sourceVersion() const { return fSourceVersion; }
 	uint32_t					sdkVersion() const { return fSDKVersion; }
 	const char*					demangleSymbol(const char* sym) const;
@@ -627,6 +629,7 @@ private:
 	void						addSegmentRename(const char* srcSegment, const char* dstSegment);
 	void						addSymbolMove(const char* dstSegment, const char* symbolList, std::vector<SymbolsMove>& list, const char* optionName);
 	void						cannotBeUsedWithBitcode(const char* arg);
+	bool 						sharedCacheEligiblePath(const char* path);
 
 
 //	ObjectFile::ReaderOptions			fReaderOptions;
@@ -781,6 +784,7 @@ private:
 	bool								fVersionLoadCommand;
 	bool								fVersionLoadCommandForcedOn;
 	bool								fVersionLoadCommandForcedOff;
+	bool								fForceLegacyVersionLoadCommands;
 	bool								fFunctionStartsLoadCommand;
 	bool								fFunctionStartsForcedOn;
 	bool								fFunctionStartsForcedOff;
@@ -798,6 +802,7 @@ private:
 	bool								fExportDynamic;
 	bool								fAbsoluteSymbols;
 	bool								fAllowSimulatorToLinkWithMacOSX;
+	bool								fSimulatorSupportDylib;
 	bool								fKeepDwarfUnwind;
 	bool								fKeepDwarfUnwindForcedOn;
 	bool								fKeepDwarfUnwindForcedOff;
