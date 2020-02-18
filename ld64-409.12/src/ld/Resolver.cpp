@@ -762,7 +762,7 @@ void Resolver::doAtom(const ld::Atom& atom)
 	}
 
 	// convert references by-name or by-content to by-slot
-	this->convertReferencesToIndirect(atom, fileMap);
+	this->convertReferencesToIndirect(atom);
 	
 	// remember if any atoms are proxies that require LTO
 	if ( atom.contentType() == ld::Atom::typeLTOtemporary )
@@ -838,7 +838,7 @@ void Resolver::convertReferencesToIndirect(const ld::Atom& atom)
 					fit->binding = ld::Fixup::bindingNone;
 				}
 				else {
-					slot = _symbolTable.findSlotForName(fit->u.name, fileMap);
+					slot = _symbolTable.findSlotForName(fit->u.name);
 					fit->binding = ld::Fixup::bindingsIndirectlyBound;
 					fit->u.bindingIndex = slot;
 				}
