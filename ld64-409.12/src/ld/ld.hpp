@@ -1360,14 +1360,8 @@ struct CLDStringPointerEquals
 		if (leftPtr->hash != rightPtr->hash) {
 			return false;
 		}
-		if (leftPtr->length == -1) {
-			leftPtr->length = strlen(leftPtr->str);
-		}
-		if (rightPtr->length == -1) {
-			rightPtr->length = strlen(rightPtr->str);
-		}
-		return leftPtr->length == rightPtr->length;
-		//&& (left.str == right.str || memcmp(left.str, right.str, left.length) == 0);
+		return leftPtr->length == rightPtr->length
+		&& (leftPtr->str == rightPtr->str || memcmp(leftPtr->str, rightPtr->str, leftPtr->length) == 0);
 	}
 };
 

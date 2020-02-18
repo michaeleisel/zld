@@ -71,7 +71,7 @@ SymbolTable::SymbolTable(const Options& opts, std::vector<const ld::Atom*>& ibt)
 	LDString deleteString;
 	deleteString.str = NULL;
 	deleteString.length = -1;
-	deleteString.hash = 0;
+	deleteString.hash = 1;
 	_stringCache.emplace_back(deleteString);
 	_byNameTableFast.set_empty_key(NULL);
 	_byNameTableFast.set_deleted_key((const char *)0x1);
