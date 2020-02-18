@@ -55,7 +55,6 @@
 		F9023C4E06D5A272001BBF46 /* ld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9023C3F06D5A254001BBF46 /* ld.cpp */; };
 		F933E3D9092E855B0083EAC8 /* ObjectDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F971EED706D5AD240041D381 /* ObjectDump.cpp */; };
 		F93CB248116E69EB003233B8 /* tlvp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F93CB246116E69EB003233B8 /* tlvp.cpp */; };
-		F97F5029070D0BB200B9FCD7 /* ld.1 in copy man page */ = {isa = PBXBuildFile; fileRef = F97F5028070D0BB200B9FCD7 /* ld.1 */; };
 		F98498A310AE2159009E9878 /* compact_unwind.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9BA963310A2545C0097A440 /* compact_unwind.cpp */; };
 		F98498A410AE2159009E9878 /* got.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9AB1063107D380700E54C9E /* got.cpp */; };
 		F9849E3610B38EF5009E9878 /* order.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9849E3410B38EF5009E9878 /* order.cpp */; };
@@ -224,17 +223,6 @@
 			name = "Embed Libraries";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F97F5025070D0B6300B9FCD7 /* copy man page */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 8;
-			dstPath = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/share/man/man1";
-			dstSubfolderSpec = 0;
-			files = (
-				F97F5029070D0BB200B9FCD7 /* ld.1 in copy man page */,
-			);
-			name = "copy man page";
-			runOnlyForDeploymentPostprocessing = 1;
-		};
 		F9A3DE140ED76D7700C590B9 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 8;
@@ -281,6 +269,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4C5E360723FB61D50073E2F5 /* configure.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = configure.h; sourceTree = "<group>"; };
+		4C5E360823FB61DC0073E2F5 /* compile_stubs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = compile_stubs.h; sourceTree = "<group>"; };
 		4C63788B23F5FF4200EB13BA /* librpmallocwrap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = librpmallocwrap.dylib; path = ../../rpmalloc/bin/macos/release/librpmallocwrap.dylib; sourceTree = "<group>"; };
 		4C755DAA23F7746D001D517E /* libtbb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbb.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbb.dylib; sourceTree = "<group>"; };
 		4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbbmalloc.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbbmalloc.dylib; sourceTree = "<group>"; };
@@ -606,9 +596,11 @@
 				F9AA69B410583C0C003E3539 /* SymbolTable.cpp */,
 				4C63788B23F5FF4200EB13BA /* librpmallocwrap.dylib */,
 				F9AA69B510583C0C003E3539 /* SymbolTable.h */,
+				4C5E360823FB61DC0073E2F5 /* compile_stubs.h */,
 				F9AA687A10572E27003E3539 /* InputFiles.mm */,
 				4C7D5B8623D8F336006E515E /* libhash2.a */,
 				4C7D5B8323D8D46B006E515E /* hash.h */,
+				4C5E360723FB61D50073E2F5 /* configure.h */,
 				F9AA687B10572E27003E3539 /* InputFiles.h */,
 				F9AA5FCC103F5CD1003E3539 /* ld.hpp */,
 				F9023C3F06D5A254001BBF46 /* ld.cpp */,
@@ -687,11 +679,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F933D91B09291AC90083EAC8 /* Build configuration list for PBXNativeTarget "ld" */;
 			buildPhases = (
-				F9E8DB4D11921594007B4D6A /* make configure.h */,
-				B3C7A09714295B60005FC714 /* make compile_stub string */,
-				F94E0A911CAC6B870092DC75 /* Add libtapi symlink */,
-				F97F5025070D0B6300B9FCD7 /* copy man page */,
 				F9023C3606D5A23E001BBF46 /* Sources */,
+				F94E0A911CAC6B870092DC75 /* Add libtapi symlink */,
 				F9023C3706D5A23E001BBF46 /* Frameworks */,
 				4C755DAD23F7746D001D517E /* Embed Libraries */,
 			);
@@ -866,23 +855,6 @@
 			shellScript = "${SRCROOT}/src/create_configure\n";
 			showEnvVarsInLog = 0;
 		};
-		B3C7A09714295B60005FC714 /* make compile_stub string */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/compile_stubs",
-			);
-			name = "make compile_stub string";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/compile_stubs.h",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/csh;
-			shellScript = "echo \"static const char *compile_stubs = \" > $DERIVED_FILE_DIR/compile_stubs.h\ncat compile_stubs | sed s/\\\"/\\\\\\\\\\\"/g | sed s/^/\\\"/ | sed s/\\$/\\\\\\\\n\\\"/ >> $DERIVED_FILE_DIR/compile_stubs.h\necho \";\" >> $DERIVED_FILE_DIR/compile_stubs.h\n";
-			showEnvVarsInLog = 0;
-		};
 		F94E0A911CAC6B870092DC75 /* Add libtapi symlink */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1005,22 +977,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "${SRCROOT}/src/create_configure\n";
-			showEnvVarsInLog = 0;
-		};
-		F9E8DB4D11921594007B4D6A /* make configure.h */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "make configure.h";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/configure.h",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/bash;
 			shellScript = "${SRCROOT}/src/create_configure\n";
 			showEnvVarsInLog = 0;
 		};
@@ -1324,7 +1280,6 @@
 					"-Wl,-exported_symbol,__mh_execute_header",
 					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
 					"-ltapi",
-					"@$(DERIVED_FILE_DIR)/linkExtras",
 					"-Wl,-stack_size,0x10000000",
 					"-Wl,-all_load",
 				);
@@ -1407,7 +1362,6 @@
 					"-Wl,-exported_symbol,__mh_execute_header",
 					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
 					"-ltapi",
-					"@$(DERIVED_FILE_DIR)/linkExtras",
 					"-Wl,-stack_size,0x01000000",
 					"-Wl,-all_load",
 				);
