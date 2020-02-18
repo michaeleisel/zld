@@ -67,7 +67,7 @@ public:
 								  _haveAliases(false), _havellvmProfiling(false) {}
 								
 
-		virtual void		doAtom(const ld::Atom&, FastFileMap *fileMap = NULL);
+		virtual void		doAtom(const ld::Atom&);
 		virtual void		doFile(const class File&);
 		
 		void				resolve();
@@ -94,7 +94,7 @@ private:
 	void					syncAliases();
 	void					fillInEntryPoint();
 	void					linkTimeOptimize();
-	void					convertReferencesToIndirect(const ld::Atom& atom, FastFileMap *fileMap = NULL);
+	void					convertReferencesToIndirect(const ld::Atom& atom);
 	const ld::Atom*			entryPoint(bool searchArchives);
 	void					markLive(const ld::Atom& atom, WhyLiveBackChain* previous);
 	bool					isDtraceProbe(ld::Fixup::Kind kind);
@@ -103,11 +103,10 @@ private:
 	bool					printReferencedBy(const char* name, SymbolTable::IndirectBindingSlot slot);
 	void					tweakWeakness();
 	void					buildArchivesList();
-	void dumpMembersParsed();
 	void					doLinkerOption(const std::vector<const char*>& linkerOption, const char* fileName);
 	void					dumpAtoms();
 
-	typedef LDSet<const char*, CStringHash, CStringEquals>  StringSet;
+	typedef std::unordered_set<const char*, CStringHash, CStringEquals>  StringSet;
 
 	class NotLive {
 	public:
@@ -127,7 +126,7 @@ private:
 	InputFiles&						_inputFiles;
 	ld::Internal&					_internal;
 	std::vector<const ld::Atom*>	_atoms;
-	LDOrderedSet<const ld::Atom*>		_deadStripRoots;
+	std::set<const ld::Atom*>		_deadStripRoots;
 	std::vector<const ld::Atom*>	_dontDeadStripIfReferencesLive;
 	std::vector<const ld::Atom*>	_atomsWithUnresolvedReferences;
 	std::vector<const class AliasAtom*>	_aliasesFromCmdLine;

@@ -459,8 +459,8 @@ class dumper : public ld::File::AtomHandler
 {
 public:
 			void dump();
-	virtual void doAtom(const ld::Atom&, FastFileMap *fileMap = NULL);
-	virtual void doFile(const ld::File&) {}
+	virtual void doAtom(const ld::Atom&);
+	virtual void doFile(const ld::File&) {} 
 private:
 	void			dumpAtom(const ld::Atom& atom);
 	const char*		scopeString(const ld::Atom&);
@@ -1049,7 +1049,7 @@ uint64_t dumper::addressOfFirstAtomInSection(const ld::Section& sect)
 	return lowestAddr;
 }
 
-void dumper::doAtom(const ld::Atom& atom, FastFileMap *fileMap)
+void dumper::doAtom(const ld::Atom& atom)
 {
 	if ( (sMatchName != NULL) && (strcmp(sMatchName, atom.name()) != 0) )
 		return;

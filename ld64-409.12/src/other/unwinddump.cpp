@@ -39,11 +39,6 @@
 #include "MachOFileAbstraction.hpp"
 #include "Architectures.hpp"
 
-#define LDOrderedMap std::map //absl::btree_map
-#define LDMap std::unordered_map //absl::flat_hash_map
-#define LDSet std::unordered_set //absl::flat_hash_set
-#define LDOrderedSet std::set //absl::btree_set
-
 
  __attribute__((noreturn))
 void throwf(const char* format, ...) 
@@ -1077,7 +1072,7 @@ void UnwindPrinter<A>::printUnwindSection(bool showFunctionNames)
 
 }
 
-static void dump(const char* path, const LDOrderedSet<cpu_type_t>& onlyArchs, bool showFunctionNames)
+static void dump(const char* path, const std::set<cpu_type_t>& onlyArchs, bool showFunctionNames)
 {
 	struct stat stat_buf;
 	
@@ -1160,7 +1155,7 @@ static void dump(const char* path, const LDOrderedSet<cpu_type_t>& onlyArchs, bo
 
 int main(int argc, const char* argv[])
 {
-	LDOrderedSet<cpu_type_t> onlyArchs;
+	std::set<cpu_type_t> onlyArchs;
 	std::vector<const char*> files;
 	bool showFunctionNames = true;
 	

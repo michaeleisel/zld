@@ -39,8 +39,6 @@
 #include <dlfcn.h>
 #include <mach-o/dyld.h>
 #include <mach-o/fat.h>
-#include <iostream>
-#include <fstream>
 
 #include <string>
 #include <map>
@@ -295,7 +293,7 @@ void Resolver::initializeState()
 		}
 	}
 #ifdef LD64_VERSION_NUM
-	uint32_t packedNum = 0x01990c00;//Options::parseVersionNumber32(STRINGIFY(LD64_VERSION_NUM));
+	uint32_t packedNum = Options::parseVersionNumber32(STRINGIFY(LD64_VERSION_NUM));
 	uint64_t combined = (uint64_t)TOOL_LD << 32 | packedNum;
 	_internal.toolsVersions.insert(combined);
 #endif
@@ -666,7 +664,7 @@ void Resolver::doFile(const ld::File& file)
 	}
 }
 
-void Resolver::doAtom(const ld::Atom& atom, FastFileMap *fileMap)
+void Resolver::doAtom(const ld::Atom& atom)
 {
 	//fprintf(stderr, "Resolver::doAtom(%p), name=%s, sect=%s, scope=%d\n", &atom, atom.name(), atom.section().sectionName(), atom.scope());
 	if ( _ltoCodeGenFinished && (atom.contentType() == ld::Atom::typeLTOtemporary) && (atom.scope() != ld::Atom::scopeTranslationUnit) )
@@ -762,7 +760,7 @@ void Resolver::doAtom(const ld::Atom& atom, FastFileMap *fileMap)
 	}
 
 	// convert references by-name or by-content to by-slot
-	this->convertReferencesToIndirect(atom, fileMap);
+	this->convertReferencesToIndirect(atom);
 	
 	// remember if any atoms are proxies that require LTO
 	if ( atom.contentType() == ld::Atom::typeLTOtemporary )
@@ -822,7 +820,7 @@ bool Resolver::isDtraceProbe(ld::Fixup::Kind kind)
 	return false;
 }
 
-void Resolver::convertReferencesToIndirect(const ld::Atom& atom, FastFileMap *fileMap)
+void Resolver::convertReferencesToIndirect(const ld::Atom& atom)
 {
 	// convert references by-name or by-content to by-slot
 	SymbolTable::IndirectBindingSlot slot;
@@ -838,7 +836,7 @@ void Resolver::convertReferencesToIndirect(const ld::Atom& atom, FastFileMap *fi
 					fit->binding = ld::Fixup::bindingNone;
 				}
 				else {
-					slot = _symbolTable.findSlotForName(fit->u.name, fileMap);
+					slot = _symbolTable.findSlotForName(fit->u.name);
 					fit->binding = ld::Fixup::bindingsIndirectlyBound;
 					fit->u.bindingIndex = slot;
 				}
@@ -867,7 +865,6 @@ void Resolver::convertReferencesToIndirect(const ld::Atom& atom, FastFileMap *fi
 				break;
 		}
 	}
-	//printf("z %d %d\n", count, count2);
 }
 
 
@@ -881,7 +878,6 @@ void Resolver::addInitialUndefines()
 
 void Resolver::resolveUndefines()
 {
-	_inputFiles.preParseLibraries();
 	// keep looping until no more undefines were added in last loop
 	unsigned int undefineGenCount = 0xFFFFFFFF;
 	while ( undefineGenCount != _symbolTable.updateCount() ) {
@@ -1179,7 +1175,7 @@ void Resolver::deadStripOptimize(bool force)
 	}
 	
 	// mark all roots as live, and all atoms they reference
-	for (LDOrderedSet<const ld::Atom*>::iterator it=_deadStripRoots.begin(); it != _deadStripRoots.end(); ++it) {
+	for (std::set<const ld::Atom*>::iterator it=_deadStripRoots.begin(); it != _deadStripRoots.end(); ++it) {
 		WhyLiveBackChain rootChain;
 		rootChain.previous = NULL;
 		rootChain.referer = *it;
@@ -1863,7 +1859,7 @@ void Resolver::linkTimeOptimize()
 		this->checkDylibSymbolCollisions();
 
 		// <rdar://problem/33853815> remove undefs from LTO objects that gets optimized away
-		LDSet<const ld::Atom*> mustPreserve;
+		std::unordered_set<const ld::Atom*> mustPreserve;
 		if ( _internal.classicBindingHelper != NULL )
 			mustPreserve.insert(_internal.classicBindingHelper);
 		if ( _internal.compressedFastBinderProxy != NULL )
@@ -1920,14 +1916,6 @@ void Resolver::buildArchivesList()
 	_inputFiles.archives(_internal);
 }
 
-void Resolver::dumpMembersParsed()
-{
-	std::ofstream stream;
-	stream.open(_options.cacheFilePath());
-	_inputFiles.dumpMembersParsed(stream);
-	stream.close();
-}
-
 void Resolver::dumpAtoms() 
 {
 	fprintf(stderr, "Resolver all atoms:\n");
@@ -1955,7 +1943,6 @@ void Resolver::resolve()
 	this->tweakWeakness();
     _symbolTable.checkDuplicateSymbols();
 	this->buildArchivesList();
-	this->dumpMembersParsed();
 }
 
 
