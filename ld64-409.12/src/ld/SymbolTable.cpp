@@ -664,6 +664,10 @@ SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name)
 	_indirectBindingTable.push_back(NULL);
 	_stringCache.emplace_back(string);
 	_byNameTable[&(_stringCache.back())] = slot;
+    auto diff = slot - _byNameReverseTable.size();
+    for (unsigned long i = 0; i < diff; i++) {
+        _byNameReverseTable.push_back(NULL);
+    }
 	_byNameReverseTable.push_back(name);
 	return slot;
 }
