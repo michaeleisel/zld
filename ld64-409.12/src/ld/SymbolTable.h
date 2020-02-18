@@ -159,7 +159,7 @@ public:
 
 	bool				add(const ld::Atom& atom, bool ignoreDuplicates);
 	//IndirectBindingSlot	findSlotForName(const char* name);
-	IndirectBindingSlot findSlotForName(const char* name, FastFileMap *fileMap = NULL);
+	IndirectBindingSlot findSlotForName(const char* name);
 	IndirectBindingSlot	findSlotForContent(const ld::Atom* atom, const ld::Atom** existingAtom);
 	IndirectBindingSlot	findSlotForReferences(const ld::Atom* atom, const ld::Atom** existingAtom);
 	const ld::Atom*		atomForSlot(IndirectBindingSlot s)	{ return _indirectBindingTable[s]; }
@@ -195,7 +195,6 @@ private:
 
 	const Options&					_options;
 	NameToSlot						_byNameTable;
-	google::dense_hash_map<const char *, size_t, CCharPtrHash>						_byNameTableFast;
 	TNode _trie;
 	SlotToName						_byNameReverseTable;
 	ContentToSlot					_literal4Table;

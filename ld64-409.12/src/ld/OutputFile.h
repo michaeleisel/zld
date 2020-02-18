@@ -165,8 +165,6 @@ private:
 	};
 
 	void						writeAtoms(ld::Internal& state, uint8_t* wholeBuffer);
-	void processBuffer(const std::vector<AtomOperation> &buffer, ld::Internal& state, uint8_t *wholeBuffer);
-	void updatePreviousLoopValues(ld::Internal& state, std::vector<ld::Internal::FinalSection*>::iterator& sit, uint64_t *fileOffsetOfEndOfLastAtom, bool *lastAtomUsesNoOps);
 	void						computeContentUUID(ld::Internal& state, uint8_t* wholeBuffer);
 	void						buildDylibOrdinalMapping(ld::Internal&);
 	bool						hasOrdinalForInstallPath(const char* path, int* ordinal);
@@ -279,7 +277,7 @@ private:
 		uint32_t			instruction;
 	};
 
-	void setInfo(ld::Internal& state, const ld::Atom* atom, uint8_t* buffer, const LDOrderedMap<uint32_t, const Fixup*>& usedHints, 
+	void setInfo(ld::Internal& state, const ld::Atom* atom, uint8_t* buffer, const LDOrderedMap<uint32_t, const Fixup*>& usedHints,
 						uint32_t offsetInAtom, uint32_t delta, InstructionInfo* info);
 
 	static uint16_t				get16LE(uint8_t* loc);

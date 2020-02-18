@@ -46,25 +46,6 @@ struct Edge
 	}
 };
 
-static size_t sBuckets[5];
-
-__attribute__((destructor)) static void asdfasdfsad() {
-	for (int i = 0; i < 5; i++) {
-		//printf("f: %ld\n", sBuckets[i]);
-	}
-}
-
-static void appendToBucket(size_t i) {
-	sBuckets[(i > 4 ? 4 : i)]++;
-}
-
-inline char *LDStrDup(const char *s, size_t length) {
-	char *dup = (char *)malloc(length + 1);
-	memcpy(dup, s, length);
-	dup[length] = '\0';
-	return dup;
-}
-
 struct Node
 {
 						Node(const char* s) : fCummulativeString(s), fCummulativeStringLength(strlen(s)), fAddress(0), fFlags(0),
@@ -87,7 +68,6 @@ struct Node
 		for (std::vector<Edge>::iterator it = fChildren.begin(); it != fChildren.end(); ++it) {
 			Edge& e = *it;
 			size_t subStringLen = e.fSubStringLength;
-			//appendToBucket(subStringLen);
 			if (e.fSubStringLength == 1) {
 				if (e.fSubString[0] != partialStr[0]) {
 					continue;
@@ -344,8 +324,7 @@ inline void makeTrie(const std::vector<Entry>& entries, std::vector<uint8_t>& ou
 	for (std::vector<Entry>::const_iterator it = entries.begin(); it != entries.end(); ++it) {
 		start.addOrderedNodes(it->name, orderedNodes);
 	}
-	orderedNodes[0];
-	
+
 	// assign each node in the vector an offset in the trie stream, iterating until all uleb128 sizes have stabilized
 	bool more;
 	do {

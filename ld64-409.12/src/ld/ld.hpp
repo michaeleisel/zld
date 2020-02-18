@@ -62,11 +62,6 @@ struct CPointerEquals
 	bool operator()(const char* left, const char* right) const { return left == right; }
 };
 
-struct FastFileMap {
-	LDMap<const char*, int32_t, CPointerHash, CPointerEquals> *fileMap;
-	uint32_t objcMsgSendSlot = -1;
-};
-
 namespace ld {
 
 //
@@ -267,7 +262,7 @@ public:
 	class AtomHandler {
 	public:
 		virtual				~AtomHandler() {}
-		virtual void		doAtom(const class Atom&, FastFileMap *fileMap = NULL) = 0;
+		virtual void		doAtom(const class Atom&) = 0;
 		virtual void		doFile(const class File&) = 0;
 	};
 
@@ -407,8 +402,7 @@ namespace relocatable {
 		struct AstTimeAndPath { uint64_t time; std::string path; };
 
 											File(const char* pth, time_t modTime, Ordinal ord)
-												: ld::File(pth, modTime, ord, Reloc) {
-												}
+												: ld::File(pth, modTime, ord, Reloc) { }
 		virtual								~File() {}
 		virtual DebugInfoKind				debugInfo() const = 0;
 		virtual const char*					debugInfoPath() const { return path(); }
@@ -1224,62 +1218,6 @@ public:
 };
 
 
-
-static size_t zz, zzz;
-
-/*__attribute__((destructor)) static void ff() {
-	printf("zz: %lu, %lu\n", zz, zzz);
-}*/
-
-#if !defined (get16bits)
-#define get16bits(d) ((((uint32_t)(((const uint8_t *)(d))[1])) << 8)\
-                       +(uint32_t)(((const uint8_t *)(d))[0]) )
-#endif
-
-static size_t SuperFastHash (const char * data, int len) {
-size_t hash = len, tmp;
-size_t rem;
-
-    if (len <= 0 || data == NULL) return 0;
-
-    rem = len & 3;
-    len >>= 2;
-
-    /* Main loop */
-    for (;len > 0; len--) {
-        hash  += get16bits (data);
-        tmp    = (get16bits (data+2) << 11) ^ hash;
-        hash   = (hash << 16) ^ tmp;
-        data  += 2*sizeof (uint16_t);
-        hash  += hash >> 11;
-    }
-
-    /* Handle end cases */
-    switch (rem) {
-        case 3: hash += get16bits (data);
-                hash ^= hash << 16;
-                hash ^= ((signed char)data[sizeof (uint16_t)]) << 18;
-                hash += hash >> 11;
-                break;
-        case 2: hash += get16bits (data);
-                hash ^= hash << 11;
-                hash += hash >> 17;
-                break;
-        case 1: hash += (signed char)*data;
-                hash ^= hash << 10;
-                hash += hash >> 1;
-    }
-
-    /* Force "avalanching" of final 127 bits */
-    hash ^= hash << 3;
-    hash += hash >> 5;
-    hash ^= hash << 4;
-    hash += hash >> 17;
-    hash ^= hash << 25;
-    hash += hash >> 6;
-
-    return hash;
-}
 
 typedef struct {
 	const char *str;

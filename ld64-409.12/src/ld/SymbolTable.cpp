@@ -73,9 +73,6 @@ SymbolTable::SymbolTable(const Options& opts, std::vector<const ld::Atom*>& ibt)
 	deleteString.length = -1;
 	deleteString.hash = 1;
 	_stringCache.emplace_back(deleteString);
-	_byNameTableFast.set_empty_key(NULL);
-	_byNameTableFast.set_deleted_key((const char *)0x1);
-	_byNameTableFast.min_load_factor(0.0);
 	_byNameTable.set_deleted_key(&(_stringCache.back()));
 	if (!opts.deadCodeStrip() && !opts.deadStripDylibs()) {
     	_byNameTable.min_load_factor(0.0);
@@ -654,31 +651,19 @@ static int nfoundz = 0;
 }
 
 // find existing or create new slot
-SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name, FastFileMap *seenPerFile)
+SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name)
 {
-	/*auto fastPos = _byNameTableFast.find(name);
-	if ( fastPos != _byNameTableFast.end() ) {
-		return fastPos->second;
-	}*/
 	LDString string = LDStringCreate(name);
 	NameToSlot::iterator pos = _byNameTable.find(&string);
 	if ( pos != _byNameTable.end() ) {
 		IndirectBindingSlot slot = pos->second;
-		//_byNameTableFast[name] = slot;
 		return slot;
 	}
 	// create new slot for this name
 	SymbolTable::IndirectBindingSlot slot = _indirectBindingTable.size();
-	//_byNameTableFast[name] = slot;
-	//node->_slot = slot;
 	_indirectBindingTable.push_back(NULL);
 	_stringCache.emplace_back(string);
 	_byNameTable[&(_stringCache.back())] = slot;
-	auto diff = slot - _byNameReverseTable.size();
-	for (unsigned long i = 0; i < diff; i++) {
-		//printf("bak\n");
-		_byNameReverseTable.push_back(NULL);
-	}
 	_byNameReverseTable.push_back(name);
 	return slot;
 }

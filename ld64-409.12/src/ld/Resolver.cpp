@@ -666,7 +666,7 @@ void Resolver::doFile(const ld::File& file)
 	}
 }
 
-void Resolver::doAtom(const ld::Atom& atom, FastFileMap *fileMap)
+void Resolver::doAtom(const ld::Atom& atom)
 {
 	//fprintf(stderr, "Resolver::doAtom(%p), name=%s, sect=%s, scope=%d\n", &atom, atom.name(), atom.section().sectionName(), atom.scope());
 	if ( _ltoCodeGenFinished && (atom.contentType() == ld::Atom::typeLTOtemporary) && (atom.scope() != ld::Atom::scopeTranslationUnit) )
@@ -822,7 +822,7 @@ bool Resolver::isDtraceProbe(ld::Fixup::Kind kind)
 	return false;
 }
 
-void Resolver::convertReferencesToIndirect(const ld::Atom& atom, FastFileMap *fileMap)
+void Resolver::convertReferencesToIndirect(const ld::Atom& atom)
 {
 	// convert references by-name or by-content to by-slot
 	SymbolTable::IndirectBindingSlot slot;
@@ -867,7 +867,6 @@ void Resolver::convertReferencesToIndirect(const ld::Atom& atom, FastFileMap *fi
 				break;
 		}
 	}
-	//printf("z %d %d\n", count, count2);
 }
 
 

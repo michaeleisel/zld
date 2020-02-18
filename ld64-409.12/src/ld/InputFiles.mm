@@ -713,13 +713,6 @@ void InputFiles::addLinkerOptionLibraries(ld::Internal& state, ld::File::AtomHan
 			auto triple = Triple(this->makeFile(pair.first, true), pair.first, pair.second);
 			readers[idx] = triple;
 		});
-		/*std::transform(pstl::execution::par, iz.begin(), iz.end(), readers.begin(), [&](auto &&pair) {
-			return
-		});*/
-		/*std::transform(pstl::execution::par, infosToParse.begin(), infosToParse.end(), std::back_inserter(readers), [&](auto &&pair) {
-			return Triple(this->makeFile(pair.first, true), pair.first, pair.second);
-		});*/
-		//sleep(1);
 		for (auto &triple : readers) {
 			try {
     			ld::dylib::File* dylibReader = dynamic_cast<ld::dylib::File*>(std::get<0>(triple));

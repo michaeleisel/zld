@@ -662,7 +662,6 @@ public:
 protected:
 	typedef typename A::P::uint_t	pint_t;
 
-	// todo: always starts at 0?
 	mutable size_t _sectionHash = 0;
 	virtual ld::Atom::Alignment		alignmentForAddress(pint_t addr)		{ return ld::Atom::Alignment(log2(sizeof(pint_t))); }
 	virtual const char*				unlabeledAtomName(Parser<A>&, pint_t)	{ return "pointer-to-literal-cstring"; }
@@ -4269,12 +4268,8 @@ bool File<A>::forEachAtom(ld::File::AtomHandler& handler) const
 {
 	handler.doFile(*this);
 	uint8_t* p = _atomsArray;
-	FastFileMap fileMap;
-	LDMap<const char*, int32_t, CPointerHash, CPointerEquals> innerMap;
-	fileMap.fileMap = &innerMap;
-	//printf("%d\n", _atomsArrayCount);
 	for(int i=_atomsArrayCount; i > 0; --i) {
-		handler.doAtom(*((Atom<A>*)p), &fileMap);
+		handler.doAtom(*((Atom<A>*)p));
 		p += sizeof(Atom<A>);
 	}
 	p = _aliasAtomsArray;

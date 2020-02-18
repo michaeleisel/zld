@@ -4763,7 +4763,7 @@ void Options::reconfigureDefaults()
 	//			macOS before 10.6
 	//			iOS before 3.1
 	if ( fMakeCompressedDyldInfoForceOff || !platforms().minOS(ld::version2009) )
-		fMakeCompressedDyldInfo = false; // change?
+		fMakeCompressedDyldInfo = false;
 
 	// only ARM and x86_64 enforces that cpu-sub-types must match
 	switch ( fArchitecture ) {

@@ -73,23 +73,6 @@
 #include "LinkEdit.hpp"
 #include "LinkEditClassic.hpp"
 
-extern "C" {
-void rpfree(void *ptr);
-void *rpmalloc(size_t size);
-}
-
-/*void * __attribute__((weak)) operator new(size_t size)
-{
-	void *ptr = rpmalloc(size);
-	return ptr;
-}
-  
-void __attribute__((weak)) operator delete(void * p) noexcept
-{
-    rpfree(p);
-}*/
-  
-
 namespace ld {
 namespace tool {
 
@@ -170,7 +153,6 @@ void OutputFile::dumpAtomsBySection(ld::Internal& state, bool printAtoms)
 
 void OutputFile::write(ld::Internal& state)
 {
-	CFTimeInterval t1 = CFAbsoluteTimeGetCurrent();
 	this->buildDylibOrdinalMapping(state);
 	this->addLoadCommands(state);
 	this->addLinkEdit(state);
@@ -178,7 +160,6 @@ void OutputFile::write(ld::Internal& state)
 	this->setLoadCommandsPadding(state);
 	_fileSize = state.assignFileOffsets();
 	this->assignAtomAddresses(state);
-	CFTimeInterval t2 = CFAbsoluteTimeGetCurrent();
 	dispatch_group_t group = dispatch_group_create();
 	auto queue = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0);
 	//dispatch_queue_attr_t attr = DISPATCH_QUEUE_SERIAL;
@@ -191,20 +172,15 @@ void OutputFile::write(ld::Internal& state)
     	this->generateLinkEditInfo(state);
 	});
 	dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
-	CFTimeInterval t3 = CFAbsoluteTimeGetCurrent();
 	if ( _options.sharedRegionEncodingV2() )
 		this->makeSplitSegInfoV2(state);
 	else
 		this->makeSplitSegInfo(state);
-	CFTimeInterval t4 = CFAbsoluteTimeGetCurrent();
 	this->updateLINKEDITAddresses(state);
 	//this->dumpAtomsBySection(state, false);
-	CFTimeInterval t5 = CFAbsoluteTimeGetCurrent();
 	this->writeOutputFile(state);
-	CFTimeInterval t6 = CFAbsoluteTimeGetCurrent();
 	this->writeMapFile(state);
 	this->writeJSONEntry(state);
-	printf("q %lf, %lf, %lf, %lf, %lf\n", t2 - t1, t3 - t2, t4 - t3, t5 - t4, t6 - t5);
 }
 
 bool OutputFile::findSegment(ld::Internal& state, uint64_t addr, uint64_t* start, uint64_t* end, uint32_t* index)
@@ -2728,20 +2704,6 @@ bool OutputFile::hasZeroForFileOffset(const ld::Section* sect)
 	return false;
 }
 
-void OutputFile::processBuffer(const std::vector<AtomOperation> &buffer, ld::Internal& state, uint8_t *wholeBuffer) {
-	for (auto bufIter = buffer.begin(); bufIter != buffer.end(); bufIter++) {
-		auto op = *bufIter;
-		// check for alignment padding between atoms
-		if ( (op.fileOffset != op.fileOffsetOfEndOfLastAtom) && op.lastAtomUsesNoOps ) {
-			this->copyNoOps(&wholeBuffer[op.fileOffsetOfEndOfLastAtom], &wholeBuffer[op.fileOffset], op.lastAtomWasThumb);
-		}
-		// copy atom content
-		op.atom->copyRawContent(&wholeBuffer[op.fileOffset]);
-		// apply fix ups
-		this->applyFixUps(state, op.mhAddress, op.atom, &wholeBuffer[op.fileOffset]);
-	}
-}
-
 void OutputFile::writeAtoms(ld::Internal& state, uint8_t* wholeBuffer)
 {
 	const bool logThreadedFixups = false;
@@ -2761,7 +2723,6 @@ void OutputFile::writeAtoms(ld::Internal& state, uint8_t* wholeBuffer)
 		//fprintf(stderr, "file offset=0x%08llX, section %s\n", sect->fileOffset, sect->sectionName());
 		std::vector<const ld::Atom*>& atoms = sect->atoms;
 		bool lastAtomWasThumb = false;
-		//NSMutableArray *operations = [NSMutableArray array];
 		for (std::vector<const ld::Atom*>::iterator ait = atoms.begin(); ait != atoms.end(); ++ait) {
 			const ld::Atom* atom = *ait;
 			if ( atom->definition() == ld::Atom::definitionProxy )
@@ -5813,25 +5774,6 @@ static time_t fileModTime(const char* path) {
 	return 0;
 }
 
-struct Asdf
-{
-	bool operator()(ld::Atom::LineInfo left, ld::Atom::LineInfo right) const {
-		return left.fileName == right.fileName;
-	}
-};
-
-struct LineInfoHash {
-	size_t operator()(ld::Atom::LineInfo li) const {
-		return (size_t)li.fileName;
-	};
-};
-
-struct LineInfoSorter {
-	bool operator() (ld::Atom::LineInfo left, ld::Atom::LineInfo right) {
-		return (ptrdiff_t)left.fileName < (ptrdiff_t)right.fileName;
-	}
-};
-
 
 void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 {
@@ -5925,7 +5867,6 @@ void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 		state.stabs.push_back(astStab);
 	}
 	
-	auto s1 = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
 	// synthesize "debug notes" and add them to master stabs vector
 	const char* dirPath = NULL;
 	const char* filename = NULL;

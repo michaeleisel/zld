@@ -46,14 +46,6 @@
 #include "macho_relocatable_file.h"
 #include "lto_file.h"
 #include "archive_file.h"
-//#include <Foundation/Foundation.h>
-
-template <class A>
-void pp(LDSet<A> set) {
-	for (auto e: set) {
-		std::cout << e << "\n";
-	}
-}
 
 
 namespace archive {
@@ -366,12 +358,6 @@ bool File<A>::memberHasObjCCategories(const Entry* member) const
 	return mach_o::relocatable::hasObjC2Categories(member->content());
 }
 
-/*static size_t nFound = 0;
-
-__attribute__((destructor)) void yoooo() {
-	printf("zz %ld\n", nFound);
-}*/
-
 template <typename A>
 typename File<A>::MemberState& File<A>::makeObjectFileForMember(const Entry* member) const
 {
@@ -569,14 +555,11 @@ void File<A>::parseMember(void *member) const {
 
 template <typename A>
 std::vector<void *> File<A>::membersToParse(LDSet<std::string> &set) const {
-	//auto start = CACurrentMediaTime();
 	LDSet<uint64_t> offsets;
 	for (auto &[k, v] : _hashTable) {
 		offsets.insert(v);
 	}
 	char name[256];
-	//dispatch_group_t group = dispatch_group_create();
-	//dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0);
 	std::vector<void *> membersToParse;
 	for (auto offset : offsets) {
 		Entry *member = (Entry *)(&_archiveFileContent[offset]);
@@ -585,24 +568,7 @@ std::vector<void *> File<A>::membersToParse(LDSet<std::string> &set) const {
 			membersToParse.push_back(member);
 		}
 	}
-	//auto end = CACurrentMediaTime();
-	//printf("asdff %lf\n", end - start);
 	return membersToParse;
-	/*std::ostringstream os;
-	std::array<char, 128> buffer;
-    std::string result;
-	os << "/usr/bin/ar -t -v" << path();
-    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(os.str().c_str(), "r"), pclose);
-	while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        result += buffer.data();
-    }
-	std::istringstream input(result);
-	for (std::string line; std::getline(input, line); ) {
-		std::string skip;
-		size_t size = 0;
-		input >> skip >> size;
-	}
-	return result;*/
 }
 
 template <typename A>
@@ -629,7 +595,7 @@ class CheckIsDataSymbolHandler : public ld::File::AtomHandler
 {
 public:
 					CheckIsDataSymbolHandler(const char* n) : _name(n), _isData(false) {}
-	virtual void	doAtom(const class ld::Atom& atom, FastFileMap *fileMap) {
+	virtual void	doAtom(const class ld::Atom& atom) {
 						if ( strcmp(atom.name(), _name) == 0 ) {
 							if ( atom.section().type() != ld::Section::typeCode )
 								_isData = true;
