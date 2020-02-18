@@ -48,6 +48,7 @@
 		4C755DAC23F7746D001D517E /* libtbb.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 4C755DAA23F7746D001D517E /* libtbb.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		4C755DAF23F7746F001D517E /* libtbbmalloc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */; };
 		4C755DB023F7746F001D517E /* libtbbmalloc.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		4C902D5C23FC439A0006EBAC /* shoco.c in Sources */ = {isa = PBXBuildFile; fileRef = 4C902D5B23FC439A0006EBAC /* shoco.c */; };
 		83046A851C8FF2F700024A7E /* objcimageinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83046A841C8FF2D000024A7E /* objcimageinfo.cpp */; };
 		B028FCF21A9E7C3F00E3584B /* bitcode_bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B028FCF11A9E7C3F00E3584B /* bitcode_bundle.cpp */; };
 		B3B672421406D42800A376BB /* Snapshot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3B672411406D42800A376BB /* Snapshot.cpp */; };
@@ -276,6 +277,9 @@
 		4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbbmalloc.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbbmalloc.dylib; sourceTree = "<group>"; };
 		4C7D5B8323D8D46B006E515E /* hash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hash.h; path = "../../examples/abseil-cpp/absl/hash/hash.h"; sourceTree = "<group>"; };
 		4C7D5B8623D8F336006E515E /* libhash2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhash2.a; path = ../../examples/build/libhash2.a; sourceTree = "<group>"; };
+		4C902D5A23FC439A0006EBAC /* shoco.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shoco.h; sourceTree = "<group>"; };
+		4C902D5B23FC439A0006EBAC /* shoco.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = shoco.c; sourceTree = "<group>"; };
+		4C902D5D23FC43E80006EBAC /* shoco_model.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shoco_model.h; sourceTree = "<group>"; };
 		4CF05E8E23EB005B009C0C95 /* libsystem_malloc.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsystem_malloc.tbd; path = usr/lib/system/libsystem_malloc.tbd; sourceTree = SDKROOT; };
 		4CF05E9023EB0093009C0C95 /* libSystem.B.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libSystem.B.tbd; path = usr/lib/libSystem.B.tbd; sourceTree = SDKROOT; };
 		4CF05E9323EB0151009C0C95 /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/System.framework; sourceTree = DEVELOPER_DIR; };
@@ -621,6 +625,9 @@
 				F98565241E98090F00528B1C /* dwarf2.h */,
 				B3B672411406D42800A376BB /* Snapshot.cpp */,
 				B3B672441406D44300A376BB /* Snapshot.h */,
+				4C902D5A23FC439A0006EBAC /* shoco.h */,
+				4C902D5B23FC439A0006EBAC /* shoco.c */,
+				4C902D5D23FC43E80006EBAC /* shoco_model.h */,
 			);
 			name = ld;
 			sourceTree = "<group>";
@@ -679,10 +686,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F933D91B09291AC90083EAC8 /* Build configuration list for PBXNativeTarget "ld" */;
 			buildPhases = (
-				F9023C3606D5A23E001BBF46 /* Sources */,
-				F94E0A911CAC6B870092DC75 /* Add libtapi symlink */,
 				F9023C3706D5A23E001BBF46 /* Frameworks */,
 				4C755DAD23F7746D001D517E /* Embed Libraries */,
+				F9023C3606D5A23E001BBF46 /* Sources */,
 			);
 			buildRules = (
 				F9E8D4BE07FCAF2A00FD5801 /* PBXBuildRule */,
@@ -855,21 +861,6 @@
 			shellScript = "${SRCROOT}/src/create_configure\n";
 			showEnvVarsInLog = 0;
 		};
-		F94E0A911CAC6B870092DC75 /* Add libtapi symlink */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Add libtapi symlink";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\n    cd \"${TARGET_BUILD_DIR}\"\n    cd ..\n    mkdir -p lib\n    cd lib\n    ln -s -f \"${DT_TOOLCHAIN_DIR}/usr/lib/libLTO.dylib\"\n    ln -s -f \"${DT_TOOLCHAIN_DIR}/usr/lib/libtapi.dylib\"\n    ln -s -f \"${DT_TOOLCHAIN_DIR}/usr/lib/libswiftDemangle.dylib\"\n";
-			showEnvVarsInLog = 0;
-		};
 		F96D5367094A2754008E9EE8 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1019,6 +1010,7 @@
 				F984A38210BB4B0D009E9878 /* branch_island.cpp in Sources */,
 				F9A4DB9110F816FF00BD8423 /* objc.cpp in Sources */,
 				F9AE20FF1107D1440007ED5D /* dylibs.cpp in Sources */,
+				4C902D5C23FC439A0006EBAC /* shoco.c in Sources */,
 				F93CB248116E69EB003233B8 /* tlvp.cpp in Sources */,
 				F9AA44DC1294885F00CB8390 /* branch_shim.cpp in Sources */,
 				B3B672421406D42800A376BB /* Snapshot.cpp in Sources */,

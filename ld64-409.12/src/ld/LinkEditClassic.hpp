@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <limits.h>
 #include <unistd.h>
+#include "shoco.h"
 
 #include <vector>
 #include <unordered_map>
@@ -38,6 +39,7 @@
 #include "ld.hpp"
 #include "Architectures.hpp"
 #include "MachOFileAbstraction.hpp"
+#include <sparsehash/dense_hash_map>
 
 namespace ld {
 namespace tool {
@@ -86,13 +88,15 @@ public:
 
 	int32_t										add(const char* name);
 	int32_t										addUnique(const char* name);
+    int32_t getOffset();
 	int32_t										emptyString()			{ return 1; }
 	const char*									stringForIndex(int32_t) const;
 	uint32_t									currentOffset();
+	//~StringPoolAtom();
 
 private:
 	enum { kBufferSize = 0x01000000 };
-	typedef LDMap<const char*, int32_t, CStringHash, CStringEquals> StringToOffset;
+	typedef google::dense_hash_map<LDString, int32_t, CLDStringHash, CLDStringEquals> StringToOffset;
 
 	const uint32_t							_pointerSize;
 	std::vector<char*>						_fullBuffers;
@@ -105,7 +109,6 @@ private:
 
 ld::Section StringPoolAtom::_s_section("__LINKEDIT", "__string_pool", ld::Section::typeLinkEdit, true);
 
-
 StringPoolAtom::StringPoolAtom(const Options& opts, ld::Internal& state, OutputFile& writer, int pointerSize)
 	: ClassicLinkEditAtom(opts, state, writer, _s_section, pointerSize), 
 	 _pointerSize(pointerSize), _currentBuffer(NULL), _currentBufferUsed(0)
@@ -115,6 +118,19 @@ StringPoolAtom::StringPoolAtom(const Options& opts, ld::Internal& state, OutputF
 	_currentBuffer[_currentBufferUsed++] = ' ';
 	// make offset 1 always point to an empty string
 	_currentBuffer[_currentBufferUsed++] = '\0';
+	LDString emptyKey = {
+		.hash = 1,
+		.str = (const char *)0x0,
+		.length = 0,
+	};
+	/*LDString deletedKey = {
+		.hash = 0,
+		.str = (const char *)0x1,
+		.length = 0,
+	};
+	_uniqueStrings.set_deleted_key(deletedKey);*/
+	_uniqueStrings.set_empty_key(emptyKey);
+	_uniqueStrings.min_load_factor(0.0);
 }
 
 uint64_t StringPoolAtom::size() const
@@ -137,9 +153,13 @@ void StringPoolAtom::copyRawContent(uint8_t buffer[]) const
 		buffer[offset++] = 0;
 }
 
-int32_t StringPoolAtom::add(const char* str)
+int32_t StringPoolAtom::getOffset() {
+	return kBufferSize * _fullBuffers.size() + _currentBufferUsed;
+}
+
+__attribute__((noinline)) int32_t StringPoolAtom::add(const char* str)
 {
-	int32_t offset = kBufferSize * _fullBuffers.size() + _currentBufferUsed;
+	int32_t offset = getOffset();
 	int lenNeeded = strlcpy(&_currentBuffer[_currentBufferUsed], str, kBufferSize-_currentBufferUsed)+1;
 	if ( (_currentBufferUsed+lenNeeded) < kBufferSize ) {
 		_currentBufferUsed += lenNeeded;
@@ -163,20 +183,45 @@ uint32_t StringPoolAtom::currentOffset()
 	return kBufferSize * _fullBuffers.size() + _currentBufferUsed;
 }
 
+static std::vector<float> ratios;
+static std::vector<std::string> syms;
 
-int32_t StringPoolAtom::addUnique(const char* str)
-{
-	StringToOffset::iterator pos = _uniqueStrings.find(str);
-	if ( pos != _uniqueStrings.end() ) {
-		return pos->second;
+#include <fstream>
+
+__attribute__((destructor)) void asdlfjsadlkjfsaf() {
+	({
+    	std::ofstream stream;
+    	stream.open("/tmp/syms");
+    	for (auto &sym : syms) {
+    		stream << sym << "\n";
+    	}
+    	stream.close();
+	});
+	std::ofstream stream;
+	stream.open("/tmp/ratios");
+	for (auto &ratio : ratios) {
+		stream << ratio << "\n";
 	}
-	else {
-		int32_t offset = this->add(str);
-		_uniqueStrings[str] = offset;
-		return offset;
-	}
+	stream.close();
 }
 
+__attribute__((noinline)) int32_t StringPoolAtom::addUnique(const char* str)
+{
+	int32_t offset = getOffset();
+	auto string = LDStringCreate(str);
+	std::pair<LDString, int32_t> pair(string, offset);
+	//auto resultPair = _uniqueStrings.insert(string, offset);
+	auto resultPair = _uniqueStrings.insert(pair);
+	syms.emplace_back(str);
+	char out[string.length];
+	size_t outLen = shoco_compress(str, string.length, out, string.length);
+	ratios.push_back((float)string.length / outLen);
+	if (resultPair.second) {
+		return this->add(str);
+	} else {
+		return resultPair.first->second;
+	}
+}
 
 const char* StringPoolAtom::stringForIndex(int32_t index) const
 {

@@ -170,6 +170,7 @@ void OutputFile::dumpAtomsBySection(ld::Internal& state, bool printAtoms)
 
 void OutputFile::write(ld::Internal& state)
 {
+	CFTimeInterval t1 = CFAbsoluteTimeGetCurrent();
 	this->buildDylibOrdinalMapping(state);
 	this->addLoadCommands(state);
 	this->addLinkEdit(state);
@@ -177,6 +178,7 @@ void OutputFile::write(ld::Internal& state)
 	this->setLoadCommandsPadding(state);
 	_fileSize = state.assignFileOffsets();
 	this->assignAtomAddresses(state);
+	CFTimeInterval t2 = CFAbsoluteTimeGetCurrent();
 	dispatch_group_t group = dispatch_group_create();
 	auto queue = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0);
 	//dispatch_queue_attr_t attr = DISPATCH_QUEUE_SERIAL;
@@ -189,15 +191,20 @@ void OutputFile::write(ld::Internal& state)
     	this->generateLinkEditInfo(state);
 	});
 	dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+	CFTimeInterval t3 = CFAbsoluteTimeGetCurrent();
 	if ( _options.sharedRegionEncodingV2() )
 		this->makeSplitSegInfoV2(state);
 	else
 		this->makeSplitSegInfo(state);
+	CFTimeInterval t4 = CFAbsoluteTimeGetCurrent();
 	this->updateLINKEDITAddresses(state);
 	//this->dumpAtomsBySection(state, false);
+	CFTimeInterval t5 = CFAbsoluteTimeGetCurrent();
 	this->writeOutputFile(state);
+	CFTimeInterval t6 = CFAbsoluteTimeGetCurrent();
 	this->writeMapFile(state);
 	this->writeJSONEntry(state);
+	printf("q %lf, %lf, %lf, %lf, %lf\n", t2 - t1, t3 - t2, t4 - t3, t5 - t4, t6 - t5);
 }
 
 bool OutputFile::findSegment(ld::Internal& state, uint64_t addr, uint64_t* start, uint64_t* end, uint32_t* index)
