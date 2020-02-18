@@ -555,7 +555,7 @@ void SymbolTableAtom<A>::addImport(const ld::Atom* atom, StringPoolAtom* pool)
 		
 #if 0
 		// set n_desc ( high byte is library ordinal, low byte is reference type )
-		LDOrderedMap<const ObjectFile::Atom*,ObjectFile::Atom*>::iterator pos = fStubsMap.find(atom);
+		std::map<const ObjectFile::Atom*,ObjectFile::Atom*>::iterator pos = fStubsMap.find(atom);
 		if ( pos != fStubsMap.end() || ( strncmp(atom->getName(), ".objc_class_name_", 17) == 0) )
 			desc |= REFERENCE_FLAG_UNDEFINED_LAZY;
 		else
@@ -820,11 +820,11 @@ protected:
 
 uint32_t RelocationsAtomAbstract::symbolIndex(const ld::Atom* atom) const
 {
-	LDOrderedMap<const ld::Atom*, uint32_t>::iterator pos = this->_writer._atomToSymbolIndex.find(atom);
+	std::map<const ld::Atom*, uint32_t>::iterator pos = this->_writer._atomToSymbolIndex.find(atom);
 	if ( pos != this->_writer._atomToSymbolIndex.end() )
 		return pos->second;
 	fprintf(stderr, "_atomToSymbolIndex content:\n");
-	for(LDOrderedMap<const ld::Atom*, uint32_t>::iterator it = this->_writer._atomToSymbolIndex.begin(); it != this->_writer._atomToSymbolIndex.end(); ++it) {
+	for(std::map<const ld::Atom*, uint32_t>::iterator it = this->_writer._atomToSymbolIndex.begin(); it != this->_writer._atomToSymbolIndex.end(); ++it) {
 			fprintf(stderr, "%p(%s) => %d\n", it->first, it->first->name(), it->second);
 	}
 	throwf("internal error: atom not found in symbolIndex(%s)", atom->name());
@@ -2143,11 +2143,11 @@ ld::Section IndirectSymbolTableAtom<A>::_s_section("__LINKEDIT", "__ind_sym_tab"
 template <typename A>
 uint32_t IndirectSymbolTableAtom<A>::symbolIndex(const ld::Atom* atom)
 {
-	LDOrderedMap<const ld::Atom*, uint32_t>::iterator pos = this->_writer._atomToSymbolIndex.find(atom);
+	std::map<const ld::Atom*, uint32_t>::iterator pos = this->_writer._atomToSymbolIndex.find(atom);
 	if ( pos != this->_writer._atomToSymbolIndex.end() )
 		return pos->second;
 	//fprintf(stderr, "_atomToSymbolIndex content:\n");
-	//for(LDOrderedMap<const ld::Atom*, uint32_t>::iterator it = this->_writer._atomToSymbolIndex.begin(); it != this->_writer._atomToSymbolIndex.end(); ++it) {
+	//for(std::map<const ld::Atom*, uint32_t>::iterator it = this->_writer._atomToSymbolIndex.begin(); it != this->_writer._atomToSymbolIndex.end(); ++it) {
 	//		fprintf(stderr, "%p(%s) => %d\n", it->first, it->first->name(), it->second);
 	//}
 	throwf("internal error: atom not found in symbolIndex(%s)", atom->name());

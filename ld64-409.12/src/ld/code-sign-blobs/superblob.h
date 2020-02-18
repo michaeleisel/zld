@@ -9,10 +9,10 @@
 #include <utility>
 #include <map>
 
-#define LDOrderedMap std::map //absl::btree_map
-#define LDMap std::unordered_map //absl::flat_hash_map
-#define LDSet std::unordered_set //absl::flat_hash_set
-#define LDOrderedSet std::set //absl::btree_set
+#define std::map std::map //absl::btree_map
+#define std::unordered_map std::unordered_map //absl::flat_hash_map
+#define std::unordered_set std::unordered_set //absl::flat_hash_set
+#define std::set std::set //absl::btree_set
 
 using namespace std;
 
@@ -149,7 +149,7 @@ public:
 	_BlobType *operator () () const { return make(); }
 
 private:
-	typedef LDOrderedMap<Type, BlobCore *> BlobMap;
+	typedef std::map<Type, BlobCore *> BlobMap;
 	BlobMap mPieces;
 };
 

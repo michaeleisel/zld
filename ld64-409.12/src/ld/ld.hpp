@@ -46,10 +46,10 @@
 #include "absl/hash/hash.h"*/
 #include <nmmintrin.h>
 
-#define LDOrderedMap std::map //absl::btree_map
-#define LDMap std::unordered_map //absl::flat_hash_map
-#define LDSet std::unordered_set //absl::flat_hash_set
-#define LDOrderedSet std::set //absl::btree_set
+#define std::map std::map //absl::btree_map
+#define std::unordered_map std::unordered_map //absl::flat_hash_map
+#define std::unordered_set std::unordered_set //absl::flat_hash_set
+#define std::set std::set //absl::btree_set
 
 struct CPointerHash {
 	std::size_t operator()(const char* __s) const {
@@ -83,7 +83,7 @@ enum Platform {
 
 const ld::Platform basePlatform(const ld::Platform& platform);
 
-typedef LDOrderedSet<Platform> PlatformSet;
+typedef std::set<Platform> PlatformSet;
 
 //
 // minumum OS versions
@@ -93,10 +93,10 @@ typedef std::pair<Platform, uint32_t> Version;
 
 struct VersionSet {
 private:
-	LDOrderedMap<Platform, uint32_t> _versions;
+	std::map<Platform, uint32_t> _versions;
 public:
 	VersionSet() {}
-	VersionSet(const LDOrderedMap<Platform, uint32_t>& P) : _versions(P) {}
+	VersionSet(const std::map<Platform, uint32_t>& P) : _versions(P) {}
 	void add(ld::Version platformVersion) {
 		_versions.insert(platformVersion);
 	}
@@ -525,7 +525,7 @@ namespace archive {
 		virtual								~File() {}
 		virtual bool						justInTimeDataOnlyforEachAtom(const char* name, AtomHandler&) const = 0;
     	virtual void dumpMembersParsed(std::ofstream &stream) const = 0;
-		virtual std::vector<void *> membersToParse(LDSet<std::string> &set) const = 0;
+		virtual std::vector<void *> membersToParse(std::unordered_set<std::string> &set) const = 0;
 		virtual void parseMember(void *member) const = 0;
 	};
 } // namespace archive 
@@ -1284,7 +1284,7 @@ struct CLDStringHash {
 	}
 };
 
-// utility classes for using LDMap with c-strings
+// utility classes for using std::unordered_map with c-strings
 struct CStringHash {
 	size_t operator()(const char* __s) const {
 		int len = strlen(__s);
@@ -1328,7 +1328,7 @@ struct CStringEquals
 	bool operator()(const char* left, const char* right) const { return (strcmp(left, right) == 0); }
 };
 
-typedef	LDSet<const char*, ld::CStringHash, ld::CStringEquals>  CStringSet;
+typedef	std::unordered_set<const char*, ld::CStringHash, ld::CStringEquals>  CStringSet;
 
 
 class Internal
@@ -1355,7 +1355,7 @@ public:
 		bool							hasExternalRelocs;
 	};
 	
-	typedef LDOrderedMap<const ld::Atom*, FinalSection*>	AtomToSection;
+	typedef std::map<const ld::Atom*, FinalSection*>	AtomToSection;
 
 	virtual uint64_t					assignFileOffsets() = 0;
 	virtual void						setSectionSizesAndAlignments() = 0;
@@ -1392,8 +1392,8 @@ public:
 	std::vector<const ld::relocatable::File*>	filesWithBitcode;
 	std::vector<const ld::relocatable::File*>	filesFromCompilerRT;
 	std::vector<const ld::Atom*>				deadAtoms;
-	LDSet<const char*>				allUndefProxies;
-	LDSet<uint64_t>				toolsVersions;
+	std::unordered_set<const char*>				allUndefProxies;
+	std::unordered_set<uint64_t>				toolsVersions;
 	const ld::dylib::File*						bundleLoader;
 	const Atom*									entryPoint;
 	const Atom*									classicBindingHelper;

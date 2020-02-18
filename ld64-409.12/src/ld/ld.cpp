@@ -172,13 +172,13 @@ private:
 	struct SectionEquals {
 		bool operator()(const ld::Section* left, const ld::Section* right) const;
 	};
-	typedef LDMap<const ld::Section*, FinalSection*, SectionHash, SectionEquals> SectionInToOut;
+	typedef std::unordered_map<const ld::Section*, FinalSection*, SectionHash, SectionEquals> SectionInToOut;
 	
 
 	SectionInToOut			_sectionInToFinalMap;
 	const Options&			_options;
 	bool					_atomsOrderedInSections;
-	LDMap<const ld::Atom*, const char*> _pendingSegMove;
+	std::unordered_map<const ld::Atom*, const char*> _pendingSegMove;
 };
 
 ld::Section	InternalState::FinalSection::_s_DATA_data( "__DATA", "__data",  ld::Section::typeUnclassified);

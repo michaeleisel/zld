@@ -123,7 +123,7 @@ private:
 		};
 	};
 
-	// utility classes for using LDMap with c-strings
+	// utility classes for using std::unordered_map with c-strings
 	struct CStringEquals
 	{
 		bool operator()(const char* left, const char* right) const { return (strcmp(left, right) == 0); }

@@ -590,7 +590,7 @@ void SymbolTable::tentativeDefs(std::vector<const char*>& tents)
 }
 
 
-void SymbolTable::mustPreserveForBitcode(LDSet<const char*>& syms)
+void SymbolTable::mustPreserveForBitcode(std::unordered_set<const char*>& syms)
 {
 	// return all names in _byNameTable that have no associated atom
 	for (const auto &entry: _byNameTable) {
@@ -612,7 +612,7 @@ bool SymbolTable::hasName(const char* name)
 }
 
 //static const char *lastObjcMsgSend = NULL;
-static LDMap<const char *, int, CStringHash, CStringEquals> foundzMap;
+static std::unordered_map<const char *, int, CStringHash, CStringEquals> foundzMap;
 
 static int foundz = 0;
 static int nfoundz = 0;
@@ -936,7 +936,7 @@ const ld::Atom* SymbolTable::indirectAtom(IndirectBindingSlot slot) const
 }
 
 
-void SymbolTable::removeDeadUndefs(std::vector<const ld::Atom*>& allAtoms, const LDSet<const ld::Atom*>& keep)
+void SymbolTable::removeDeadUndefs(std::vector<const ld::Atom*>& allAtoms, const std::unordered_set<const ld::Atom*>& keep)
 {
 	// mark the indirect entries in use
 	std::vector<bool> indirectUsed;
