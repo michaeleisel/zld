@@ -3512,8 +3512,16 @@ void OutputFile::buildSymbolTable(ld::Internal& state)
 	}
 	
 	// sort by name
+	// note: parallel sorting here may affect reproducibility of builds
+#if REPRODUCIBLE
+	std::sort(_exportedAtoms.begin(), _exportedAtoms.end(), AtomByNameSorter());
+	std::sort(_importedAtoms.begin(), _importedAtoms.end(), AtomByNameSorter());
+#else
 	std::sort(std::execution::par, _exportedAtoms.begin(), _exportedAtoms.end(), AtomByNameSorter());
 	std::sort(std::execution::par, _importedAtoms.begin(), _importedAtoms.end(), AtomByNameSorter());
+	assert(std::is_sorted(_exportedAtoms.begin(), _exportedAtoms.end(), AtomByNameSorter()));
+	assert(std::is_sorted(_importedAtoms.begin(), _importedAtoms.end(), AtomByNameSorter()));
+#endif
 
 	LDOrderedMap<std::string, std::vector<std::string>> addedSymbols;
 	LDOrderedMap<std::string, std::vector<std::string>> hiddenSymbols;
@@ -5843,7 +5851,12 @@ void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 	}
 	
 	// sort by file ordinal then atom ordinal
+#if REPRODUCIBLE
+	std::sort(atomsNeedingDebugNotes.begin(), atomsNeedingDebugNotes.end(), DebugNoteSorter());
+#else
 	std::sort(std::execution::par, atomsNeedingDebugNotes.begin(), atomsNeedingDebugNotes.end(), DebugNoteSorter());
+#endif
+	assert(std::is_sorted(atomsNeedingDebugNotes.begin(), atomsNeedingDebugNotes.end(), DebugNoteSorter()));
 
 	// <rdar://problem/17689030> Add -add_ast_path option to linker which add N_AST stab entry to output
 	LDOrderedSet<std::string> seenAstPaths;
