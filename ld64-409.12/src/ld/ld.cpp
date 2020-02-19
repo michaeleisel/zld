@@ -1291,11 +1291,12 @@ static void printTime(const char* msg, uint64_t partTime, uint64_t totalTime)
 		fprintf(stderr, "%24s: % 4d.%d milliseconds (% 4d.%d%%)\n", msg, milliSeconds, milliSecondsTimeTen-milliSeconds*10, percent, percentTimesTen-percent*10);
 	}
 	else {
-		uint32_t secondsTimeTen = (partTime*10)/sUnitsPerSecond;
-		uint32_t seconds = secondsTimeTen/10;
+		double seconds = ((double)partTime)/sUnitsPerSecond;
+		fprintf(stderr, "%24s: %.2lf seconds\n", msg, seconds);
+		/*uint32_t seconds = secondsTimeTen/10;
 		uint32_t percentTimesTen = (partTime*1000)/totalTime;
 		uint32_t percent = percentTimesTen/10;
-		fprintf(stderr, "%24s: % 4d.%d seconds (% 4d.%d%%)\n", msg, seconds, secondsTimeTen-seconds*10, percent, percentTimesTen-percent*10);
+		fprintf(stderr, "%24s: % 4d.%d seconds (% 4d.%d%%)\n", msg, seconds, percent, percentTimesTen-percent*10);*/
 	}
 }
 
