@@ -169,20 +169,18 @@ void OutputFile::write(ld::Internal& state)
 	//dispatch_group_enter(group);
 	dispatch_group_async(group, queue, ^{
 		this->buildSymbolTable(state);
-		this->updateLINKEDITAddresses(state);
+		this->generateLinkEditInfo(state);
 	});
 	dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
-	//dispatch_group_notify(group, dispatch_get_main_queue(), ^{
-	this->generateLinkEditInfo(state);
 	if ( _options.sharedRegionEncodingV2() )
 		this->makeSplitSegInfoV2(state);
 	else
 		this->makeSplitSegInfo(state);
+	this->updateLINKEDITAddresses(state);
 	//this->dumpAtomsBySection(state, false);
 	this->writeOutputFile(state);
 	this->writeMapFile(state);
 	this->writeJSONEntry(state);
-	//});
 }
 
 bool OutputFile::findSegment(ld::Internal& state, uint64_t addr, uint64_t* start, uint64_t* end, uint32_t* index)
