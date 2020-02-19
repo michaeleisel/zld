@@ -3513,7 +3513,7 @@ void OutputFile::buildSymbolTable(ld::Internal& state)
 	
 	// sort by name
 	// note: parallel sorting here may affect reproducibility of builds
-#if REPRODUCIBLE
+#if REPRO
 	std::sort(_exportedAtoms.begin(), _exportedAtoms.end(), AtomByNameSorter());
 	std::sort(_importedAtoms.begin(), _importedAtoms.end(), AtomByNameSorter());
 #else
@@ -5851,7 +5851,7 @@ void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 	}
 	
 	// sort by file ordinal then atom ordinal
-#if REPRODUCIBLE
+#if REPRO
 	std::sort(atomsNeedingDebugNotes.begin(), atomsNeedingDebugNotes.end(), DebugNoteSorter());
 #else
 	std::sort(std::execution::par, atomsNeedingDebugNotes.begin(), atomsNeedingDebugNotes.end(), DebugNoteSorter());

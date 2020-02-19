@@ -631,7 +631,7 @@ void Layout::doPass()
 			default:
 				if ( log ) fprintf(stderr, "sorting section %s\n", sect->sectionName());
 				// riskier
-#if REPRODUCIBLE
+#if REPRO
 				std::sort(sect->atoms.begin(), sect->atoms.end(), _comparer);
 #else
 				std::sort(std::execution::par, sect->atoms.begin(), sect->atoms.end(), _comparer);
