@@ -60,39 +60,10 @@ static ld::IndirectBindingTable*	_s_indirectBindingTable = NULL;
 
 
 SymbolTable::SymbolTable(const Options& opts, std::vector<const ld::Atom*>& ibt) 
-	: _options(opts), _byNameTable(405000), _cstringTable(6151), _indirectBindingTable(ibt), _hasExternalTentativeDefinitions(false)
+	: _options(opts), _indirectBindingTable(ibt), _hasExternalTentativeDefinitions(false)
 {
-	LDString emptyString;
-	emptyString.str = NULL;
-	emptyString.length = 0;
-	emptyString.hash = 0;
-	_stringCache.emplace_back(emptyString);
-	_byNameTable.set_empty_key(&(_stringCache.back()));
-	LDString deleteString;
-	deleteString.str = NULL;
-	deleteString.length = -1;
-	deleteString.hash = 1;
-	_stringCache.emplace_back(deleteString);
-	_byNameTable.set_deleted_key(&(_stringCache.back()));
-	if (!opts.deadCodeStrip() && !opts.deadStripDylibs()) {
-    	_byNameTable.min_load_factor(0.0);
-	}
 	_s_indirectBindingTable = this;
 }
-
-SymbolTable::~SymbolTable() {
-	std::unordered_map<size_t, const char *> hashes;
-	for (auto &pair: _byNameTable) {
-		size_t hash = _byNameTable.hash_funct()(pair.first);
-		auto search = hashes.find(hash);
-		if (search != hashes.end() && strlen(search->second) == strlen(pair.first->str)) {
-			printf("confli: %s, %s\n", search->second, pair.first->str);
-		} else {
-			hashes[hash] = pair.first->str;
-		}
-	}
-}
-
 
 size_t SymbolTable::ContentFuncs::operator()(const ld::Atom* atom) const
 {
@@ -569,7 +540,7 @@ void SymbolTable::undefines(std::vector<const char*>& undefs)
 	for (NameToSlot::iterator it=_byNameTable.begin(); it != _byNameTable.end(); ++it) {
 		//fprintf(stderr, "  _byNameTable[%s] = slot %d which has atom %p\n", it->first, it->second, _indirectBindingTable[it->second]);
 		if ( _indirectBindingTable[it->second] == NULL )
-			undefs.push_back(it->first->str);
+			undefs.push_back(it->first.str);
 	}
 	// sort so that undefines are in a stable order (not dependent on hashing functions)
 	struct StrcmpSorter strcmpSorter;
@@ -581,7 +552,7 @@ void SymbolTable::tentativeDefs(std::vector<const char*>& tents)
 {
 	// return all names in _byNameTable that have no associated atom
 	for (NameToSlot::iterator it=_byNameTable.begin(); it != _byNameTable.end(); ++it) {
-		const char* name = it->first->str;
+		const char* name = it->first.str;
 		const ld::Atom* atom = _indirectBindingTable[it->second];
 		if ( (atom != NULL) && (atom->definition() == ld::Atom::definitionTentative) )
 			tents.push_back(name);
@@ -594,7 +565,7 @@ void SymbolTable::mustPreserveForBitcode(LDSet<const char*>& syms)
 {
 	// return all names in _byNameTable that have no associated atom
 	for (const auto &entry: _byNameTable) {
-		const char* name = entry.first->str;
+		const char* name = entry.first.str;
 		const ld::Atom* atom = _indirectBindingTable[entry.second];
 		if ( (atom == NULL) || (atom->definition() == ld::Atom::definitionProxy) )
 			syms.insert(name);
@@ -605,56 +576,17 @@ void SymbolTable::mustPreserveForBitcode(LDSet<const char*>& syms)
 bool SymbolTable::hasName(const char* name)			
 {
 	LDString string = LDStringCreate(name);
-	NameToSlot::iterator pos = _byNameTable.find(&string);
+	NameToSlot::iterator pos = _byNameTable.find(string);
 	if ( pos == _byNameTable.end() ) 
 		return false;
 	return (_indirectBindingTable[pos->second] != NULL); 
-}
-
-//static const char *lastObjcMsgSend = NULL;
-static LDMap<const char *, int, CStringHash, CStringEquals> foundzMap;
-
-static int foundz = 0;
-static int nfoundz = 0;
-/*__attribute__((destructor))*/ void aaazz() {
-	// create an empty vector of pairs
-	std::vector<std::pair<const char *, int>> vec;
-
-	typedef std::pair<const char *, int> Pair;
-	// copy key-value pairs from the map to the vector
-	std::copy(foundzMap.begin(),
-			foundzMap.end(),
-			std::back_inserter<std::vector<Pair>>(vec));
-
-	// sort the vector by increasing order of its pair's second value
-	// if second value are equal, order by the pair's first value
-	std::sort(vec.begin(), vec.end(),
-			[](const Pair& l, const Pair& r) {
-				if (l.second != r.second)
-					return l.second < r.second;
-
-				return l.first < r.first;
-			});
-	//std::cout << vec << std::endl;
-	std::vector<Pair> vv(vec.begin() + 24000, vec.end());
-	int sum = 0;
-	for (auto iter = vec.begin() + 23000; iter < vec.end(); iter++) {
-		sum += iter->second;
-	}
-	int fullSum = 0;
-	for (auto iter = vec.begin(); iter < vec.end(); iter++) {
-		fullSum += iter->second;
-	}
-	//std::accumulate(vv.begin(), vv.end(), 0);
-	printf("## %d, %d\n", sum, fullSum);
-	//printf("## %d, %d\n", foundz, nfoundz);
 }
 
 // find existing or create new slot
 SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name)
 {
 	LDString string = LDStringCreate(name);
-	NameToSlot::iterator pos = _byNameTable.find(&string);
+	NameToSlot::iterator pos = _byNameTable.find(string);
 	if ( pos != _byNameTable.end() ) {
 		IndirectBindingSlot slot = pos->second;
 		return slot;
@@ -662,8 +594,7 @@ SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* name)
 	// create new slot for this name
 	SymbolTable::IndirectBindingSlot slot = _indirectBindingTable.size();
 	_indirectBindingTable.push_back(NULL);
-	_stringCache.emplace_back(string);
-	_byNameTable[&(_stringCache.back())] = slot;
+	_byNameTable[string] = slot;
     auto diff = slot - _byNameReverseTable.size();
     for (unsigned long i = 0; i < diff; i++) {
         _byNameReverseTable.push_back(NULL);
@@ -686,12 +617,12 @@ void SymbolTable::removeDeadAtoms()
 				// <rdar://problem/16025786> need to completely remove dead atoms from symbol table
 				_byNameReverseTable[slot] = NULL;
 				// can't remove while iterating, do it after iteration
-				namesToRemove.push_back(*it->first);
+				namesToRemove.push_back(it->first);
 			}
 		}
 	}
 	for (std::vector<LDString>::iterator it = namesToRemove.begin(); it != namesToRemove.end(); ++it) {
-		_byNameTable.erase(&(*it));
+		_byNameTable.erase(*it);
 	}
 
 	// remove dead atoms from _nonLazyPointerTable
@@ -967,7 +898,7 @@ void SymbolTable::removeDeadUndefs(std::vector<const ld::Atom*>& allAtoms, const
 				_indirectBindingTable[slot] = NULL;
 				_byNameReverseTable[slot] = NULL;
 				auto string = LDStringCreate(name);
-				_byNameTable.erase(&string);
+				_byNameTable.erase(string);
 				allAtoms.erase(std::remove(allAtoms.begin(), allAtoms.end(), atom), allAtoms.end());
 			}
 		}
@@ -979,7 +910,7 @@ void SymbolTable::printStatistics()
 {
 //	fprintf(stderr, "cstring table size: %lu, bucket count: %lu, hash func called %u times\n", 
 //				_cstringTable.size(), _cstringTable.bucket_count(), cstringHashCount);
-	int count[11];
+	/*int count[11];
 	for(unsigned int b=0; b < 11; ++b) {
 		count[b] = 0;
 	}
@@ -995,7 +926,7 @@ void SymbolTable::printStatistics()
 		fprintf(stderr, "%u buckets have %u elements\n", count[b], b);
 	}
 	fprintf(stderr, "indirect table size: %lu\n", _indirectBindingTable.size());
-	fprintf(stderr, "by-name table size: %lu\n", _byNameTable.size());
+	fprintf(stderr, "by-name table size: %lu\n", _byNameTable.size());*/
 //	fprintf(stderr, "by-content table size: %lu, hash count: %u, equals count: %u, lookup count: %u\n", 
 //						_byContentTable.size(), contentHashCount, contentEqualCount, contentLookupCount);
 //	fprintf(stderr, "by-ref table size: %lu, hashed count: %u, equals count: %u, lookup count: %u, insert count: %u\n", 

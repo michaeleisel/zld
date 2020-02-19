@@ -97,7 +97,8 @@ public:
 private:
 	enum { kBufferSize = 0x01000000 };
 	//typedef google::dense_hash_map<LDString, int32_t, CLDStringHash, CLDStringEquals> StringToOffset;
-	typedef tsl::array_map<char, int32_t>/*, CStringHash, CStringEquals>*/ StringToOffset;
+	//typedef tsl::array_map<char, int32_t>/*, CStringHash, CStringEquals>*/ StringToOffset;
+	typedef LDMap<LDString, int32_t, CLDStringHash, CLDStringEquals> StringToOffset;
 
 	const uint32_t							_pointerSize;
 	std::vector<char*>						_fullBuffers;
@@ -119,19 +120,19 @@ StringPoolAtom::StringPoolAtom(const Options& opts, ld::Internal& state, OutputF
 	_currentBuffer[_currentBufferUsed++] = ' ';
 	// make offset 1 always point to an empty string
 	_currentBuffer[_currentBufferUsed++] = '\0';
-	_uniqueStrings.reserve(600000);
+	/*_uniqueStrings.reserve(600000);
 	LDString emptyKey = {
 		.hash = 1,
 		.str = (const char *)0x0,
 		.length = 0,
 	};
-	/*LDString deletedKey = {
+	LDString deletedKey = {
 		.hash = 0,
 		.str = (const char *)0x1,
 		.length = 0,
 	};
-	_uniqueStrings.set_deleted_key(deletedKey);*/
-	/*_uniqueStrings.set_empty_key(emptyKey);
+	_uniqueStrings.set_deleted_key(deletedKey);
+	_uniqueStrings.set_empty_key(emptyKey);
 	_uniqueStrings.min_load_factor(0.0);*/
 }
 
@@ -159,7 +160,7 @@ int32_t StringPoolAtom::getOffset() {
 	return kBufferSize * _fullBuffers.size() + _currentBufferUsed;
 }
 
-__attribute__((noinline)) int32_t StringPoolAtom::add(const char* str)
+int32_t StringPoolAtom::add(const char* str)
 {
 	int32_t offset = getOffset();
 	int lenNeeded = strlcpy(&_currentBuffer[_currentBufferUsed], str, kBufferSize-_currentBufferUsed)+1;
@@ -190,40 +191,15 @@ static std::vector<std::string> syms;
 
 #include <fstream>
 
-static int nCount = 0;
-__attribute__((destructor)) void asdlfjsadlkjfsaf() {
-	printf("zz %d\n", nCount);
-	({
-    	std::ofstream stream;
-    	stream.open("/tmp/syms");
-    	for (auto &sym : syms) {
-    		stream << sym << "\n";
-    	}
-    	stream.close();
-	});
-	std::ofstream stream;
-	stream.open("/tmp/ratios");
-	for (auto &ratio : ratios) {
-		stream << ratio << "\n";
-	}
-	stream.close();
-}
-
-__attribute__((noinline)) int32_t StringPoolAtom::addUnique(const char* str)
+int32_t StringPoolAtom::addUnique(const char* str)
 {
 	int32_t offset = getOffset();
-	//auto string = LDStringCreate(str);
-	//std::pair<LDString, int32_t> pair(string, offset);
-	//auto resultPair = _uniqueStrings.insert(string, offset);
-	const std::basic_string_view<char> view(str);
-	auto resultPair = _uniqueStrings.insert(view, offset);
-	//auto resultPair = _uniqueStrings.insert(pair);
-	//syms.emplace_back(str);
+	auto string = LDStringCreate(str);
+	auto resultPair = _uniqueStrings.try_emplace(string, offset);
 	if (resultPair.second) {
-		nCount++;
 		return this->add(str);
 	} else {
-		return resultPair.first.value();
+		return resultPair.first->second;
 	}
 }
 

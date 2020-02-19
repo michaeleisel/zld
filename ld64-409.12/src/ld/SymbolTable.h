@@ -98,11 +98,10 @@ class SymbolTable : public ld::IndirectBindingTable
 {
 public:
 	typedef uint32_t IndirectBindingSlot;
-	~SymbolTable();
 
 private:
-	typedef google::dense_hash_map<LDString *, IndirectBindingSlot, CLDStringPointerHash, CLDStringPointerEquals> NameToSlot;//LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
-	std::deque<LDString> _stringCache;
+	//typedef google::dense_hash_map<LDString *, IndirectBindingSlot, CLDStringPointerHash, CLDStringPointerEquals> NameToSlot;
+	typedef LDMap<LDString, IndirectBindingSlot, CLDStringHash, CLDStringEquals> NameToSlot;
 
 	class ContentFuncs {
 	public:
@@ -123,7 +122,7 @@ private:
 		size_t	operator()(const ld::Atom*) const;
 		bool	operator()(const ld::Atom* left, const ld::Atom* right) const;
 	};
-	typedef std::unordered_map<const ld::Atom*, IndirectBindingSlot, CStringHashFuncs, CStringHashFuncs> CStringToSlot;
+	typedef LDMap<const ld::Atom*, IndirectBindingSlot, CStringHashFuncs, CStringHashFuncs> CStringToSlot;
 
 	class UTF16StringHashFuncs {
 	public:
