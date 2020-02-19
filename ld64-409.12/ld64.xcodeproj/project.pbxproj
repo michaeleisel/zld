@@ -48,6 +48,7 @@
 		4C755DAC23F7746D001D517E /* libtbb.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 4C755DAA23F7746D001D517E /* libtbb.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		4C755DAF23F7746F001D517E /* libtbbmalloc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */; };
 		4C755DB023F7746F001D517E /* libtbbmalloc.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		4C902D6F23FD979F0006EBAC /* libhash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C902D6E23FD979F0006EBAC /* libhash.a */; };
 		83046A851C8FF2F700024A7E /* objcimageinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83046A841C8FF2D000024A7E /* objcimageinfo.cpp */; };
 		B028FCF21A9E7C3F00E3584B /* bitcode_bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B028FCF11A9E7C3F00E3584B /* bitcode_bundle.cpp */; };
 		B3B672421406D42800A376BB /* Snapshot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3B672411406D42800A376BB /* Snapshot.cpp */; };
@@ -269,13 +270,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4C47258B23FD9E3C00AA02B2 /* MapDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapDefines.h; sourceTree = "<group>"; };
 		4C5E360723FB61D50073E2F5 /* configure.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = configure.h; sourceTree = "<group>"; };
 		4C5E360823FB61DC0073E2F5 /* compile_stubs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = compile_stubs.h; sourceTree = "<group>"; };
 		4C63788B23F5FF4200EB13BA /* librpmallocwrap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = librpmallocwrap.dylib; path = ../../rpmalloc/bin/macos/release/librpmallocwrap.dylib; sourceTree = "<group>"; };
 		4C755DAA23F7746D001D517E /* libtbb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbb.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbb.dylib; sourceTree = "<group>"; };
 		4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbbmalloc.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbbmalloc.dylib; sourceTree = "<group>"; };
 		4C7D5B8323D8D46B006E515E /* hash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hash.h; path = "../../examples/abseil-cpp/absl/hash/hash.h"; sourceTree = "<group>"; };
-		4C7D5B8623D8F336006E515E /* libhash2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhash2.a; path = ../../examples/build/libhash2.a; sourceTree = "<group>"; };
+		4C902D6E23FD979F0006EBAC /* libhash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhash.a; path = ../../examples/build/libhash.a; sourceTree = "<group>"; };
 		4CF05E8E23EB005B009C0C95 /* libsystem_malloc.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsystem_malloc.tbd; path = usr/lib/system/libsystem_malloc.tbd; sourceTree = SDKROOT; };
 		4CF05E9023EB0093009C0C95 /* libSystem.B.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libSystem.B.tbd; path = usr/lib/libSystem.B.tbd; sourceTree = SDKROOT; };
 		4CF05E9323EB0151009C0C95 /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/System.framework; sourceTree = DEVELOPER_DIR; };
@@ -401,6 +403,7 @@
 			files = (
 				4C755DAB23F7746D001D517E /* libtbb.dylib in Frameworks */,
 				4C755DAF23F7746F001D517E /* libtbbmalloc.dylib in Frameworks */,
+				4C902D6F23FD979F0006EBAC /* libhash.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -591,6 +594,7 @@
 		F9B813AD0EC27B8500F94C13 /* ld */ = {
 			isa = PBXGroup;
 			children = (
+				4C47258B23FD9E3C00AA02B2 /* MapDefines.h */,
 				F9AA69BF10583E19003E3539 /* Resolver.cpp */,
 				F9AA69C010583E19003E3539 /* Resolver.h */,
 				F9AA69B410583C0C003E3539 /* SymbolTable.cpp */,
@@ -598,8 +602,8 @@
 				F9AA69B510583C0C003E3539 /* SymbolTable.h */,
 				4C5E360823FB61DC0073E2F5 /* compile_stubs.h */,
 				F9AA687A10572E27003E3539 /* InputFiles.mm */,
-				4C7D5B8623D8F336006E515E /* libhash2.a */,
 				4C7D5B8323D8D46B006E515E /* hash.h */,
+				4C902D6E23FD979F0006EBAC /* libhash.a */,
 				4C5E360723FB61D50073E2F5 /* configure.h */,
 				F9AA687B10572E27003E3539 /* InputFiles.h */,
 				F9AA5FCC103F5CD1003E3539 /* ld.hpp */,
@@ -1480,7 +1484,8 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
-					"-Wl,-undefined,dynamic_lookup",
+					"-Wl,-t",
+					"-Wl,-U,_fnd_get_demangled_name",
 				);
 				SDKROOT = macosx;
 			};
@@ -1530,7 +1535,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
-					"-Wl,-undefined,dynamic_lookup",
+					"-Wl,-t",
+					"-Wl,-U,_fnd_get_demangled_name",
 				);
 				SDKROOT = macosx;
 			};
@@ -1598,7 +1604,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
-					"-Wl,-undefined,dynamic_lookup",
+					"-Wl,-t",
+					"-Wl,-U,_fnd_get_demangled_name",
 				);
 				SDKROOT = macosx;
 			};
