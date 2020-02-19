@@ -3010,7 +3010,7 @@ void OutputFile::writeAtoms(ld::Internal& state, uint8_t* wholeBuffer)
 			if (logThreadedFixups) fprintf(stderr, "thread start[0x%llX]: header=0x%X\n", threadStartsFileOffset, get32LE(&wholeBuffer[threadStartsFileOffset]));
 			threadStartsFileOffset += sizeof(uint32_t);
 			for (uint64_t threadStart : threadStarts) {
-				uint64_t offset = threadStart - baseAddress;
+				uint64_t offset = threadStart - mhAddress;
 				assert(offset < 0x100000000);
 				set32LE(&wholeBuffer[threadStartsFileOffset], offset);
 				if (logThreadedFixups) fprintf(stderr, "thread start[0x%llX]: address=0x%llX -> offset=0x%llX\n", threadStartsFileOffset, threadStart, offset);
