@@ -165,6 +165,7 @@ private:
 	};
 
 	void						writeAtoms(ld::Internal& state, uint8_t* wholeBuffer);
+	void updatePreviousLoopValues(ld::Internal& state, std::vector<ld::Internal::FinalSection*>::iterator& sit, uint64_t *fileOffsetOfEndOfLastAtom, bool *lastAtomUsesNoOps);
 	void						computeContentUUID(ld::Internal& state, uint8_t* wholeBuffer);
 	void						buildDylibOrdinalMapping(ld::Internal&);
 	bool						hasOrdinalForInstallPath(const char* path, int* ordinal);

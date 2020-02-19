@@ -59,7 +59,7 @@
 		F98498A410AE2159009E9878 /* got.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9AB1063107D380700E54C9E /* got.cpp */; };
 		F9849E3610B38EF5009E9878 /* order.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9849E3410B38EF5009E9878 /* order.cpp */; };
 		F984A38210BB4B0D009E9878 /* branch_island.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F984A38010BB4B0D009E9878 /* branch_island.cpp */; };
-		F989D30D106826020014B60C /* OutputFile.mm in Sources */ = {isa = PBXBuildFile; fileRef = F989D30B106826020014B60C /* OutputFile.mm */; };
+		F989D30D106826020014B60C /* OutputFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F989D30B106826020014B60C /* OutputFile.cpp */; };
 		F9A3DDD30ED762E400C590B9 /* PruneTrie.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9A3DDD20ED762E400C590B9 /* PruneTrie.cpp */; };
 		F9A3DE1E0ED7738300C590B9 /* prune_trie.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = F9A3DE0F0ED76D1900C590B9 /* prune_trie.h */; };
 		F9A4DB9110F816FF00BD8423 /* objc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9A4DB8F10F816FF00BD8423 /* objc.cpp */; };
@@ -314,7 +314,7 @@
 		F984A38110BB4B0D009E9878 /* branch_island.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = branch_island.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F98565241E98090F00528B1C /* dwarf2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dwarf2.h; path = src/ld/dwarf2.h; sourceTree = "<group>"; };
 		F989D0391062E6350014B60C /* stub_x86_64.hpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.h; path = stub_x86_64.hpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
-		F989D30B106826020014B60C /* OutputFile.mm */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = OutputFile.mm; path = src/ld/OutputFile.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
+		F989D30B106826020014B60C /* OutputFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OutputFile.cpp; path = src/ld/OutputFile.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F989D30C106826020014B60C /* OutputFile.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; name = OutputFile.h; path = src/ld/OutputFile.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F989D3AA10684F5B0014B60C /* LinkEdit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.h; name = LinkEdit.hpp; path = src/ld/LinkEdit.hpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F989D44B10694F2E0014B60C /* LinkEditClassic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.h; name = LinkEditClassic.hpp; path = src/ld/LinkEditClassic.hpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
@@ -606,7 +606,7 @@
 				F9023C3F06D5A254001BBF46 /* ld.cpp */,
 				F9C0D48A06DD1E1B001C7193 /* Options.cpp */,
 				F9C0D48B06DD1E1B001C7193 /* Options.h */,
-				F989D30B106826020014B60C /* OutputFile.mm */,
+				F989D30B106826020014B60C /* OutputFile.cpp */,
 				F989D30C106826020014B60C /* OutputFile.h */,
 				F989D7E91072DEC20014B60C /* HeaderAndLoadCommands.hpp */,
 				F989D3AA10684F5B0014B60C /* LinkEdit.hpp */,
@@ -992,7 +992,7 @@
 				F9AA687C10572E27003E3539 /* InputFiles.mm in Sources */,
 				F9AA69B610583C0C003E3539 /* SymbolTable.cpp in Sources */,
 				F9AA69C110583E19003E3539 /* Resolver.cpp in Sources */,
-				F989D30D106826020014B60C /* OutputFile.mm in Sources */,
+				F989D30D106826020014B60C /* OutputFile.cpp in Sources */,
 				F9AA65111051BD2B003E3539 /* stubs.cpp in Sources */,
 				F9AA6786105700C2003E3539 /* opaque_section_file.cpp in Sources */,
 				F9AA67B610570C41003E3539 /* dtrace_dof.cpp in Sources */,
