@@ -64,7 +64,7 @@ struct Node
 	uint32_t			fTrieOffset;
 	
 	void addSymbol(const char* fullStr, uint64_t address, uint64_t flags, uint64_t other, const char* importName) {
-		const char* partialStr = &fullStr[fCummulativeStringLength];
+		const char* partialStr = &fullStr[strlen(fCummulativeString)];
 		for (std::vector<Edge>::iterator it = fChildren.begin(); it != fChildren.end(); ++it) {
 			Edge& e = *it;
 			size_t subStringLen = e.fSubStringLength;

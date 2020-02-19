@@ -35,11 +35,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <set>
-
-#define LDOrderedMap std::map //absl::btree_map
-#define LDMap std::unordered_map //absl::flat_hash_map
-#define LDSet std::unordered_set //absl::flat_hash_set
-#define LDOrderedSet std::set //absl::btree_set
+#include "MapDefines.h"
 
 
 #include "MachOFileAbstraction.hpp"
