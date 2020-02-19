@@ -1336,6 +1336,10 @@
 					/Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release,
 				);
 				LLVM_LTO = NO;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DREPRO=1",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-stdlib=libc++",

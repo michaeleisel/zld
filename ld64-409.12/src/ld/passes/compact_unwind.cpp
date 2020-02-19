@@ -94,7 +94,7 @@ private:
 	void						findCommonEncoding(const std::vector<UnwindEntry>& entries, 
 													LDOrderedMap<compact_unwind_encoding_t, unsigned int>& commonEncodings);
 	void						makeLsdaIndex(const std::vector<UnwindEntry>& entries, std::vector<LSDAEntry>& lsdaIndex, 
-																LDOrderedMap<const ld::Atom*, uint32_t>& lsdaIndexOffsetMap);
+																LDMap<const ld::Atom*, uint32_t>& lsdaIndexOffsetMap);
 	unsigned int				makeCompressedSecondLevelPage(const std::vector<UnwindEntry>& uniqueInfos,   
 													const LDOrderedMap<compact_unwind_encoding_t,unsigned int> commonEncodings,  
 													uint32_t pageSize, unsigned int endIndex, uint8_t*& pageEnd);
@@ -152,7 +152,7 @@ UnwindInfoAtom<A>::UnwindInfoAtom(const std::vector<UnwindEntry>& entries, uint6
 	findCommonEncoding(uniqueEntries, commonEncodings);
 	
 	// build lsda index
-	LDOrderedMap<const ld::Atom*, uint32_t> lsdaIndexOffsetMap;
+	LDMap<const ld::Atom*, uint32_t> lsdaIndexOffsetMap;
 	std::vector<LSDAEntry>	lsdaIndex;
 	makeLsdaIndex(uniqueEntries, lsdaIndex, lsdaIndexOffsetMap);
 	
@@ -350,7 +350,7 @@ void UnwindInfoAtom<A>::makePersonalityIndexes(std::vector<UnwindEntry>& entries
 
 
 template <typename A>
-void UnwindInfoAtom<A>::findCommonEncoding(const std::vector<UnwindEntry>& entries, 
+void UnwindInfoAtom<A>::findCommonEncoding(const std::vector<UnwindEntry>& entries,
 											LDOrderedMap<compact_unwind_encoding_t, unsigned int>& commonEncodings)
 {
 	// scan infos to get frequency counts for each encoding
@@ -386,7 +386,7 @@ void UnwindInfoAtom<A>::findCommonEncoding(const std::vector<UnwindEntry>& entri
 
 
 template <typename A>
-void UnwindInfoAtom<A>::makeLsdaIndex(const std::vector<UnwindEntry>& entries, std::vector<LSDAEntry>& lsdaIndex, LDOrderedMap<const ld::Atom*, uint32_t>& lsdaIndexOffsetMap)
+void UnwindInfoAtom<A>::makeLsdaIndex(const std::vector<UnwindEntry>& entries, std::vector<LSDAEntry>& lsdaIndex, LDMap<const ld::Atom*, uint32_t>& lsdaIndexOffsetMap)
 {
 	for(std::vector<UnwindEntry>::const_iterator it=entries.begin(); it != entries.end(); ++it) {
 		lsdaIndexOffsetMap[it->func] = lsdaIndex.size() * sizeof(unwind_info_section_header_lsda_index_entry);
