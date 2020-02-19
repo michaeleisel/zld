@@ -66,6 +66,7 @@
 #include "MachOTrie.hpp"
 
 #include "Options.h"
+#include "Tweaks.hpp"
 
 #include "OutputFile.h"
 #include "Architectures.hpp"
@@ -3513,15 +3514,15 @@ void OutputFile::buildSymbolTable(ld::Internal& state)
 	
 	// sort by name
 	// note: parallel sorting here may affect reproducibility of builds
-#if REPRO
-	std::sort(_exportedAtoms.begin(), _exportedAtoms.end(), AtomByNameSorter());
-	std::sort(_importedAtoms.begin(), _importedAtoms.end(), AtomByNameSorter());
-#else
-	std::sort(std::execution::par, _exportedAtoms.begin(), _exportedAtoms.end(), AtomByNameSorter());
-	std::sort(std::execution::par, _importedAtoms.begin(), _importedAtoms.end(), AtomByNameSorter());
-	assert(std::is_sorted(_exportedAtoms.begin(), _exportedAtoms.end(), AtomByNameSorter()));
-	assert(std::is_sorted(_importedAtoms.begin(), _importedAtoms.end(), AtomByNameSorter()));
-#endif
+	if (Tweaks::reproEnabled()) {
+    	std::sort(_exportedAtoms.begin(), _exportedAtoms.end(), AtomByNameSorter());
+    	std::sort(_importedAtoms.begin(), _importedAtoms.end(), AtomByNameSorter());
+	} else {
+    	std::sort(std::execution::par, _exportedAtoms.begin(), _exportedAtoms.end(), AtomByNameSorter());
+    	std::sort(std::execution::par, _importedAtoms.begin(), _importedAtoms.end(), AtomByNameSorter());
+    	assert(std::is_sorted(_exportedAtoms.begin(), _exportedAtoms.end(), AtomByNameSorter()));
+    	assert(std::is_sorted(_importedAtoms.begin(), _importedAtoms.end(), AtomByNameSorter()));
+	}
 
 	LDOrderedMap<std::string, std::vector<std::string>> addedSymbols;
 	LDOrderedMap<std::string, std::vector<std::string>> hiddenSymbols;
@@ -5851,11 +5852,11 @@ void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 	}
 	
 	// sort by file ordinal then atom ordinal
-#if REPRO
-	std::sort(atomsNeedingDebugNotes.begin(), atomsNeedingDebugNotes.end(), DebugNoteSorter());
-#else
-	std::sort(std::execution::par, atomsNeedingDebugNotes.begin(), atomsNeedingDebugNotes.end(), DebugNoteSorter());
-#endif
+	if (Tweaks::reproEnabled()) {
+    	std::sort(atomsNeedingDebugNotes.begin(), atomsNeedingDebugNotes.end(), DebugNoteSorter());
+	} else {
+    	std::sort(std::execution::par, atomsNeedingDebugNotes.begin(), atomsNeedingDebugNotes.end(), DebugNoteSorter());
+	}
 	assert(std::is_sorted(atomsNeedingDebugNotes.begin(), atomsNeedingDebugNotes.end(), DebugNoteSorter()));
 
 	// <rdar://problem/17689030> Add -add_ast_path option to linker which add N_AST stab entry to output

@@ -38,6 +38,7 @@
 
 #include "ld.hpp"
 #include "order.h"
+#include "Tweaks.hpp"
 
 namespace ld {
 namespace passes {
@@ -631,11 +632,11 @@ void Layout::doPass()
 			default:
 				if ( log ) fprintf(stderr, "sorting section %s\n", sect->sectionName());
 				// riskier
-#if REPRO
-				std::sort(sect->atoms.begin(), sect->atoms.end(), _comparer);
-#else
-				std::sort(std::execution::par, sect->atoms.begin(), sect->atoms.end(), _comparer);
-#endif
+				if (Tweaks::reproEnabled()) {
+    				std::sort(sect->atoms.begin(), sect->atoms.end(), _comparer);
+				} else {
+    				std::sort(std::execution::par, sect->atoms.begin(), sect->atoms.end(), _comparer);
+				}
 				// note that is_sorted fails here, probably because of some shenanigans around aliases in _comparer.
 				// but it doesn't seem to be a regression
 				break;
