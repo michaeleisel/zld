@@ -1255,6 +1255,7 @@
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
 				LLVM_LTO = NO;
 				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-stdlib=libc++",
@@ -1336,10 +1337,7 @@
 					/Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release,
 				);
 				LLVM_LTO = NO;
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-DREPRO=1",
-				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-stdlib=libc++",
@@ -1674,10 +1672,7 @@
 					/Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release,
 				);
 				LLVM_LTO = NO;
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CPLUSPLUSFLAGS)",
-					"-DREPRO=1",
-				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
 				OTHER_LDFLAGS = (
 					"-stdlib=libc++",
 					"-lxar",
