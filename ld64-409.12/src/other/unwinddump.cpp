@@ -39,11 +39,10 @@
 #include "MachOFileAbstraction.hpp"
 #include "Architectures.hpp"
 
-#define LDOrderedMap std::map //absl::btree_map
-#define LDMap std::unordered_map //absl::flat_hash_map
-#define LDSet std::unordered_set //absl::flat_hash_set
-#define LDOrderedSet std::set //absl::btree_set
-
+#define LDOrderedMap absl::btree_map
+#define LDMap absl::flat_hash_map
+#define LDSet absl::flat_hash_set
+#define LDOrderedSet absl::btree_set
 
  __attribute__((noreturn))
 void throwf(const char* format, ...) 
