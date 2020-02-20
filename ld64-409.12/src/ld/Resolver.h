@@ -103,6 +103,7 @@ private:
 	bool					printReferencedBy(const char* name, SymbolTable::IndirectBindingSlot slot);
 	void					tweakWeakness();
 	void					buildArchivesList();
+	void dumpMembersParsed();
 	void					doLinkerOption(const std::vector<const char*>& linkerOption, const char* fileName);
 	void					dumpAtoms();
 

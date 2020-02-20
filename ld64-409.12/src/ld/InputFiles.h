@@ -64,7 +64,9 @@ public:
 	
 	// iterates all atoms in initial files
 	void						forEachInitialAtom(ld::File::AtomHandler&, ld::Internal& state);
+	void preParseLibraries() const;
 	// searches libraries for name
+	void dumpMembersParsed(std::ofstream &stream) const;
 	bool						searchLibraries(const char* name, bool searchDylibs, bool searchArchives,  
 																  bool dataSymbolOnly, ld::File::AtomHandler&) const;
 	// see if any linked dylibs export a weak def of symbol

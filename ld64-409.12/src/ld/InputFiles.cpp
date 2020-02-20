@@ -1358,6 +1358,75 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 }
 
 
+void InputFiles::preParseLibraries() const {
+	std::string line;
+	std::ifstream infile(_options.cacheFilePath());
+	std::unordered_set<std::string> currentSet;
+	std::unordered_map<std::string, std::unordered_set<std::string>> map;
+	std::string currentLib;
+	std::getline(infile, currentLib);
+	while (std::getline(infile, line)) {
+		if (line[0] == '\t') {
+			line.erase(0, 1);
+			currentSet.insert(line);
+		} else {
+			map[currentLib] = currentSet;
+			currentLib = line;
+			currentSet = std::unordered_set<std::string>();
+		}
+	}
+	map[currentLib] = currentSet;
+	auto queue = [[NSOperationQueue alloc] init];
+	queue.qualityOfService = NSQualityOfServiceUserInteractive;
+	// initialize info for parsing input files on worker threads
+	unsigned int ncpus;
+	int mib[2];
+	size_t len = sizeof(ncpus);
+	mib[0] = CTL_HW;
+	mib[1] = HW_NCPU;
+	auto res = sysctl(mib, 2, &ncpus, &len, NULL, 0);
+	if (res != 0) {
+		ncpus = 1;
+	}
+	queue.maxConcurrentOperationCount = ncpus;
+
+    for (std::vector<LibraryInfo>::const_iterator it=_searchLibraries.begin(); it != _searchLibraries.end(); ++it) {
+		auto lib = *it;
+		if (lib.isDylib()) {
+			auto dylib = lib.dylib();
+			auto it = map.find(dylib->path());
+			if (it == map.end()) {
+				continue;
+			}
+			//dylib->insertFilesToLoad();
+		} else {
+			auto archiveFile = lib.archive();
+			auto it = map.find(archiveFile->path());
+			if (it == map.end()) {
+				continue;
+			}
+			auto members = archiveFile->membersToParse(it->second);
+			for (auto member : members) {
+				[queue addOperationWithBlock:^{
+    				archiveFile->parseMember(member);
+				}];
+			}
+		}
+	}
+	[queue waitUntilAllOperationsAreFinished];
+}
+
+void InputFiles::dumpMembersParsed(std::ofstream &stream) const {
+    for (std::vector<LibraryInfo>::const_iterator it=_searchLibraries.begin(); it != _searchLibraries.end(); ++it) {
+		auto lib = *it;
+		if (lib.isDylib()) {
+		} else {
+			auto archive = lib.archive();
+			archive->dumpMembersParsed(stream);
+		}
+	}
+}
+
 bool InputFiles::searchLibraries(const char* name, bool searchDylibs, bool searchArchives, bool dataSymbolOnly, ld::File::AtomHandler& handler) const
 {
 	// Check each input library.
