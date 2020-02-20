@@ -329,6 +329,7 @@ public:
 	virtual uint32_t					cpuSubType() const		{ return 0; }
 	virtual uint32_t					subFileCount() const	{ return 1; }
 	virtual const VersionSet&			platforms() const		{ return _platforms; }
+	virtual void markSubFrameworksAsExported(const char *myLeaf) { }
     bool								fileExists() const     { return _modTime != 0; }
 	Type								type() const { return _type; }
 	virtual Bitcode*					getBitcode() const		{ return NULL; }
@@ -443,6 +444,15 @@ namespace dylib {
 				bool						willBeUpwardDylib() const		{ return _upward; }
 				void						setWillBeRemoved(bool value)	{ _dead = value; }
 				bool						willRemoved() const				{ return _dead; }
+		void markSubFrameworksAsExported(const char *myLeaf) {
+			const char* childParent = parentUmbrella();
+			if ( childParent != NULL ) {
+				if ( strcmp(childParent, &myLeaf[1]) == 0 ) {
+					// mark that this dylib will be re-exported
+					setWillBeReExported();
+				}
+			}
+		}
 				
 		virtual void						processIndirectLibraries(DylibHandler* handler, bool addImplicitDylibs) = 0;
 		virtual bool						providedExportAtom() const = 0;
