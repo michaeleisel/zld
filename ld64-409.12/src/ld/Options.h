@@ -548,8 +548,8 @@ public:
 	static uint32_t				parseVersionNumber32(const char*);
 
 private:
-	typedef std::unordered_map<const char*, unsigned int, ld::CStringHash, ld::CStringEquals> NameToOrder;
-	typedef std::unordered_set<const char*, ld::CStringHash, ld::CStringEquals>  NameSet;
+	typedef LDMap<const char*, unsigned int, ld::CStringHash, ld::CStringEquals> NameToOrder;
+	typedef LDSet<const char*, ld::CStringHash, ld::CStringEquals>  NameSet;
 	enum ExportMode { kExportDefault, kExportSome, kDontExportSome };
 	enum LibrarySearchMode { kSearchDylibAndArchiveInEachDir, kSearchAllDirsForDylibsThenAllDirsForArchives };
 	enum InterposeMode { kInterposeNone, kInterposeAllExternal, kInterposeSome };
@@ -562,8 +562,8 @@ private:
 		bool					containsNonWildcard(const char*) const;
 		bool					empty() const			{ return fRegular.empty() && fWildCard.empty(); }
 		bool					hasWildCards() const	{ return !fWildCard.empty(); }
-		NameSet::iterator		regularBegin() const	{ return fRegular.begin(); }
-		NameSet::iterator		regularEnd() const		{ return fRegular.end(); }
+		NameSet::const_iterator		regularBegin() const	{ return fRegular.begin(); }
+		NameSet::const_iterator		regularEnd() const		{ return fRegular.end(); }
 		void					remove(const NameSet&); 
 		std::vector<const char*>		data() const;
 	private:
