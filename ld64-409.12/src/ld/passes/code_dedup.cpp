@@ -73,7 +73,7 @@ private:
 
 
 namespace {
-    typedef std::unordered_map<const ld::Atom*, unsigned long> CachedHashes;
+    typedef LDMap<const ld::Atom*, unsigned long> CachedHashes;
 
     ld::Internal*   sState = nullptr;
     CachedHashes    sSavedHashes;
@@ -82,7 +82,7 @@ namespace {
 };
 
 
-// A helper for std::unordered_map<> that hashes the instructions of a function
+// A helper for LDMap<> that hashes the instructions of a function
 struct atom_hashing {
 
     static unsigned long hash(const ld::Atom* atom) {
@@ -139,7 +139,7 @@ struct atom_hashing {
 };
 
 
-// A helper for std::unordered_map<> that compares functions
+// A helper for LDMap<> that compares functions
 struct atom_equal {
 
     struct BackChain {
@@ -278,8 +278,8 @@ void doPass(const Options& opts, ld::Internal& state)
     // the key for the map is always the first element in the value vector
     // the key is always earlier in the atoms list then matching other atoms
     sState = &state;
-    std::unordered_map<const ld::Atom*, std::vector<const ld::Atom*>, atom_hashing, atom_equal> map;
-    std::unordered_set<const ld::Atom*> masterAtoms;
+    LDMap<const ld::Atom*, std::vector<const ld::Atom*>, atom_hashing, atom_equal> map;
+    LDSet<const ld::Atom*> masterAtoms;
     for (const ld::Atom* atom : textSection->atoms) {
         // ignore empty (alias) atoms
         if ( atom->size() == 0 )
@@ -306,7 +306,7 @@ void doPass(const Options& opts, ld::Internal& state)
     unsigned atomsBeingComparedCount = 0;
     uint64_t dedupSavings = 0;
     std::vector<const ld::Atom*>& textAtoms = textSection->atoms;
-    std::unordered_map<const ld::Atom*, const ld::Atom*> replacementMap;
+    LDMap<const ld::Atom*, const ld::Atom*> replacementMap;
     for (auto& entry : map) {
         const ld::Atom* masterAtom = entry.first;
         std::vector<const ld::Atom*>& dups = entry.second;
@@ -346,7 +346,7 @@ void doPass(const Options& opts, ld::Internal& state)
     for (ld::Internal::FinalSection* sect : state.sections) {
         for (const ld::Atom* atom : sect->atoms) {
 			for (ld::Fixup::iterator fit = atom->fixupsBegin(), end=atom->fixupsEnd(); fit != end; ++fit) {
-                std::unordered_map<const ld::Atom*, const ld::Atom*>::iterator pos;
+                LDMap<const ld::Atom*, const ld::Atom*>::iterator pos;
                 switch ( fit->binding ) {
                     case ld::Fixup::bindingsIndirectlyBound:
                         pos = replacementMap.find(state.indirectBindingTable[fit->u.bindingIndex]);

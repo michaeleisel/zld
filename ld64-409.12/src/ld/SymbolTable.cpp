@@ -562,7 +562,7 @@ void SymbolTable::tentativeDefs(std::vector<const char*>& tents)
 }
 
 
-void SymbolTable::mustPreserveForBitcode(std::unordered_set<const char*>& syms)
+void SymbolTable::mustPreserveForBitcode(LDSet<const char*>& syms)
 {
 	// return all names in _byNameTable that have no associated atom
 	for (const auto &entry: _byNameTable) {
@@ -631,7 +631,7 @@ void SymbolTable::removeDeadAtoms()
 		const ld::Atom* atom = it->first;
 		assert(atom != NULL);
 		if ( !atom->live() && !atom->dontDeadStrip() )
-			it = _nonLazyPointerTable.erase(it);
+			_nonLazyPointerTable.erase(it++);
 		else
 			++it;
 	}
@@ -641,7 +641,7 @@ void SymbolTable::removeDeadAtoms()
 		const ld::Atom* atom = it->first;
 		assert(atom != NULL);
 		if ( !atom->live() && !atom->dontDeadStrip() )
-			it = _cstringTable.erase(it);
+			_cstringTable.erase(it++);
 		else
 			++it;
 	}
@@ -651,7 +651,7 @@ void SymbolTable::removeDeadAtoms()
 		const ld::Atom* atom = it->first;
 		assert(atom != NULL);
 		if ( !atom->live() && !atom->dontDeadStrip() )
-			it = _utf16Table.erase(it);
+			_utf16Table.erase(it++);
 		else
 			++it;
 	}
@@ -661,7 +661,7 @@ void SymbolTable::removeDeadAtoms()
 		const ld::Atom* atom = it->first;
 		assert(atom != NULL);
 		if ( !atom->live() && !atom->dontDeadStrip() )
-			it = _cfStringTable.erase(it);
+			_cfStringTable.erase(it++);
 		else
 			++it;
 	}
@@ -671,7 +671,7 @@ void SymbolTable::removeDeadAtoms()
 		const ld::Atom* atom = it->first;
 		assert(atom != NULL);
 		if ( !atom->live() && !atom->dontDeadStrip() )
-			it = _literal4Table.erase(it);
+			_literal4Table.erase(it++);
 		else
 			++it;
 	}
@@ -681,7 +681,7 @@ void SymbolTable::removeDeadAtoms()
 		const ld::Atom* atom = it->first;
 		assert(atom != NULL);
 		if ( !atom->live() && !atom->dontDeadStrip() )
-			it = _literal8Table.erase(it);
+			_literal8Table.erase(it++);
 		else
 			++it;
 	}
@@ -691,7 +691,7 @@ void SymbolTable::removeDeadAtoms()
 		const ld::Atom* atom = it->first;
 		assert(atom != NULL);
 		if ( !atom->live() && !atom->dontDeadStrip() )
-			it = _literal16Table.erase(it);
+			_literal16Table.erase(it++);
 		else
 			++it;
 	}
@@ -872,7 +872,7 @@ const ld::Atom* SymbolTable::indirectAtom(IndirectBindingSlot slot) const
 }
 
 
-void SymbolTable::removeDeadUndefs(std::vector<const ld::Atom*>& allAtoms, const std::unordered_set<const ld::Atom*>& keep)
+void SymbolTable::removeDeadUndefs(std::vector<const ld::Atom*>& allAtoms, const LDSet<const ld::Atom*>& keep)
 {
 	// mark the indirect entries in use
 	std::vector<bool> indirectUsed;
@@ -911,7 +911,7 @@ void SymbolTable::printStatistics()
 {
 //	fprintf(stderr, "cstring table size: %lu, bucket count: %lu, hash func called %u times\n", 
 //				_cstringTable.size(), _cstringTable.bucket_count(), cstringHashCount);
-	int count[11];
+	/*int count[11];
 	for(unsigned int b=0; b < 11; ++b) {
 		count[b] = 0;
 	}
@@ -927,7 +927,7 @@ void SymbolTable::printStatistics()
 		fprintf(stderr, "%u buckets have %u elements\n", count[b], b);
 	}
 	fprintf(stderr, "indirect table size: %lu\n", _indirectBindingTable.size());
-	fprintf(stderr, "by-name table size: %lu\n", _byNameTable.size());
+	fprintf(stderr, "by-name table size: %lu\n", _byNameTable.size());*/
 //	fprintf(stderr, "by-content table size: %lu, hash count: %u, equals count: %u, lookup count: %u\n", 
 //						_byContentTable.size(), contentHashCount, contentEqualCount, contentLookupCount);
 //	fprintf(stderr, "by-ref table size: %lu, hashed count: %u, equals count: %u, lookup count: %u, insert count: %u\n", 
