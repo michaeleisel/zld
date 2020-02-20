@@ -39,6 +39,8 @@
 #include <dlfcn.h>
 #include <mach-o/dyld.h>
 #include <mach-o/fat.h>
+#include <iostream>
+#include <fstream>
 
 #include <string>
 #include <map>
@@ -878,6 +880,7 @@ void Resolver::addInitialUndefines()
 
 void Resolver::resolveUndefines()
 {
+	_inputFiles.preParseLibraries();
 	// keep looping until no more undefines were added in last loop
 	unsigned int undefineGenCount = 0xFFFFFFFF;
 	while ( undefineGenCount != _symbolTable.updateCount() ) {
@@ -1916,6 +1919,14 @@ void Resolver::buildArchivesList()
 	_inputFiles.archives(_internal);
 }
 
+void Resolver::dumpMembersParsed()
+{
+	std::ofstream stream;
+	stream.open(_options.cacheFilePath());
+	_inputFiles.dumpMembersParsed(stream);
+	stream.close();
+}
+
 void Resolver::dumpAtoms() 
 {
 	fprintf(stderr, "Resolver all atoms:\n");
@@ -1943,6 +1954,7 @@ void Resolver::resolve()
 	this->tweakWeakness();
     _symbolTable.checkDuplicateSymbols();
 	this->buildArchivesList();
+	this->dumpMembersParsed();
 }
 
 
