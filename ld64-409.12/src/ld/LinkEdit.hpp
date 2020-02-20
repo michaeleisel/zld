@@ -1193,6 +1193,14 @@ private:
 
 	const ld::Atom*								stubForResolverFunction(const ld::Atom* resolver) const;
 
+	struct TrieAddressSorter
+	{
+		bool operator()(const mach_o::trie::Entry& left, const mach_o::trie::Entry& right)
+		{
+				return (left.address < right.address);
+		}
+	};
+	
 	struct TrieEntriesSorter
 	{
 		TrieEntriesSorter(const Options& o) : _options(o) {}
@@ -1320,8 +1328,12 @@ void ExportInfoAtom<A>::encode() const
 	}
 
 	// sort vector by -exported_symbols_order, and any others by address
-	std::sort(entries.begin(), entries.end(), TrieEntriesSorter(_options));
-	
+	if (_options.hasExportedSymbolOrder()) {
+		std::sort(entries.begin(), entries.end(), TrieEntriesSorter(_options));
+	} else {
+		std::sort(entries.begin(), entries.end(), TrieAddressSorter());
+	}
+
 	// create trie
 	mach_o::trie::makeTrie(entries, this->_encodedData.bytes());
 
