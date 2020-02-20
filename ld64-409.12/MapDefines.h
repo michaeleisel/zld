@@ -9,6 +9,12 @@
 #ifndef MapDefines_h
 #define MapDefines_h
 
+#include "absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_set.h"
+
+#include "absl/container/btree_map.h"
+#include "absl/container/btree_set.h"
+
 #define LDOrderedMap absl::btree_map
 #define LDMap absl::flat_hash_map
 #define LDSet absl::flat_hash_set
