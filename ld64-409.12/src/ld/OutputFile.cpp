@@ -44,6 +44,9 @@
 #include <dlfcn.h>
 #include <mach-o/dyld.h>
 #include <mach-o/fat.h>
+#include <dispatch/dispatch.h>
+#include <algorithm>
+#include <Foundation/Foundation.h>
 
 #include <string>
 #include <map>
@@ -158,9 +161,18 @@ void OutputFile::write(ld::Internal& state)
 	this->setLoadCommandsPadding(state);
 	_fileSize = state.assignFileOffsets();
 	this->assignAtomAddresses(state);
-	this->synthesizeDebugNotes(state);
-	this->buildSymbolTable(state);
-	this->generateLinkEditInfo(state);
+	dispatch_group_t group = dispatch_group_create();
+	auto queue = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0);
+	//dispatch_queue_attr_t attr = DISPATCH_QUEUE_SERIAL;
+	//auto queue = dispatch_queue_create("asdf", attr);
+	dispatch_group_async(group, queue, ^{
+    	this->synthesizeDebugNotes(state);
+	});
+	dispatch_group_async(group, queue, ^{
+		this->buildSymbolTable(state);
+    	this->generateLinkEditInfo(state);
+	});
+	dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 	if ( _options.sharedRegionEncodingV2() )
 		this->makeSplitSegInfoV2(state);
 	else
@@ -230,28 +242,37 @@ void OutputFile::assignAtomAddresses(ld::Internal& state)
 
 void OutputFile::updateLINKEDITAddresses(ld::Internal& state)
 {
+	auto queue = [[NSOperationQueue alloc] init];
+	queue.qualityOfService = NSQualityOfServiceUserInteractive;
+	// initialize info for parsing input files on worker threads
+	unsigned int ncpus;
+	int mib[2];
+	size_t len = sizeof(ncpus);
+	mib[0] = CTL_HW;
+	mib[1] = HW_NCPU;
+	auto res = sysctl(mib, 2, &ncpus, &len, NULL, 0);
+	if (res != 0) {
+		ncpus = 1;
+	}
+	queue.maxConcurrentOperationCount = ncpus;
 	if ( _options.makeCompressedDyldInfo() ) {
-		// build dylb rebasing info  
+		// build dylb rebasing info
 		assert(_rebasingInfoAtom != NULL);
 		_rebasingInfoAtom->encode();
-		
+
 		// build dyld binding info  
 		assert(_bindingInfoAtom != NULL);
 		_bindingInfoAtom->encode();
-		
+
 		// build dyld lazy binding info  
 		assert(_lazyBindingInfoAtom != NULL);
 		_lazyBindingInfoAtom->encode();
-		
+
 		// build dyld weak binding info  
 		assert(_weakBindingInfoAtom != NULL);
 		_weakBindingInfoAtom->encode();
-		
-		// build dyld export info  
-		assert(_exportInfoAtom != NULL);
-		_exportInfoAtom->encode();
 	}
-	
+
 	if ( _options.sharedRegionEligible() ) {
 		// build split seg info  
 		assert(_splitSegInfoAtom != NULL);
@@ -276,9 +297,21 @@ void OutputFile::updateLINKEDITAddresses(ld::Internal& state)
 		_optimizationHintsAtom->encode();
 	}
 	
+
+	if (_options.makeCompressedDyldInfo()) {
+    	// build dyld export info
+    	assert(_exportInfoAtom != NULL);
+    	[queue addOperationWithBlock:^{
+    		_exportInfoAtom->encode();
+    	}];
+	}
+	
 	// build classic symbol table
 	assert(_symbolTableAtom != NULL);
-	_symbolTableAtom->encode();
+	[queue addOperationWithBlock:^{
+		_symbolTableAtom->encode();
+	}];
+	[queue waitUntilAllOperationsAreFinished];
 	assert(_indirectSymbolTableAtom != NULL);
 	_indirectSymbolTableAtom->encode();
 
@@ -2679,6 +2712,7 @@ void OutputFile::writeAtoms(ld::Internal& state, uint8_t* wholeBuffer)
 	// have each atom write itself
 	uint64_t fileOffsetOfEndOfLastAtom = 0;
 	bool lastAtomUsesNoOps = false;
+	std::vector<AtomOperation> buffer;
 	uint64_t baseAddress = _options.baseAddress();
 	for (std::vector<ld::Internal::FinalSection*>::iterator sit = state.sections.begin(); sit != state.sections.end(); ++sit) {
 		ld::Internal::FinalSection* sect = *sit;
@@ -2696,14 +2730,7 @@ void OutputFile::writeAtoms(ld::Internal& state, uint8_t* wholeBuffer)
 				continue;
 			try {
 				uint64_t fileOffset = atom->finalAddress() - sect->address + sect->fileOffset;
-				// check for alignment padding between atoms
-				if ( (fileOffset != fileOffsetOfEndOfLastAtom) && lastAtomUsesNoOps ) {
-					this->copyNoOps(&wholeBuffer[fileOffsetOfEndOfLastAtom], &wholeBuffer[fileOffset], lastAtomWasThumb);
-				}
-				// copy atom content
-				atom->copyRawContent(&wholeBuffer[fileOffset]);
-				// apply fix ups
-				this->applyFixUps(state, baseAddress, atom, &wholeBuffer[fileOffset]);
+				buffer.emplace_back(atom, fileOffset, fileOffsetOfEndOfLastAtom, baseAddress, lastAtomUsesNoOps, lastAtomWasThumb);
 				fileOffsetOfEndOfLastAtom = fileOffset+atom->size();
 				lastAtomUsesNoOps = sectionUsesNops;
 				lastAtomWasThumb = atom->isThumb();
@@ -2716,7 +2743,28 @@ void OutputFile::writeAtoms(ld::Internal& state, uint8_t* wholeBuffer)
 			}
 		}
 	}
-	
+	NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+	queue.qualityOfService = NSQualityOfServiceUserInteractive;
+	queue.maxConcurrentOperationCount = 8;
+	int stepSize = buffer.size() / queue.maxConcurrentOperationCount + 1;
+	for (size_t i = 0; i < (size_t)queue.maxConcurrentOperationCount; i++) {
+		std::vector<AtomOperation> &bufferCopy = buffer;
+		[queue addOperationWithBlock:^{
+			for (auto bufIter = bufferCopy.begin() + i * stepSize; bufIter != bufferCopy.begin() + std::min(bufferCopy.size(), (i + 1) * stepSize); bufIter++) {
+				auto op = *bufIter;
+				// check for alignment padding between atoms
+				if ( (op.fileOffset != op.fileOffsetOfEndOfLastAtom) && op.lastAtomUsesNoOps ) {
+					this->copyNoOps(&wholeBuffer[op.fileOffsetOfEndOfLastAtom], &wholeBuffer[op.fileOffset], op.lastAtomWasThumb);
+				}
+				// copy atom content
+				op.atom->copyRawContent(&wholeBuffer[op.fileOffset]);
+				// apply fix ups
+				this->applyFixUps(state, op.mhAddress, op.atom, &wholeBuffer[op.fileOffset]);
+			}
+		}];
+	}
+	[queue waitUntilAllOperationsAreFinished];
+
 	if ( _options.verboseOptimizationHints() ) {
 		//fprintf(stderr, "ADRP optimized away:   %d\n", sAdrpNA);
 		//fprintf(stderr, "ADRPs changed to NOPs: %d\n", sAdrpNoped);
@@ -5838,7 +5886,7 @@ void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 	const char* filename = NULL;
 	bool wroteStartSO = false;
 	state.stabs.reserve(atomsNeedingDebugNotes.size()*4);
-	std::unordered_set<const char*, CStringHash, CStringEquals>  seenFiles;
+	std::unordered_set<LDString, CLDStringHash, CLDStringEquals>  seenFiles;
 	for (std::vector<const ld::Atom*>::iterator it=atomsNeedingDebugNotes.begin(); it != atomsNeedingDebugNotes.end(); it++) {
 		const ld::Atom* atom = *it;
 		const ld::File* atomFile = atom->file();
@@ -5910,11 +5958,11 @@ void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 				state.stabs.push_back(objStab);
 				wroteStartSO = true;
 				// add the source file path to seenFiles so it does not show up in SOLs
-				seenFiles.insert(newFilename);
+				seenFiles.insert(LDStringCreate(newFilename));
 				char* fullFilePath;
 				asprintf(&fullFilePath, "%s%s", newDirPath, newFilename);
 				// add both leaf path and full path
-				seenFiles.insert(fullFilePath);
+				seenFiles.insert(LDStringCreate(fullFilePath));
 
 				// <rdar://problem/34121435> Add linker support for propagating N_AST debug notes from .o files to linked image
 				if ( const std::vector<relocatable::File::AstTimeAndPath>* asts = atomObjFile->astFiles() ) {
@@ -5959,8 +6007,9 @@ void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 				const char* curFile = NULL;
 				for (ld::Atom::LineInfo::iterator lit = atom->beginLineInfo(); lit != atom->endLineInfo(); ++lit) {
 					if ( lit->fileName != curFile ) {
-						if ( seenFiles.count(lit->fileName) == 0 ) {
-							seenFiles.insert(lit->fileName);
+                		auto ldFileName = LDStringCreate(lit->fileName);
+						if ( seenFiles.count(ldFileName) == 0 ) {
+							seenFiles.insert(ldFileName);
 							ld::relocatable::File::Stab sol;
 							sol.atom		= 0;
 							sol.type		= N_SOL;
