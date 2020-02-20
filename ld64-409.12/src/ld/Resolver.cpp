@@ -293,7 +293,7 @@ void Resolver::initializeState()
 		}
 	}
 #ifdef LD64_VERSION_NUM
-	uint32_t packedNum = Options::parseVersionNumber32(STRINGIFY(LD64_VERSION_NUM));
+	uint32_t packedNum = 0x01c20300;
 	uint64_t combined = (uint64_t)TOOL_LD << 32 | packedNum;
 	_internal.toolsVersions.insert(combined);
 #endif
