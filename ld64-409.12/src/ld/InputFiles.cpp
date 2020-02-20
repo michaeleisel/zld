@@ -748,7 +748,7 @@ void InputFiles::createIndirectDylibs()
 {	
 	// keep processing dylibs until no more dylibs are added
 	unsigned long lastMapSize = 0;
-	std::set<ld::dylib::File*>  dylibsProcessed;
+	std::unordered_set<ld::dylib::File*>  dylibsProcessed;
 	while ( lastMapSize != _allDylibs.size() ) {
 		lastMapSize = _allDylibs.size();
 		// can't iterator _installPathToDylibs while modifying it, so use temp buffer
