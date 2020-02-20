@@ -662,6 +662,7 @@ public:
 protected:
 	typedef typename A::P::uint_t	pint_t;
 
+	mutable size_t _sectionHash = 0;
 	virtual ld::Atom::Alignment		alignmentForAddress(pint_t addr)		{ return ld::Atom::Alignment(log2(sizeof(pint_t))); }
 	virtual const char*				unlabeledAtomName(Parser<A>&, pint_t)	{ return "pointer-to-literal-cstring"; }
 	virtual	pint_t					elementSizeAtAddress(pint_t addr)		{ return sizeof(pint_t); }
@@ -761,6 +762,7 @@ public:
 	virtual void								setFile(const ld::File* f);
 
 private:
+	mutable const uint8_t *_contentPointer = NULL;
 
 	enum {	kFixupStartIndexBits = 32,
 			kLineInfoStartIndexBits = 32, 
@@ -909,11 +911,15 @@ void Atom<A>::setLineInfoRange(uint32_t startIndex, uint32_t count)
 template <typename A>
 const uint8_t* Atom<A>::contentPointer() const
 {
+	if (_contentPointer != NULL)  {
+		return _contentPointer;
+	}
 	const macho_section<P>* sct = this->sect().machoSection();
 	if ( this->_objAddress > sct->addr() + sct->size() )
 		throwf("malformed .o file, symbol has address 0x%0llX which is outside range of its section", (uint64_t)this->_objAddress);
 	uint32_t fileOffset = sct->offset() - sct->addr() + this->_objAddress;
-	return this->sect().file().fileContent()+fileOffset;
+	_contentPointer = this->sect().file().fileContent()+fileOffset;
+	return _contentPointer;
 }
 
 
@@ -5650,12 +5656,8 @@ bool Literal16Section<A>::ignoreLabel(const char* label) const
 template <typename A>
 unsigned long Literal16Section<A>::contentHash(const class Atom<A>* atom, const ld::IndirectBindingTable& ind) const
 {
-	unsigned long hash = 5381;
-	const uint8_t* byteContent = atom->contentPointer();
-	for (int i=0; i < 16; ++i) {
-		hash = hash * 33 + byteContent[i];
-	}
-	return hash;
+	const uint64_t* byteContent = (uint64_t *)atom->contentPointer();
+	return _mm_crc32_u64(5381, byteContent[0]) ^ _mm_crc32_u64(5381, byteContent[1]);
 }
 
 template <typename A>
@@ -5709,12 +5711,8 @@ Atom<A>* CStringSection<A>::findAtomByAddress(pint_t addr)
 template <typename A>
 unsigned long CStringSection<A>::contentHash(const class Atom<A>* atom, const ld::IndirectBindingTable& ind) const
 {
-	unsigned long hash = 5381;
 	const char* stringContent = (char*)atom->contentPointer();
-	for (const char* s = stringContent; *s != '\0'; ++s) {
-		hash = hash * 33 + *s;
-	}
-	return hash;
+	return ld::CRCHash(stringContent, strlen(stringContent));
 }
 
 
@@ -6285,15 +6283,18 @@ template <typename A>
 unsigned long PointerToCStringSection<A>::contentHash(const class Atom<A>* atom, 
 													const ld::IndirectBindingTable& indirectBindingTable) const
 {
-	// make hash from section name and target cstring name
 	unsigned long hash = 123;
-	for (const char* s = this->sectionName(); *s != '\0'; ++s) {
-		hash = hash * 33 + *s;
+	if (this->_sectionHash == 0) {
+    	// make hash from section name and target cstring name
+    	for (const char* s = this->sectionName(); *s != '\0'; ++s) {
+    		hash = hash * 33 + *s;
+    	}
+		this->_sectionHash = hash;
+	} else {
+		hash = this->_sectionHash;
 	}
-	for (const char* s = this->targetCString(atom, indirectBindingTable); *s != '\0'; ++s) {
-		hash = hash * 33 + *s;
-	}
-	return hash;
+	const char* s = this->targetCString(atom, indirectBindingTable);
+	return hash ^ ld::CRCHash(s, strlen(s));
 }
 
 template <typename A>
