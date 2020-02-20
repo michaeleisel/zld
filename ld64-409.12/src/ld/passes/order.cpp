@@ -23,6 +23,8 @@
  */
 
 
+#include "pstl/execution"
+#include "pstl/algorithm"
 #include <stdint.h>
 #include <math.h>
 #include <unistd.h>
@@ -36,6 +38,7 @@
 
 #include "ld.hpp"
 #include "order.h"
+#include "Tweaks.hpp"
 
 namespace ld {
 namespace passes {
@@ -628,7 +631,14 @@ void Layout::doPass()
 				break;
 			default:
 				if ( log ) fprintf(stderr, "sorting section %s\n", sect->sectionName());
-				std::sort(sect->atoms.begin(), sect->atoms.end(), _comparer);
+				// riskier
+				if (Tweaks::reproEnabled()) {
+    				std::sort(sect->atoms.begin(), sect->atoms.end(), _comparer);
+				} else {
+    				std::sort(std::execution::par, sect->atoms.begin(), sect->atoms.end(), _comparer);
+				}
+				// note that is_sorted fails here, probably because of some shenanigans around aliases in _comparer.
+				// but it doesn't seem to be a regression
 				break;
 		}
 	}

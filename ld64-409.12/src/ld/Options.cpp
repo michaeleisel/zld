@@ -435,7 +435,7 @@ bool Options::segmentOrderAfterFixedAddressSegment(const char* segName) const
 	return false;
 }
 
-bool Options::hasExportedSymbolOrder()
+bool Options::hasExportedSymbolOrder() const
 {
 	return (fExportSymbolsOrder.size() > 0);
 }
