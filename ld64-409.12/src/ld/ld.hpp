@@ -34,10 +34,13 @@
 #include <set>
 #include <map>
 #include <vector>
+#include "Tweaks.hpp"
 #include <string>
 #include <unordered_set>
 
 #include "configure.h"
+#include <nmmintrin.h>
+#include "MapDefines.h"
 
 namespace ld {
 
@@ -1194,15 +1197,75 @@ public:
 
 
 
+typedef struct {
+	const char *str;
+	size_t length;
+	size_t hash;
+} LDString;
+
+static inline size_t CRCHash(const char *__s, size_t len) {
+	if (Tweaks::reproEnabled()) {
+    	size_t __h = 0;
+    	for ( ; *__s; ++__s)
+    		__h = 5 * __h + *__s;
+    	return __h;
+	}
+
+	uint32_t __h = 5183;
+	int curr = len;
+	uint64_t *chunks = (uint64_t *)__s;
+	while (curr >= 8) {
+		__h = (uint32_t)_mm_crc32_u64((uint64_t)__h, *chunks);
+		chunks++;
+		curr -= 8;
+	}
+	if (curr >= 4) {
+		uint32_t *bits = (uint32_t *)(__s + len - curr);
+		__h = _mm_crc32_u32(__h, *bits);
+		curr -= 4;
+	}
+	if (curr >= 2) {
+		uint16_t *bits = (uint16_t *)(__s + len - curr);
+		__h = _mm_crc32_u16(__h, *bits);
+		curr -= 2;
+	}
+	if (curr >= 1) {
+		__h = _mm_crc32_u8(__h, __s[len - 1]);
+	}
+	return (size_t)__h;
+}
+
+static inline LDString LDStringCreate(const char *str) {
+	auto length = strlen(str);
+	return (LDString){
+		.str = str,
+		.length = length,
+		.hash = CRCHash(str, length),
+	};
+}
+
+struct CLDStringHash {
+	size_t operator()(LDString __s) const {
+		return __s.hash;
+	}
+};
+
 // utility classes for using std::unordered_map with c-strings
 struct CStringHash {
 	size_t operator()(const char* __s) const {
-		size_t __h = 0;
-		for ( ; *__s; ++__s)
-			__h = 5 * __h + *__s;
-		return __h;
+		int len = strlen(__s);
+		return CRCHash(__s, len);
 	};
 };
+
+struct CLDStringEquals
+{
+	bool operator()(LDString left, LDString right) const {
+		return left.hash == right.hash && left.length == right.length
+		  && (left.str == right.str || memcmp(left.str, right.str, left.length) == 0);
+    }
+};
+
 struct CStringEquals
 {
 	bool operator()(const char* left, const char* right) const { return (strcmp(left, right) == 0); }
