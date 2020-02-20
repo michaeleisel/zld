@@ -86,13 +86,14 @@ public:
 
 	int32_t										add(const char* name);
 	int32_t										addUnique(const char* name);
+    int32_t getOffset();
 	int32_t										emptyString()			{ return 1; }
 	const char*									stringForIndex(int32_t) const;
 	uint32_t									currentOffset();
 
 private:
 	enum { kBufferSize = 0x01000000 };
-	typedef std::unordered_map<const char*, int32_t, CStringHash, CStringEquals> StringToOffset;
+	typedef std::unordered_map<LDString, int32_t, CLDStringHash, CLDStringEquals> StringToOffset;
 
 	const uint32_t							_pointerSize;
 	std::vector<char*>						_fullBuffers;
@@ -137,9 +138,13 @@ void StringPoolAtom::copyRawContent(uint8_t buffer[]) const
 		buffer[offset++] = 0;
 }
 
+int32_t StringPoolAtom::getOffset() {
+	return kBufferSize * _fullBuffers.size() + _currentBufferUsed;
+}
+
 int32_t StringPoolAtom::add(const char* str)
 {
-	int32_t offset = kBufferSize * _fullBuffers.size() + _currentBufferUsed;
+	int32_t offset = getOffset();
 	int lenNeeded = strlcpy(&_currentBuffer[_currentBufferUsed], str, kBufferSize-_currentBufferUsed)+1;
 	if ( (_currentBufferUsed+lenNeeded) < kBufferSize ) {
 		_currentBufferUsed += lenNeeded;
@@ -166,14 +171,13 @@ uint32_t StringPoolAtom::currentOffset()
 
 int32_t StringPoolAtom::addUnique(const char* str)
 {
-	StringToOffset::iterator pos = _uniqueStrings.find(str);
-	if ( pos != _uniqueStrings.end() ) {
-		return pos->second;
-	}
-	else {
-		int32_t offset = this->add(str);
-		_uniqueStrings[str] = offset;
-		return offset;
+	int32_t offset = getOffset();
+	auto string = LDStringCreate(str);
+	auto resultPair = _uniqueStrings.try_emplace(string, offset);
+	if (resultPair.second) {
+		return this->add(str);
+	} else {
+		return resultPair.first->second;
 	}
 }
 
