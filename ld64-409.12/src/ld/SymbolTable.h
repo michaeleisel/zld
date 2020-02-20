@@ -101,41 +101,41 @@ public:
 
 private:
 	//typedef google::dense_hash_map<LDString *, IndirectBindingSlot, CLDStringPointerHash, CLDStringPointerEquals> NameToSlot;
-	typedef LDMap<LDString, IndirectBindingSlot, CLDStringHash, CLDStringEquals> NameToSlot;
+	typedef std::unordered_map<LDString, IndirectBindingSlot, CLDStringHash, CLDStringEquals> NameToSlot;
 
 	class ContentFuncs {
 	public:
 		size_t	operator()(const ld::Atom*) const;
 		bool	operator()(const ld::Atom* left, const ld::Atom* right) const;
 	};
-	typedef LDMap<const ld::Atom*, IndirectBindingSlot, ContentFuncs, ContentFuncs> ContentToSlot;
+	typedef std::unordered_map<const ld::Atom*, IndirectBindingSlot, ContentFuncs, ContentFuncs> ContentToSlot;
 
 	class ReferencesHashFuncs {
 	public:
 		size_t	operator()(const ld::Atom*) const;
 		bool	operator()(const ld::Atom* left, const ld::Atom* right) const;
 	};
-	typedef LDMap<const ld::Atom*, IndirectBindingSlot, ReferencesHashFuncs, ReferencesHashFuncs> ReferencesToSlot;
+	typedef std::unordered_map<const ld::Atom*, IndirectBindingSlot, ReferencesHashFuncs, ReferencesHashFuncs> ReferencesToSlot;
 
 	class CStringHashFuncs {
 	public:
 		size_t	operator()(const ld::Atom*) const;
 		bool	operator()(const ld::Atom* left, const ld::Atom* right) const;
 	};
-	typedef LDMap<const ld::Atom*, IndirectBindingSlot, CStringHashFuncs, CStringHashFuncs> CStringToSlot;
+	typedef std::unordered_map<const ld::Atom*, IndirectBindingSlot, CStringHashFuncs, CStringHashFuncs> CStringToSlot;
 
 	class UTF16StringHashFuncs {
 	public:
 		size_t	operator()(const ld::Atom*) const;
 		bool	operator()(const ld::Atom* left, const ld::Atom* right) const;
 	};
-	typedef LDMap<const ld::Atom*, IndirectBindingSlot, UTF16StringHashFuncs, UTF16StringHashFuncs> UTF16StringToSlot;
+	typedef std::unordered_map<const ld::Atom*, IndirectBindingSlot, UTF16StringHashFuncs, UTF16StringHashFuncs> UTF16StringToSlot;
 
 	typedef std::vector<const char*> SlotToName;
-	typedef LDMap<const char*, CStringToSlot*, CStringHash, CStringEquals> NameToMap;
+	typedef std::unordered_map<const char*, CStringToSlot*, CStringHash, CStringEquals> NameToMap;
     
     typedef std::vector<const ld::Atom *> DuplicatedSymbolAtomList;
-    typedef LDOrderedMap<const char *, DuplicatedSymbolAtomList * > DuplicateSymbols;
+    typedef std::map<const char *, DuplicatedSymbolAtomList * > DuplicateSymbols;
 	
 public:
 
@@ -165,14 +165,14 @@ public:
 	unsigned int		updateCount()						{ return _indirectBindingTable.size(); }
 	void				undefines(std::vector<const char*>& undefines);
 	void				tentativeDefs(std::vector<const char*>& undefines);
-	void				mustPreserveForBitcode(LDSet<const char*>& syms);
+	void				mustPreserveForBitcode(std::unordered_set<const char*>& syms);
 	void				removeDeadAtoms();
 	bool				hasName(const char* name);
 	bool				hasExternalTentativeDefinitions()	{ return _hasExternalTentativeDefinitions; }
 	byNameIterator		begin()								{ return byNameIterator(_byNameTable.begin(),_indirectBindingTable); }
 	byNameIterator		end()								{ return byNameIterator(_byNameTable.end(),_indirectBindingTable); }
 	void				printStatistics();
-	void				removeDeadUndefs(std::vector<const ld::Atom *>& allAtoms, const LDSet<const ld::Atom*>& keep);
+	void				removeDeadUndefs(std::vector<const ld::Atom *>& allAtoms, const std::unordered_set<const ld::Atom*>& keep);
 
 	// from ld::IndirectBindingTable
 	virtual const char*			indirectName(IndirectBindingSlot slot) const;

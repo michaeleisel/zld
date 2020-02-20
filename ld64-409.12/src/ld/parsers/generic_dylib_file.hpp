@@ -173,8 +173,8 @@ protected:
 	struct ReExportChain { ReExportChain* prev; const File* file; };
 
 private:
-	using NameToAtomMap = LDMap<const char*, AtomAndWeak, ld::CStringHash, ld::CStringEquals>;
-	using NameSet = LDSet<const char*, ld::CStringHash, ld::CStringEquals>;
+	using NameToAtomMap = std::unordered_map<const char*, AtomAndWeak, ld::CStringHash, ld::CStringEquals>;
+	using NameSet = std::unordered_set<const char*, ld::CStringHash, ld::CStringEquals>;
 
 	std::pair<bool, bool>		hasWeakDefinitionImpl(const char* name) const;
     bool                        hasDefinitionImpl(const char* name) const;
