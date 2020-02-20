@@ -460,7 +460,7 @@ class dumper : public ld::File::AtomHandler
 public:
 			void dump();
 	virtual void doAtom(const ld::Atom&);
-	virtual void doFile(const ld::File&) {}
+	virtual void doFile(const ld::File&) {} 
 private:
 	void			dumpAtom(const ld::Atom& atom);
 	const char*		scopeString(const ld::Atom&);

@@ -38,7 +38,6 @@
 #include "configure.h"
 #include "MachOFileAbstraction.hpp"
 #include "Architectures.hpp"
-#include "MapDefines.h"
 
 
  __attribute__((noreturn))
@@ -1073,7 +1072,7 @@ void UnwindPrinter<A>::printUnwindSection(bool showFunctionNames)
 
 }
 
-static void dump(const char* path, const LDOrderedSet<cpu_type_t>& onlyArchs, bool showFunctionNames)
+static void dump(const char* path, const std::set<cpu_type_t>& onlyArchs, bool showFunctionNames)
 {
 	struct stat stat_buf;
 	
@@ -1156,7 +1155,7 @@ static void dump(const char* path, const LDOrderedSet<cpu_type_t>& onlyArchs, bo
 
 int main(int argc, const char* argv[])
 {
-	LDOrderedSet<cpu_type_t> onlyArchs;
+	std::set<cpu_type_t> onlyArchs;
 	std::vector<const char*> files;
 	bool showFunctionNames = true;
 	

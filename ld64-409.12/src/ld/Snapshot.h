@@ -95,8 +95,8 @@ private:
         bool operator() (const char *a, const char *b) const { return ::strcmp(a, b) < 0; }
     };
     typedef std::vector<const char *> StringVector;
-    typedef LDOrderedMap<const char *, int, strcompclass > DylibMap;
-    typedef LDOrderedMap<const char *, const char *, strcompclass> PathMap;
+    typedef std::map<const char *, int, strcompclass > DylibMap;
+    typedef std::map<const char *, const char *, strcompclass> PathMap;
     typedef std::vector<unsigned> IntVector;
     
     // Write the current contents of the args vector to a file in the snapshot.

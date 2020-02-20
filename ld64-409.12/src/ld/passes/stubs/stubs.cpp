@@ -39,7 +39,6 @@
 #include "ld.hpp"
 
 #include "make_stubs.h"
-//#include "absl/container/btree_map.h"
 
 
 namespace ld {
@@ -302,8 +301,8 @@ void Pass::process(ld::Internal& state)
 	// walk all atoms and fixups looking for stubable references
 	// don't create stubs inline because that could invalidate the sections iterator
 	std::vector<const ld::Atom*> atomsCallingStubs;
-	LDOrderedMap<const ld::Atom*,ld::Atom*> stubFor;
-	LDOrderedMap<const ld::Atom*,bool>		weakImportMap;
+	std::map<const ld::Atom*,ld::Atom*> stubFor;
+	std::map<const ld::Atom*,bool>		weakImportMap;
 	atomsCallingStubs.reserve(128);
 	uint64_t codeSize = 0;
 	for (std::vector<ld::Internal::FinalSection*>::iterator sit=state.sections.begin(); sit != state.sections.end(); ++sit) {
@@ -321,7 +320,7 @@ void Pass::process(ld::Internal& state)
 					}
 					stubFor[stubableTargetOfFixup] = NULL;	
 					// record weak_import attribute
-					LDOrderedMap<const ld::Atom*,bool>::iterator pos = weakImportMap.find(stubableTargetOfFixup);
+					std::map<const ld::Atom*,bool>::iterator pos = weakImportMap.find(stubableTargetOfFixup);
 					if ( pos == weakImportMap.end() ) {
 						// target not in weakImportMap, so add
 						weakImportMap[stubableTargetOfFixup] = fit->weakImport;
@@ -404,7 +403,7 @@ void Pass::process(ld::Internal& state)
     }
 	
 	// make stub atoms 
-	for (LDOrderedMap<const ld::Atom*,ld::Atom*>::iterator it = stubFor.begin(); it != stubFor.end(); ++it) {
+	for (std::map<const ld::Atom*,ld::Atom*>::iterator it = stubFor.begin(); it != stubFor.end(); ++it) {
 		it->second = makeStub(*it->first, weakImportMap[it->first]);
 	}
 	

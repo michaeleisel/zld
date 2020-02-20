@@ -111,19 +111,15 @@ private:
 	typedef typename A::P::E				E;
 	typedef typename A::P::uint_t			pint_t;
 	
-	
+	// utility classes for using std::unordered_map with c-strings
 	struct CStringHash {
 		size_t operator()(const char* __s) const {
-			size_t hash = 5381;
-			while (*__s) {
-				hash = hash * 5 + *__s;
-				__s++;
-			}
-			return hash;
+			size_t __h = 0;
+			for ( ; *__s; ++__s)
+				__h = 5 * __h + *__s;
+			return __h;
 		};
 	};
-
-	// utility classes for using LDMap with c-strings
 	struct CStringEquals
 	{
 		bool operator()(const char* left, const char* right) const { return (strcmp(left, right) == 0); }

@@ -163,7 +163,7 @@ private:
 	mutable uint32_t			_linkeditCmdOffset;
 	mutable uint32_t			_symboltableCmdOffset;
 	std::vector< std::vector<const char*> >	 _linkerOptions;
-	LDSet<uint64_t>&	_toolsVersions;
+	std::unordered_set<uint64_t>&	_toolsVersions;
 	
 	static ld::Section			_s_section;
 	static ld::Section			_s_preload_section;
