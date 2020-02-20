@@ -35,25 +35,20 @@ namespace trie {
 
 struct Edge
 {
-					Edge(const char* s, struct Node* n) : fSubString(s), fSubStringLength(strlen(s)), fChild(n) { }
+					Edge(const char* s, struct Node* n) : fSubString(s), fChild(n) { }
 					~Edge() {  }
-	const char* fSubString;
-	size_t fSubStringLength;
+	const char*		fSubString;
 	struct Node*	fChild;
-	void setSubString(const char *s) {
-		fSubString = s;
-		fSubStringLength = strlen(s);
-	}
+	
 };
 
 struct Node
 {
-						Node(const char* s) : fCummulativeString(s), fCummulativeStringLength(strlen(s)), fAddress(0), fFlags(0),
+						Node(const char* s) : fCummulativeString(s), fAddress(0), fFlags(0), 
 											fOther(0), fImportedName(NULL), fOrdered(false), 
 											fHaveExportInfo(false), fTrieOffset(0) {}
 						~Node() { }
-	const char* const			fCummulativeString;
-	size_t fCummulativeStringLength;
+	const char*			fCummulativeString;
 	std::vector<Edge>	fChildren;
 	uint64_t			fAddress;
 	uint64_t			fFlags;
@@ -67,49 +62,33 @@ struct Node
 		const char* partialStr = &fullStr[strlen(fCummulativeString)];
 		for (std::vector<Edge>::iterator it = fChildren.begin(); it != fChildren.end(); ++it) {
 			Edge& e = *it;
-			size_t subStringLen = e.fSubStringLength;
-			if (e.fSubStringLength == 1) {
-				if (e.fSubString[0] != partialStr[0]) {
-					continue;
-				} else {
-					// already have matching edge, go down that path
-					e.fChild->addSymbol(fullStr, address, flags, other, importName);
-					return;
-				}
-			}
+			int subStringLen = strlen(e.fSubString);
 			if ( strncmp(e.fSubString, partialStr, subStringLen) == 0 ) {
 				// already have matching edge, go down that path
 				e.fChild->addSymbol(fullStr, address, flags, other, importName);
 				return;
 			}
 			else {
-				unsigned long matching = 0;
-				for (; matching < subStringLen; matching++) {
-					if (e.fSubString[matching] != partialStr[matching]) {
-						break;
+				for (int i=subStringLen-1; i > 0; --i) {
+					if ( strncmp(e.fSubString, partialStr, i) == 0 ) {
+						// found a common substring, splice in new node
+						//  was A -> C,  now A -> B -> C
+						char* bNodeCummStr = strdup(e.fChild->fCummulativeString);
+						bNodeCummStr[strlen(bNodeCummStr)+i-subStringLen] = '\0';
+						//node* aNode = this;
+						Node* bNode = new Node(bNodeCummStr);
+						Node* cNode = e.fChild;
+						char* abEdgeStr = strdup(e.fSubString);
+						abEdgeStr[i] = '\0';
+						char* bcEdgeStr = strdup(&e.fSubString[i]);
+						Edge& abEdge = e;
+						abEdge.fSubString = abEdgeStr;
+						abEdge.fChild = bNode;
+						Edge bcEdge(bcEdgeStr, cNode);
+						bNode->fChildren.push_back(bcEdge);
+						bNode->addSymbol(fullStr, address, flags, other, importName);
+						return;
 					}
-				}
-				if (matching == subStringLen) {
-					matching--;
-				}
-				if (matching > 0) {
-					// found a common substring, splice in new node
-					//  was A -> C,  now A -> B -> C
-					char* bNodeCummStr = strdup(e.fChild->fCummulativeString);
-					bNodeCummStr[strlen(bNodeCummStr)+matching-subStringLen] = '\0';
-					//node* aNode = this;
-					Node* bNode = new Node(bNodeCummStr);
-					Node* cNode = e.fChild;
-					char* abEdgeStr = strdup(e.fSubString);
-					abEdgeStr[matching] = '\0';
-					char* bcEdgeStr = strdup(&e.fSubString[matching]);
-					Edge& abEdge = e;
-					abEdge.setSubString(abEdgeStr);
-					abEdge.fChild = bNode;
-					Edge bcEdge(bcEdgeStr, cNode);
-					bNode->fChildren.push_back(bcEdge);
-					bNode->addSymbol(fullStr, address, flags, other, importName);
-					return;
 				}
 			}
 		}
@@ -140,17 +119,9 @@ struct Node
 			//fprintf(stderr, "ordered %p %s\n", this, fCummulativeString);
 			fOrdered = true;
 		}
-		const char* partialStr = &name[fCummulativeStringLength];
+		const char* partialStr = &name[strlen(fCummulativeString)];
 		for (std::vector<Edge>::iterator it = fChildren.begin(); it != fChildren.end(); ++it) {
 			Edge& e = *it;
-           if (e.fSubStringLength == 1) {
-               if (e.fSubString[0] == partialStr[0]) {
-                   e.fChild->addOrderedNodes(name, orderedNodes);
-                   return;
-               } else {
-                   continue;
-               }
-           }
 			int subStringLen = strlen(e.fSubString);
 			if ( strncmp(e.fSubString, partialStr, subStringLen) == 0 ) {
 				// already have matching edge, go down that path
@@ -324,7 +295,7 @@ inline void makeTrie(const std::vector<Entry>& entries, std::vector<uint8_t>& ou
 	for (std::vector<Entry>::const_iterator it = entries.begin(); it != entries.end(); ++it) {
 		start.addOrderedNodes(it->name, orderedNodes);
 	}
-
+	
 	// assign each node in the vector an offset in the trie stream, iterating until all uleb128 sizes have stabilized
 	bool more;
 	do {

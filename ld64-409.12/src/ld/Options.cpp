@@ -62,7 +62,7 @@ namespace lto {
 // magic to place command line in crash reports
 const int crashreporterBufferSize = 2000;
 static char crashreporterBuffer[crashreporterBufferSize];
-#if 0//__MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
 	#include <CrashReporterClient.h>
 	// hack until ld does not need to build on 10.6 anymore
     struct crashreporter_annotations_t gCRAnnotations 
@@ -435,7 +435,7 @@ bool Options::segmentOrderAfterFixedAddressSegment(const char* segName) const
 	return false;
 }
 
-bool Options::hasExportedSymbolOrder() const
+bool Options::hasExportedSymbolOrder()
 {
 	return (fExportSymbolsOrder.size() > 0);
 }
@@ -4749,7 +4749,7 @@ void Options::reconfigureDefaults()
 			break;
 		case Options::kDyld:
 			// arm64e has support for compressed LINKEDIT.
-			if ( (fArchitecture == CPU_TYPE_ARM64) && (fSubArchitecture == CPU_SUBTYPE_ARM64E) )
+			if ( (fArchitecture == CPU_TYPE_ARM64) && (fSubArchitecture == CPU_SUBTYPE_ARM64_E) )
 				break;
 		case Options::kPreload:
 		case Options::kStaticExecutable:
@@ -5889,7 +5889,7 @@ void Options::checkForClassic(int argc, const char* argv[])
 	
 	// build command line buffer in case ld crashes
 #if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
-	//CRSetCrashLogMessage(crashreporterBuffer);
+	CRSetCrashLogMessage(crashreporterBuffer);
 #endif
 	const char* srcRoot = getenv("SRCROOT");
 	if ( srcRoot != NULL ) {

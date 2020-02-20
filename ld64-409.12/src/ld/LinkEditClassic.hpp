@@ -38,8 +38,6 @@
 #include "ld.hpp"
 #include "Architectures.hpp"
 #include "MachOFileAbstraction.hpp"
-#include <sparsehash/dense_hash_map>
-#include "tsl/array_map.h"
 
 namespace ld {
 namespace tool {
@@ -88,17 +86,13 @@ public:
 
 	int32_t										add(const char* name);
 	int32_t										addUnique(const char* name);
-    int32_t getOffset();
 	int32_t										emptyString()			{ return 1; }
 	const char*									stringForIndex(int32_t) const;
 	uint32_t									currentOffset();
-	//~StringPoolAtom();
 
 private:
 	enum { kBufferSize = 0x01000000 };
-	//typedef google::dense_hash_map<LDString, int32_t, CLDStringHash, CLDStringEquals> StringToOffset;
-	//typedef tsl::array_map<char, int32_t>/*, CStringHash, CStringEquals>*/ StringToOffset;
-	typedef LDMap<LDString, int32_t, CLDStringHash, CLDStringEquals> StringToOffset;
+	typedef std::unordered_map<const char*, int32_t, CStringHash, CStringEquals> StringToOffset;
 
 	const uint32_t							_pointerSize;
 	std::vector<char*>						_fullBuffers;
@@ -111,6 +105,7 @@ private:
 
 ld::Section StringPoolAtom::_s_section("__LINKEDIT", "__string_pool", ld::Section::typeLinkEdit, true);
 
+
 StringPoolAtom::StringPoolAtom(const Options& opts, ld::Internal& state, OutputFile& writer, int pointerSize)
 	: ClassicLinkEditAtom(opts, state, writer, _s_section, pointerSize), 
 	 _pointerSize(pointerSize), _currentBuffer(NULL), _currentBufferUsed(0)
@@ -120,20 +115,6 @@ StringPoolAtom::StringPoolAtom(const Options& opts, ld::Internal& state, OutputF
 	_currentBuffer[_currentBufferUsed++] = ' ';
 	// make offset 1 always point to an empty string
 	_currentBuffer[_currentBufferUsed++] = '\0';
-	/*_uniqueStrings.reserve(600000);
-	LDString emptyKey = {
-		.hash = 1,
-		.str = (const char *)0x0,
-		.length = 0,
-	};
-	LDString deletedKey = {
-		.hash = 0,
-		.str = (const char *)0x1,
-		.length = 0,
-	};
-	_uniqueStrings.set_deleted_key(deletedKey);
-	_uniqueStrings.set_empty_key(emptyKey);
-	_uniqueStrings.min_load_factor(0.0);*/
 }
 
 uint64_t StringPoolAtom::size() const
@@ -156,13 +137,9 @@ void StringPoolAtom::copyRawContent(uint8_t buffer[]) const
 		buffer[offset++] = 0;
 }
 
-int32_t StringPoolAtom::getOffset() {
-	return kBufferSize * _fullBuffers.size() + _currentBufferUsed;
-}
-
 int32_t StringPoolAtom::add(const char* str)
 {
-	int32_t offset = getOffset();
+	int32_t offset = kBufferSize * _fullBuffers.size() + _currentBufferUsed;
 	int lenNeeded = strlcpy(&_currentBuffer[_currentBufferUsed], str, kBufferSize-_currentBufferUsed)+1;
 	if ( (_currentBufferUsed+lenNeeded) < kBufferSize ) {
 		_currentBufferUsed += lenNeeded;
@@ -186,22 +163,20 @@ uint32_t StringPoolAtom::currentOffset()
 	return kBufferSize * _fullBuffers.size() + _currentBufferUsed;
 }
 
-static std::vector<float> ratios;
-static std::vector<std::string> syms;
-
-#include <fstream>
 
 int32_t StringPoolAtom::addUnique(const char* str)
 {
-	int32_t offset = getOffset();
-	auto string = LDStringCreate(str);
-	auto resultPair = _uniqueStrings.try_emplace(string, offset);
-	if (resultPair.second) {
-		return this->add(str);
-	} else {
-		return resultPair.first->second;
+	StringToOffset::iterator pos = _uniqueStrings.find(str);
+	if ( pos != _uniqueStrings.end() ) {
+		return pos->second;
+	}
+	else {
+		int32_t offset = this->add(str);
+		_uniqueStrings[str] = offset;
+		return offset;
 	}
 }
+
 
 const char* StringPoolAtom::stringForIndex(int32_t index) const
 {
@@ -531,7 +506,7 @@ void SymbolTableAtom<A>::addImport(const ld::Atom* atom, StringPoolAtom* pool)
 		
 #if 0
 		// set n_desc ( high byte is library ordinal, low byte is reference type )
-		LDOrderedMap<const ObjectFile::Atom*,ObjectFile::Atom*>::iterator pos = fStubsMap.find(atom);
+		std::map<const ObjectFile::Atom*,ObjectFile::Atom*>::iterator pos = fStubsMap.find(atom);
 		if ( pos != fStubsMap.end() || ( strncmp(atom->getName(), ".objc_class_name_", 17) == 0) )
 			desc |= REFERENCE_FLAG_UNDEFINED_LAZY;
 		else
@@ -688,6 +663,7 @@ bool SymbolTableAtom<A>::hasStabs(uint32_t& ssos, uint32_t& ssoe, uint32_t& sos,
 	return ( (_stabsIndexStart != _stabsIndexEnd) || (_stabsStringsOffsetStart != _stabsStringsOffsetEnd) );
 }
 
+
 template <typename A>
 void SymbolTableAtom<A>::encode()
 {
@@ -796,11 +772,11 @@ protected:
 
 uint32_t RelocationsAtomAbstract::symbolIndex(const ld::Atom* atom) const
 {
-	LDOrderedMap<const ld::Atom*, uint32_t>::iterator pos = this->_writer._atomToSymbolIndex.find(atom);
+	std::map<const ld::Atom*, uint32_t>::iterator pos = this->_writer._atomToSymbolIndex.find(atom);
 	if ( pos != this->_writer._atomToSymbolIndex.end() )
 		return pos->second;
 	fprintf(stderr, "_atomToSymbolIndex content:\n");
-	for(LDOrderedMap<const ld::Atom*, uint32_t>::iterator it = this->_writer._atomToSymbolIndex.begin(); it != this->_writer._atomToSymbolIndex.end(); ++it) {
+	for(std::map<const ld::Atom*, uint32_t>::iterator it = this->_writer._atomToSymbolIndex.begin(); it != this->_writer._atomToSymbolIndex.end(); ++it) {
 			fprintf(stderr, "%p(%s) => %d\n", it->first, it->first->name(), it->second);
 	}
 	throwf("internal error: atom not found in symbolIndex(%s)", atom->name());
@@ -2119,11 +2095,11 @@ ld::Section IndirectSymbolTableAtom<A>::_s_section("__LINKEDIT", "__ind_sym_tab"
 template <typename A>
 uint32_t IndirectSymbolTableAtom<A>::symbolIndex(const ld::Atom* atom)
 {
-	LDOrderedMap<const ld::Atom*, uint32_t>::iterator pos = this->_writer._atomToSymbolIndex.find(atom);
+	std::map<const ld::Atom*, uint32_t>::iterator pos = this->_writer._atomToSymbolIndex.find(atom);
 	if ( pos != this->_writer._atomToSymbolIndex.end() )
 		return pos->second;
 	//fprintf(stderr, "_atomToSymbolIndex content:\n");
-	//for(LDOrderedMap<const ld::Atom*, uint32_t>::iterator it = this->_writer._atomToSymbolIndex.begin(); it != this->_writer._atomToSymbolIndex.end(); ++it) {
+	//for(std::map<const ld::Atom*, uint32_t>::iterator it = this->_writer._atomToSymbolIndex.begin(); it != this->_writer._atomToSymbolIndex.end(); ++it) {
 	//		fprintf(stderr, "%p(%s) => %d\n", it->first, it->first->name(), it->second);
 	//}
 	throwf("internal error: atom not found in symbolIndex(%s)", atom->name());

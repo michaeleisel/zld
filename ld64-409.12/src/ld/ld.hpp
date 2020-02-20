@@ -36,27 +36,8 @@
 #include <vector>
 #include <string>
 #include <unordered_set>
-#include <unordered_map>
 
 #include "configure.h"
-#include "absl/container/btree_map.h"
-#include "absl/container/btree_set.h"
-#include "absl/container/flat_hash_map.h"
-#include "absl/container/flat_hash_set.h"
-//#include "absl/hash/hash.h"
-#include <nmmintrin.h>
-#include "MapDefines.h"
-
-struct CPointerHash {
-	std::size_t operator()(const char* __s) const {
-		return (std::size_t)__s;
-	};
-};
-
-struct CPointerEquals
-{
-	bool operator()(const char* left, const char* right) const { return left == right; }
-};
 
 namespace ld {
 
@@ -79,7 +60,7 @@ enum Platform {
 
 const ld::Platform basePlatform(const ld::Platform& platform);
 
-typedef LDOrderedSet<Platform> PlatformSet;
+typedef std::set<Platform> PlatformSet;
 
 //
 // minumum OS versions
@@ -89,10 +70,10 @@ typedef std::pair<Platform, uint32_t> Version;
 
 struct VersionSet {
 private:
-	LDOrderedMap<Platform, uint32_t> _versions;
+	std::map<Platform, uint32_t> _versions;
 public:
 	VersionSet() {}
-	VersionSet(const LDOrderedMap<Platform, uint32_t>& P) : _versions(P) {}
+	VersionSet(const std::map<Platform, uint32_t>& P) : _versions(P) {}
 	void add(ld::Version platformVersion) {
 		_versions.insert(platformVersion);
 	}
@@ -277,13 +258,6 @@ public:
 	//
 	class Ordinal
 	{
-	public:
-		const uint64_t getNumber() const { return _ordinal; };
-		const uint16_t	partition() const		{ return (_ordinal>>48)&0xffff; }
-		const uint16_t	majorIndex() const		{ return (_ordinal>>32)&0xffff; }
-		const uint16_t	minorIndex() const		{ return (_ordinal>>16)&0xffff; }
-		const uint16_t	counter() const			{ return (_ordinal>>00)&0xffff; }
-
 	private:
 		// The actual numeric ordinal. Lower values have higher precedence and a zero value is invalid.
 		// The 64 bit ordinal is broken into 4 16 bit chunks. The high 16 bits are a "partition" that
@@ -298,6 +272,11 @@ public:
 			_ordinal = ((uint64_t)partition<<48) | ((uint64_t)majorIndex<<32) | ((uint64_t)minorIndex<<16) | ((uint64_t)counter<<0);
 		}
 		
+		const uint16_t	partition() const		{ return (_ordinal>>48)&0xffff; }
+		const uint16_t	majorIndex() const		{ return (_ordinal>>32)&0xffff; }
+		const uint16_t	minorIndex() const		{ return (_ordinal>>16)&0xffff; }
+		const uint16_t	counter() const			{ return (_ordinal>>00)&0xffff; }
+
 		const Ordinal nextMajorIndex()		const { assert(majorIndex() < 0xffff); return Ordinal(_ordinal+((uint64_t)1<<32)); }
 		const Ordinal nextMinorIndex()		const { assert(minorIndex() < 0xffff); return Ordinal(_ordinal+((uint64_t)1<<16)); }
 		const Ordinal nextCounter()		const { assert(counter() < 0xffff); return Ordinal(_ordinal+((uint64_t)1<<0)); }
@@ -350,7 +329,6 @@ public:
 	virtual uint32_t					cpuSubType() const		{ return 0; }
 	virtual uint32_t					subFileCount() const	{ return 1; }
 	virtual const VersionSet&			platforms() const		{ return _platforms; }
-	virtual void markSubFrameworksAsExported(const char *myLeaf) { }
     bool								fileExists() const     { return _modTime != 0; }
 	Type								type() const { return _type; }
 	virtual Bitcode*					getBitcode() const		{ return NULL; }
@@ -465,15 +443,6 @@ namespace dylib {
 				bool						willBeUpwardDylib() const		{ return _upward; }
 				void						setWillBeRemoved(bool value)	{ _dead = value; }
 				bool						willRemoved() const				{ return _dead; }
-		void markSubFrameworksAsExported(const char *myLeaf) {
-			const char* childParent = parentUmbrella();
-			if ( childParent != NULL ) {
-				if ( strcmp(childParent, &myLeaf[1]) == 0 ) {
-					// mark that this dylib will be re-exported
-					setWillBeReExported();
-				}
-			}
-		}
 				
 		virtual void						processIndirectLibraries(DylibHandler* handler, bool addImplicitDylibs) = 0;
 		virtual bool						providedExportAtom() const = 0;
@@ -520,9 +489,6 @@ namespace archive {
 												: ld::File(pth, modTime, ord, Archive) { }
 		virtual								~File() {}
 		virtual bool						justInTimeDataOnlyforEachAtom(const char* name, AtomHandler&) const = 0;
-    	virtual void dumpMembersParsed(std::ofstream &stream) const = 0;
-		virtual std::vector<void *> membersToParse(LDSet<std::string> &set) const = 0;
-		virtual void parseMember(void *member) const = 0;
 	};
 } // namespace archive 
 
@@ -1215,116 +1181,21 @@ public:
 
 
 
-typedef struct {
-	const char *str;
-	size_t length;
-	size_t hash;
-} LDString;
-
-static inline size_t CRCHash(const char *__s, size_t len) {
-	uint32_t __h = 5183;
-	int curr = len;
-	uint64_t *chunks = (uint64_t *)__s;
-	while (curr >= 8) {
-		__h = (uint32_t)_mm_crc32_u64((uint64_t)__h, *chunks);
-		chunks++;
-		curr -= 8;
-	}
-	if (curr >= 4) {
-		uint32_t *bits = (uint32_t *)(__s + len - curr);
-		__h = _mm_crc32_u32(__h, *bits);
-		curr -= 4;
-	}
-	if (curr >= 2) {
-		uint16_t *bits = (uint16_t *)(__s + len - curr);
-		__h = _mm_crc32_u16(__h, *bits);
-		curr -= 2;
-	}
-	if (curr >= 1) {
-		__h = _mm_crc32_u8(__h, __s[len - 1]);
-	}
-	return (size_t)__h;
-}
-
-static inline LDString LDStringCreate(const char *str) {
-	auto length = strlen(str);
-	return (LDString){
-		.str = str,
-		.length = length,
-		.hash = CRCHash(str, length),
-	};
-}
-
-struct CCharPtrHash {
-	size_t operator()(const char *c) const {
-		return _mm_crc32_u64(5183, (size_t)c);
-	}
-};
-
-struct CCharPtrEquals
-{
-	bool operator()(const char *a, const char *b) const {
-		return a == b;
-	}
-};
-
-struct CLDStringPointerHash {
-	size_t operator()(LDString *__s) const {
-		return __s->hash;
-	}
-};
-
-struct CLDStringHash {
-	size_t operator()(LDString __s) const {
-		return __s.hash;
-	}
-};
-
-// utility classes for using LDMap with c-strings
+// utility classes for using std::unordered_map with c-strings
 struct CStringHash {
 	size_t operator()(const char* __s) const {
-		int len = strlen(__s);
-		return CRCHash(__s, len);
+		size_t __h = 0;
+		for ( ; *__s; ++__s)
+			__h = 5 * __h + *__s;
+		return __h;
 	};
 };
-
-struct CLDStringPointerEquals
-{
-	bool operator()(LDString *leftPtr, LDString *rightPtr) const {
-		if (leftPtr->hash != rightPtr->hash) {
-			return false;
-		}
-		return leftPtr->length == rightPtr->length
-		&& (leftPtr->str == rightPtr->str || memcmp(leftPtr->str, rightPtr->str, leftPtr->length) == 0);
-	}
-};
-
-struct CLDStringPtrEquals
-{
-	bool operator()(LDString left, LDString right) const {
-		return left.str == right.str;
-	}
-};
-
-struct CLDStringEquals
-{
-	bool operator()(LDString left, LDString right) const {
-		return left.hash == right.hash && left.length == right.length
-		  && (left.str == right.str || memcmp(left.str, right.str, left.length) == 0);
-    }
-};
-
-struct CStringPtrEquals
-{
-	bool operator()(const char* left, const char* right) const { return left == right || (strcmp(left, right) == 0); }
-};
-
 struct CStringEquals
 {
 	bool operator()(const char* left, const char* right) const { return (strcmp(left, right) == 0); }
 };
 
-typedef	LDSet<const char*, ld::CStringHash, ld::CStringEquals>  CStringSet;
+typedef	std::unordered_set<const char*, ld::CStringHash, ld::CStringEquals>  CStringSet;
 
 
 class Internal
@@ -1351,7 +1222,7 @@ public:
 		bool							hasExternalRelocs;
 	};
 	
-	typedef LDMap<const ld::Atom*, FinalSection*>	AtomToSection;
+	typedef std::map<const ld::Atom*, FinalSection*>	AtomToSection;		
 
 	virtual uint64_t					assignFileOffsets() = 0;
 	virtual void						setSectionSizesAndAlignments() = 0;
@@ -1388,8 +1259,8 @@ public:
 	std::vector<const ld::relocatable::File*>	filesWithBitcode;
 	std::vector<const ld::relocatable::File*>	filesFromCompilerRT;
 	std::vector<const ld::Atom*>				deadAtoms;
-	LDSet<const char*>				allUndefProxies;
-	LDSet<uint64_t>				toolsVersions;
+	std::unordered_set<const char*>				allUndefProxies;
+	std::unordered_set<uint64_t>				toolsVersions;
 	const ld::dylib::File*						bundleLoader;
 	const Atom*									entryPoint;
 	const Atom*									classicBindingHelper;

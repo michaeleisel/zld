@@ -64,9 +64,7 @@ public:
 	
 	// iterates all atoms in initial files
 	void						forEachInitialAtom(ld::File::AtomHandler&, ld::Internal& state);
-	void preParseLibraries() const;
 	// searches libraries for name
-	void dumpMembersParsed(std::ofstream &stream) const;
 	bool						searchLibraries(const char* name, bool searchDylibs, bool searchArchives,  
 																  bool dataSymbolOnly, ld::File::AtomHandler&) const;
 	// see if any linked dylibs export a weak def of symbol
@@ -112,14 +110,14 @@ private:
 	static void					parseWorkerThread(InputFiles *inputFiles);
 	void						startThread(void (*threadFunc)(InputFiles *)) const;
 
-	typedef LDOrderedMap<std::string, ld::dylib::File*>	InstallNameToDylib;
+	typedef std::map<std::string, ld::dylib::File*>	InstallNameToDylib;
 
 	const Options&				_options;
 	std::vector<ld::File*>		_inputFiles;
-	mutable LDOrderedSet<class ld::File*>	_archiveFilesLogged;
+	mutable std::set<class ld::File*>	_archiveFilesLogged;
 	mutable std::vector<std::string>	_archiveFilePaths;
 	InstallNameToDylib			_installPathToDylibs;
-	LDOrderedSet<ld::dylib::File*>	_allDylibs;
+	std::set<ld::dylib::File*>	_allDylibs;
 	ld::dylib::File*			_bundleLoader;
 	bool						_inferredArch;
     struct strcompclass {

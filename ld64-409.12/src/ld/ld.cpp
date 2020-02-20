@@ -172,13 +172,13 @@ private:
 	struct SectionEquals {
 		bool operator()(const ld::Section* left, const ld::Section* right) const;
 	};
-	typedef LDMap<const ld::Section*, FinalSection*, SectionHash, SectionEquals> SectionInToOut;
+	typedef std::unordered_map<const ld::Section*, FinalSection*, SectionHash, SectionEquals> SectionInToOut;
 	
 
 	SectionInToOut			_sectionInToFinalMap;
 	const Options&			_options;
 	bool					_atomsOrderedInSections;
-	LDMap<const ld::Atom*, const char*> _pendingSegMove;
+	std::unordered_map<const ld::Atom*, const char*> _pendingSegMove;
 };
 
 ld::Section	InternalState::FinalSection::_s_DATA_data( "__DATA", "__data",  ld::Section::typeUnclassified);
@@ -1291,12 +1291,11 @@ static void printTime(const char* msg, uint64_t partTime, uint64_t totalTime)
 		fprintf(stderr, "%24s: % 4d.%d milliseconds (% 4d.%d%%)\n", msg, milliSeconds, milliSecondsTimeTen-milliSeconds*10, percent, percentTimesTen-percent*10);
 	}
 	else {
-		double seconds = ((double)partTime)/sUnitsPerSecond;
-		fprintf(stderr, "%24s: %.2lf seconds\n", msg, seconds);
-		/*uint32_t seconds = secondsTimeTen/10;
+		uint32_t secondsTimeTen = (partTime*10)/sUnitsPerSecond;
+		uint32_t seconds = secondsTimeTen/10;
 		uint32_t percentTimesTen = (partTime*1000)/totalTime;
 		uint32_t percent = percentTimesTen/10;
-		fprintf(stderr, "%24s: % 4d.%d seconds (% 4d.%d%%)\n", msg, seconds, percent, percentTimesTen-percent*10);*/
+		fprintf(stderr, "%24s: % 4d.%d seconds (% 4d.%d%%)\n", msg, seconds, secondsTimeTen-seconds*10, percent, percentTimesTen-percent*10);
 	}
 }
 
