@@ -1,48 +1,55 @@
-# ld64
+# zld
+## A faster version of Apple's linker
 
-These instructions are for building ld64 based on Apple's sources for the ld64 that comes
-with Xcode 10.1 and the dyld from Mojave (10.14.1) with clang/llvm 7.0.1.
+### Introduction
 
-Thanks to @rmaz for helping simplify my instructions.
+For large projects, the linking phase ([explanation](https://stackoverflow.com/questions/6264249/how-does-the-compilation-linking-process-work)) can significantly increase incremental build times. This project is a fork of the Apple linker, `ld`. It is a drop-in replacement that can substantially speed things up.
 
-1. Initial setup
-   1. Install Xcode 10.1 from [Apple](https://developer.apple.com/download/)
-   1. Clone this project, or download the zip.
-   1. Navigate to the project directory in the terminal.
-   1. Make sure there are no spaces in the current directory path, or things will go badly for you.
-1. Get Sources
-   1.  `curl https://opensource.apple.com/tarballs/ld64/ld64-409.12.tar.gz --output ld64-409.12.tar.gz | tar xz`
-   1.  `curl https://opensource.apple.com/tarballs/dyld/dyld-635.2.tar.gz --output dyld-635.2.tar.gz | tar xz`
-   1.  `mkdir tapi-master`
-   1.  `curl -L https://github.com/ributzka/tapi/tarball/master | tar xz -C tapi-master --strip-components=1`
-   1.  `curl http://releases.llvm.org/7.0.1/llvm-7.0.1.src.tar.xz | tar xJ`
-   1.  `curl http://releases.llvm.org/7.0.1/cfe-7.0.1.src.tar.xz | tar xJ`
-1. Apply patches
-   1. `patch -p1 -d tapi-master < patches/tapi.patch`
-   1. `patch -p1 -d ld64-409.12 < patches/ld64.patch`
-   1. `patch -p1 -d dyld-635.2 < patches/dyld.patch`
-1. Configure ld64 project
-   1. `open ld64-409.12/ld64.xcodeproj`
-   1. Change the `Base SDK` for the ld64 project from `macosx.internal` to `macos`
-       ![alt text](img/project_basesdk.png)
-   1. Remove the override for `Base SDK` from the ld target so it changes from `macosx.internal` to `macos` (you can do this be selecting it and hitting delete).
-       ![alt text](img/ld_target_basesdk.png)
-   1. Add the following `Header Search Paths`:
-      * `$(SRCROOT)/../tapi-master/include`
-      * `$(SRCROOT)/../dyld-635.2/include`
-      * `$(SRCROOT)/../llvm-7.0.1.src/include`
-      * `$(SRCROOT)/../cfe-7.0.1.src/include`
-      ![alt text](img/header_search_paths.png)
-   1. Set `Treat Warnings as Errors` to `No`
-      ![alt text](img/treat_warnings_as_errors.png)
-1. Select the `ld` target to build
-1. `Build`
+### Performance
 
-You should be able to replace the ld64 that comes with Xcode 10.1 with this one (located in `/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/`). It will successfully link macOS 10.14, iOS 12 apps.
+In general, `zld` is at least 50% faster for link times < 1 second, and twice as fast for link times > 1 second. Feel free to file an issue if you find otherwise (make sure to run it twice in a row to ensure that [caches](#caches) have been generated).
 
-**Be sure to back up your original `ld64`!!!**
+### Stability
 
-**Do not ship anything to Apple that was linked with this linker. This is purely for debugging linker related issues.**
+`zld` is forked from the most recently open-sourced version of `ld`. It produces byte-for-byte equivalent binaries (besides a few optimizations which you can disable with `-Wl,-zld-reproducible`). It also passes `ld`'s own suite of unit tests.  Although it's not ideal to mix compiler and linker versions (the forked `ld` is the one used in Xcode 10.2), this has been tested to work on Swift 5 projects, and there's no apparent reason why it shouldn't. The linker, after all, is fairly language-agnostic. `zld` will be updated with more recent versions of the linker as Apple open-sources them.
 
-## Level of support
-This is not an officially supported Google product.
+### Installation
+
+`zld` can be installed with Homebrew:
+
+```
+brew install zld
+```
+
+### Usage
+
+If using Xcode, add `-fuse-ld=zld` to "Other Linker Flags" in the build settings (debug configuration):
+
+<img src="img/usage.png" width="75%">
+
+### Caching
+
+By default, `zld` stores some metadata in `/tmp/zld-...` to speed things up. This is the first step towards making `zld` a truly incremental linker. Currently, the only things that are stored are object file and library names. You can disable all caching with `-Wl,-zld-no_cache`.
+
+### Why is it faster?
+
+Apple's approach is a very reasonable one, using C++ with STL data structures. However, there are a number of ways in which `zld` has sped things up, for instance:
+
+- Using [Swiss Tables](https://abseil.io/blog/20180927-swisstables) instead of STL for hash maps and sets
+- Parallelizing in various places (the parsing of libraries, writing the output file, sorting, etc.)
+- Optimizations around the hashing of strings (caching the hashes, using a better hash function, etc.)
+
+### Other things to speed up linking
+
+Whether you use this project or not, there are a number of things that can speed linking up (again, this is only for debug builds):
+
+- The linker flag `-Wl,-no_uuid`, which disables UUID creation
+- Turning off dead stripping (referred to as "Dead Code Stripping" in Xcode build settings)
+- If you're not using `zld`, using `-Wl,-force_load` for libraries can sometimes speed things up
+- Linking with dynamic libraries instead of static ones
+
+### Contributing
+
+The biggest way to contribute to `zld` is to file issues! If you encountered any problems, feel free to file an issue, and you can expect a prompt response. PRs, as well as issues to discuss potential new directions, are also welcome.
+
+Special thanks to @dmaclach's [ld64](https://github.com/dmaclach/ld64), which helped with building `ld`.
