@@ -10,6 +10,10 @@
 
 namespace Tweaks {
     bool reproEnabled() {
+#ifdef REPRO
 		return true;
+#else
+		return false;
+#endif
     }
 }

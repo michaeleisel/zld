@@ -15,10 +15,21 @@
 #include "absl/container/btree_map.h"
 #include "absl/container/btree_set.h"
 
+#ifdef REPRO
+
+#define LDOrderedMap std::map
+#define LDMap std::unordered_map
+#define LDSet std::unordered_set
+#define LDOrderedSet std::set
+
+#else
+
 #define LDOrderedMap absl::btree_map
 #define LDMap absl::flat_hash_map
 #define LDSet absl::flat_hash_set
 #define LDOrderedSet absl::btree_set
+
+#endif
 
 
 #endif /* MapDefines_h */
