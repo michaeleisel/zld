@@ -5,20 +5,22 @@
 
 For large projects, the linking phase ([explanation](https://stackoverflow.com/questions/6264249/how-does-the-compilation-linking-process-work)) can significantly increase incremental build times. This project is a fork of the Apple linker, `ld`. It is a drop-in replacement that can substantially speed things up.
 
+Note: it is only intended for debug builds.
+
 ### Performance
 
-In general, `zld` is at least 50% faster for link times < 1 second, and twice as fast for link times > 1 second. Feel free to file an issue if you find otherwise (make sure to run it twice in a row to ensure that [caches](#caches) have been generated).
+Feel free to file an issue if you find it's not at least 40% faster for your case (make sure to run it twice in a row to ensure that [caches](#caching) have been generated).
 
 ### Stability
 
-`zld` is forked from the most recently open-sourced version of `ld`. Besides a few optimizations around hashing, it produces byte-for-byte the same executables as the open-source one (and you can see this by compiling the project with `-DREPRO`). It also passes `ld`'s own suite of unit tests.  Although it's not ideal to mix compiler and linker versions, and the open-source one is from Xcode 10.2, this has been tested to work on Swift 5 projects, and there's no apparent reason why it shouldn't. The linker, after all, is fairly language-agnostic. `zld` will be updated with more recent versions of the linker as Apple open-sources them.
+`zld` is forked from the most recently open-sourced version of `ld`. Without a few optimizations around hashing, it would produce byte-for-byte the same executables as the open-source one. Although it's not ideal to mix compiler and linker toolchain versions, and the open-source one is a bit old (Xcode 10.2), this has been tested to work on Swift 5 projects, and there's no apparent reason why it shouldn't. The linker, after all, is fairly language-agnostic. `zld` will be updated with more recent versions of the linker as Apple open-sources them.
 
 ### Installation
 
-`zld` can be installed with Homebrew:
+`zld` can be installed with Cocoapods:
 
 ```
-brew install zld
+gem install zld
 ```
 
 ### Usage
@@ -29,7 +31,7 @@ If using Xcode, add `-fuse-ld=zld` to "Other Linker Flags" in the build settings
 
 ### Caching
 
-By default, `zld` stores some metadata in `/tmp/zld-...` to speed things up. This is the first step towards making `zld` a truly incremental linker. Currently, the only things that are stored are object file and library names. You can disable all caching with `-Wl,-zld-no_cache`.
+By default, `zld` stores some metadata in `/tmp/zld-...` to speed things up. This is the first step towards making `zld` a truly incremental linker. Currently, the only things that are stored are object file and library names.
 
 ### Why is it faster?
 
@@ -50,6 +52,6 @@ Whether you use this project or not, there are a number of things that can speed
 
 ### Contributing
 
-The biggest way to contribute to `zld` is to file issues! If you encountered any problems, feel free to file an issue, and you can expect a prompt response. PRs, as well as issues to discuss potential new directions, are also welcome.
+The biggest way to contribute to `zld` is to file issues! If you encountered any problems, feel free to file an issue, and you can expect a prompt response.
 
 Special thanks to @dmaclach's [ld64](https://github.com/dmaclach/ld64), which helped with building `ld`.

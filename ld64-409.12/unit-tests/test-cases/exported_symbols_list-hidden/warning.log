@@ -1,2 +1,4 @@
-ld: warning: cannot export hidden symbol _func_hidden1 from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/test-eda1a7.o
-ld: warning: cannot export hidden symbol _common_hidden1 from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/test-eda1a7.o
+RPATH successful expansion of @rpath/libtapi.dylib to: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/libtapi.dylib
+RPATH successful expansion of @rpath/libswiftDemangle.dylib to: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/libswiftDemangle.dylib
+ld: warning: cannot export hidden symbol _func_hidden1 from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/test-b9def0.o
+ld: warning: cannot export hidden symbol _common_hidden1 from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/test-b9def0.o

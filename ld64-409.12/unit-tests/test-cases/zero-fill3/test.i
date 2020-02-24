@@ -1,37 +1,37 @@
 # 1 "test.c"
 # 1 "<built-in>" 1
 # 1 "<built-in>" 3
-# 376 "<built-in>" 3
+# 362 "<built-in>" 3
 # 1 "<command line>" 1
 # 1 "<built-in>" 2
 # 1 "test.c" 2
 # 24 "test.c"
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 1 3 4
-# 64 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_stdio.h" 1 3 4
-# 68 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_stdio.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/cdefs.h" 1 3 4
-# 630 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/cdefs.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_symbol_aliasing.h" 1 3 4
-# 631 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/cdefs.h" 2 3 4
-# 696 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/cdefs.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_posix_availability.h" 1 3 4
-# 697 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/cdefs.h" 2 3 4
-# 69 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_stdio.h" 2 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/Availability.h" 1 3 4
-# 251 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/Availability.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/AvailabilityInternal.h" 1 3 4
-# 252 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/Availability.h" 2 3 4
-# 70 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_stdio.h" 2 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 1 3 4
+# 64 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_stdio.h" 1 3 4
+# 68 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_stdio.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/cdefs.h" 1 3 4
+# 608 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/cdefs.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_symbol_aliasing.h" 1 3 4
+# 609 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/cdefs.h" 2 3 4
+# 674 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/cdefs.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_posix_availability.h" 1 3 4
+# 675 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/cdefs.h" 2 3 4
+# 69 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_stdio.h" 2 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/Availability.h" 1 3 4
+# 232 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/Availability.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/AvailabilityInternal.h" 1 3 4
+# 233 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/Availability.h" 2 3 4
+# 70 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_stdio.h" 2 3 4
 
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_types.h" 1 3 4
-# 27 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_types.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types.h" 1 3 4
-# 33 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/machine/_types.h" 1 3 4
-# 32 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/machine/_types.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/_types.h" 1 3 4
-# 13 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/_types.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_types.h" 1 3 4
+# 27 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_types.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types.h" 1 3 4
+# 33 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/machine/_types.h" 1 3 4
+# 32 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/machine/_types.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/_types.h" 1 3 4
+# 37 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/_types.h" 3 4
 typedef signed char __int8_t;
 
 
@@ -46,7 +46,7 @@ typedef unsigned long long __uint64_t;
 
 typedef long __darwin_intptr_t;
 typedef unsigned int __darwin_natural_t;
-# 46 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/_types.h" 3 4
+# 70 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/_types.h" 3 4
 typedef int __darwin_ct_rune_t;
 
 
@@ -98,9 +98,9 @@ typedef unsigned long __darwin_clock_t;
 typedef __uint32_t __darwin_socklen_t;
 typedef long __darwin_ssize_t;
 typedef long __darwin_time_t;
-# 33 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/machine/_types.h" 2 3 4
-# 34 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types.h" 2 3 4
-# 55 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types.h" 3 4
+# 33 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/machine/_types.h" 2 3 4
+# 34 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types.h" 2 3 4
+# 55 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types.h" 3 4
 typedef __int64_t __darwin_blkcnt_t;
 typedef __int32_t __darwin_blksize_t;
 typedef __int32_t __darwin_dev_t;
@@ -127,8 +127,8 @@ typedef unsigned char __darwin_uuid_t[16];
 typedef char __darwin_uuid_string_t[37];
 
 
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_pthread/_pthread_types.h" 1 3 4
-# 57 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_pthread/_pthread_types.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_pthread/_pthread_types.h" 1 3 4
+# 57 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_pthread/_pthread_types.h" 3 4
 struct __darwin_pthread_handler_rec {
  void (*__routine)(void *);
  void *__arg;
@@ -191,56 +191,56 @@ typedef struct _opaque_pthread_once_t __darwin_pthread_once_t;
 typedef struct _opaque_pthread_rwlock_t __darwin_pthread_rwlock_t;
 typedef struct _opaque_pthread_rwlockattr_t __darwin_pthread_rwlockattr_t;
 typedef struct _opaque_pthread_t *__darwin_pthread_t;
-# 81 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types.h" 2 3 4
-# 28 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_types.h" 2 3 4
-# 40 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_types.h" 3 4
+# 81 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types.h" 2 3 4
+# 28 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_types.h" 2 3 4
+# 40 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_types.h" 3 4
 typedef int __darwin_nl_item;
 typedef int __darwin_wctrans_t;
 
 typedef __uint32_t __darwin_wctype_t;
-# 72 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_stdio.h" 2 3 4
+# 72 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_stdio.h" 2 3 4
 
 
 
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_va_list.h" 1 3 4
-# 31 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_va_list.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/machine/types.h" 1 3 4
-# 35 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/machine/types.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/types.h" 1 3 4
-# 52 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/types.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_int8_t.h" 1 3 4
-# 30 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_int8_t.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_va_list.h" 1 3 4
+# 31 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_va_list.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/machine/types.h" 1 3 4
+# 35 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/machine/types.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/types.h" 1 3 4
+# 76 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/types.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_int8_t.h" 1 3 4
+# 30 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_int8_t.h" 3 4
 typedef signed char int8_t;
-# 53 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/types.h" 2 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_int16_t.h" 1 3 4
-# 30 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_int16_t.h" 3 4
+# 77 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/types.h" 2 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_int16_t.h" 1 3 4
+# 30 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_int16_t.h" 3 4
 typedef short int16_t;
-# 54 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/types.h" 2 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_int32_t.h" 1 3 4
-# 30 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_int32_t.h" 3 4
+# 78 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/types.h" 2 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_int32_t.h" 1 3 4
+# 30 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_int32_t.h" 3 4
 typedef int int32_t;
-# 55 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/types.h" 2 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_int64_t.h" 1 3 4
-# 30 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_int64_t.h" 3 4
+# 79 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/types.h" 2 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_int64_t.h" 1 3 4
+# 30 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_int64_t.h" 3 4
 typedef long long int64_t;
-# 56 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/types.h" 2 3 4
+# 80 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/types.h" 2 3 4
 
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_u_int8_t.h" 1 3 4
-# 30 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_u_int8_t.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_u_int8_t.h" 1 3 4
+# 30 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_u_int8_t.h" 3 4
 typedef unsigned char u_int8_t;
-# 58 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/types.h" 2 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_u_int16_t.h" 1 3 4
-# 30 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_u_int16_t.h" 3 4
+# 82 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/types.h" 2 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_u_int16_t.h" 1 3 4
+# 30 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_u_int16_t.h" 3 4
 typedef unsigned short u_int16_t;
-# 59 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/types.h" 2 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_u_int32_t.h" 1 3 4
-# 30 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_u_int32_t.h" 3 4
+# 83 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/types.h" 2 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_u_int32_t.h" 1 3 4
+# 30 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_u_int32_t.h" 3 4
 typedef unsigned int u_int32_t;
-# 60 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/types.h" 2 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_u_int64_t.h" 1 3 4
-# 30 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_u_int64_t.h" 3 4
+# 84 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/types.h" 2 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_u_int64_t.h" 1 3 4
+# 30 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_u_int64_t.h" 3 4
 typedef unsigned long long u_int64_t;
-# 61 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/types.h" 2 3 4
+# 85 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/types.h" 2 3 4
 
 
 typedef int64_t register_t;
@@ -249,18 +249,17 @@ typedef int64_t register_t;
 
 
 
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_intptr_t.h" 1 3 4
-# 30 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_intptr_t.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/machine/types.h" 1 3 4
-# 31 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_intptr_t.h" 2 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_intptr_t.h" 1 3 4
+# 30 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_intptr_t.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/machine/types.h" 1 3 4
+# 31 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_intptr_t.h" 2 3 4
 
 typedef __darwin_intptr_t intptr_t;
-# 69 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/types.h" 2 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_uintptr_t.h" 1 3 4
-# 30 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_uintptr_t.h" 3 4
+# 93 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/types.h" 2 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_uintptr_t.h" 1 3 4
+# 30 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_uintptr_t.h" 3 4
 typedef unsigned long uintptr_t;
-# 70 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/types.h" 2 3 4
-
+# 94 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/i386/types.h" 2 3 4
 
 
 
@@ -271,22 +270,28 @@ typedef int64_t user_long_t;
 typedef u_int64_t user_ulong_t;
 typedef int64_t user_time_t;
 typedef int64_t user_off_t;
-# 101 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/arm/types.h" 3 4
-typedef u_int64_t syscall_arg_t;
-# 36 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/machine/types.h" 2 3 4
-# 32 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_va_list.h" 2 3 4
-typedef __darwin_va_list va_list;
-# 76 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_stdio.h" 2 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_size_t.h" 1 3 4
-# 31 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_size_t.h" 3 4
-typedef __darwin_size_t size_t;
-# 77 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_stdio.h" 2 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_null.h" 1 3 4
-# 78 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_stdio.h" 2 3 4
 
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/stdio.h" 1 3 4
-# 39 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/stdio.h" 3 4
-int renameat(int, const char *, int, const char *) __attribute__((availability(ios,introduced=8.0)));
+
+
+
+
+
+
+typedef u_int64_t syscall_arg_t;
+# 36 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/machine/types.h" 2 3 4
+# 32 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_va_list.h" 2 3 4
+typedef __darwin_va_list va_list;
+# 76 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_stdio.h" 2 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_size_t.h" 1 3 4
+# 31 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_size_t.h" 3 4
+typedef __darwin_size_t size_t;
+# 77 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_stdio.h" 2 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_null.h" 1 3 4
+# 78 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_stdio.h" 2 3 4
+
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/stdio.h" 1 3 4
+# 39 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/stdio.h" 3 4
+int renameat(int, const char *, int, const char *) __attribute__((availability(macosx,introduced=10.10)));
 
 
 
@@ -295,10 +300,10 @@ int renameat(int, const char *, int, const char *) __attribute__((availability(i
 
 int renamex_np(const char *, const char *, unsigned int) __attribute__((availability(macosx,introduced=10.12))) __attribute__((availability(ios,introduced=10.0))) __attribute__((availability(tvos,introduced=10.0))) __attribute__((availability(watchos,introduced=3.0)));
 int renameatx_np(int, const char *, int, const char *, unsigned int) __attribute__((availability(macosx,introduced=10.12))) __attribute__((availability(ios,introduced=10.0))) __attribute__((availability(tvos,introduced=10.0))) __attribute__((availability(watchos,introduced=3.0)));
-# 80 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_stdio.h" 2 3 4
+# 80 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_stdio.h" 2 3 4
 
 typedef __darwin_off_t fpos_t;
-# 92 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_stdio.h" 3 4
+# 92 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_stdio.h" 3 4
 struct __sbuf {
  unsigned char *_base;
  int _size;
@@ -306,7 +311,7 @@ struct __sbuf {
 
 
 struct __sFILEX;
-# 126 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_stdio.h" 3 4
+# 126 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/_stdio.h" 3 4
 typedef struct __sFILE {
  unsigned char *_p;
  int _r;
@@ -339,13 +344,13 @@ typedef struct __sFILE {
  int _blksize;
  fpos_t _offset;
 } FILE;
-# 65 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 2 3 4
+# 65 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 2 3 4
 
 
 extern FILE *__stdinp;
 extern FILE *__stdoutp;
 extern FILE *__stderrp;
-# 142 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 3 4
+# 142 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 3 4
 void clearerr(FILE *);
 int fclose(FILE *);
 int feof(FILE *);
@@ -373,7 +378,7 @@ size_t fwrite(const void * restrict __ptr, size_t __size, size_t __nitems, FILE 
 int getc(FILE *);
 int getchar(void);
 char *gets(char *);
-void perror(const char *) __attribute__((__cold__));
+void perror(const char *);
 int printf(const char * restrict, ...) __attribute__((__format__ (__printf__, 1, 2)));
 int putc(int, FILE *);
 int putchar(int);
@@ -390,18 +395,16 @@ FILE *tmpfile(void);
 
 __attribute__((__availability__(swift, unavailable, message="Use mkstemp(3) instead.")))
 
-__attribute__((__deprecated__("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of tmpnam(3), it is highly recommended that you use mkstemp(3) instead.")))
+__attribute__((deprecated("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of tmpnam(3), it is highly recommended that you use mkstemp(3) instead.")))
 
 char *tmpnam(char *);
 int ungetc(int, FILE *);
 int vfprintf(FILE * restrict, const char * restrict, va_list) __attribute__((__format__ (__printf__, 2, 0)));
 int vprintf(const char * restrict, va_list) __attribute__((__format__ (__printf__, 1, 0)));
 int vsprintf(char * restrict, const char * restrict, va_list) __attribute__((__format__ (__printf__, 2, 0))) __attribute__((__availability__(swift, unavailable, message="Use vsnprintf instead.")));
-# 205 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_ctermid.h" 1 3 4
-# 26 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/_ctermid.h" 3 4
+# 208 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 3 4
 char *ctermid(char *);
-# 206 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 2 3 4
+
 
 
 
@@ -409,24 +412,24 @@ char *ctermid(char *);
 FILE *fdopen(int, const char *) __asm("_" "fdopen" );
 
 int fileno(FILE *);
-# 228 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 3 4
+# 232 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 3 4
 int pclose(FILE *) __attribute__((__availability__(swift, unavailable, message="Use posix_spawn APIs or NSTask instead.")));
 
 
 
 FILE *popen(const char *, const char *) __asm("_" "popen" ) __attribute__((__availability__(swift, unavailable, message="Use posix_spawn APIs or NSTask instead.")));
-# 249 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 3 4
+# 253 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 3 4
 int __srget(FILE *);
 int __svfscanf(FILE *, const char *, va_list) __attribute__((__format__ (__scanf__, 2, 0)));
 int __swbuf(int, FILE *);
-# 260 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 3 4
+# 264 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 3 4
 inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
  if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\n'))
   return (*_p->_p++ = _c);
  else
   return (__swbuf(_c, _p));
 }
-# 286 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 3 4
+# 290 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 3 4
 void flockfile(FILE *);
 int ftrylockfile(FILE *);
 void funlockfile(FILE *);
@@ -443,14 +446,14 @@ int putw(int, FILE *);
 
 __attribute__((__availability__(swift, unavailable, message="Use mkstemp(3) instead.")))
 
-__attribute__((__deprecated__("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of tempnam(3), it is highly recommended that you use mkstemp(3) instead.")))
+__attribute__((deprecated("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of tempnam(3), it is highly recommended that you use mkstemp(3) instead.")))
 
 char *tempnam(const char *__dir, const char *__prefix) __asm("_" "tempnam" );
-# 324 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_off_t.h" 1 3 4
-# 31 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_off_t.h" 3 4
+# 328 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_off_t.h" 1 3 4
+# 31 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_off_t.h" 3 4
 typedef __darwin_off_t off_t;
-# 325 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 2 3 4
+# 329 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 2 3 4
 
 
 int fseeko(FILE * __stream, off_t __offset, int __whence);
@@ -465,20 +468,20 @@ int vfscanf(FILE * restrict __stream, const char * restrict __format, va_list) _
 int vscanf(const char * restrict __format, va_list) __attribute__((__format__ (__scanf__, 1, 0)));
 int vsnprintf(char * restrict __str, size_t __size, const char * restrict __format, va_list) __attribute__((__format__ (__printf__, 3, 0)));
 int vsscanf(const char * restrict __str, const char * restrict __format, va_list) __attribute__((__format__ (__scanf__, 2, 0)));
-# 349 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_ssize_t.h" 1 3 4
-# 31 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys/_types/_ssize_t.h" 3 4
+# 353 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_ssize_t.h" 1 3 4
+# 31 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_ssize_t.h" 3 4
 typedef __darwin_ssize_t ssize_t;
-# 350 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 2 3 4
+# 354 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 2 3 4
 
 
-int dprintf(int, const char * restrict, ...) __attribute__((__format__ (__printf__, 2, 3))) __attribute__((availability(ios,introduced=4.3)));
-int vdprintf(int, const char * restrict, va_list) __attribute__((__format__ (__printf__, 2, 0))) __attribute__((availability(ios,introduced=4.3)));
-ssize_t getdelim(char ** restrict __linep, size_t * restrict __linecapp, int __delimiter, FILE * restrict __stream) __attribute__((availability(ios,introduced=4.3)));
-ssize_t getline(char ** restrict __linep, size_t * restrict __linecapp, FILE * restrict __stream) __attribute__((availability(ios,introduced=4.3)));
+int dprintf(int, const char * restrict, ...) __attribute__((__format__ (__printf__, 2, 3))) __attribute__((availability(macosx,introduced=10.7)));
+int vdprintf(int, const char * restrict, va_list) __attribute__((__format__ (__printf__, 2, 0))) __attribute__((availability(macosx,introduced=10.7)));
+ssize_t getdelim(char ** restrict __linep, size_t * restrict __linecapp, int __delimiter, FILE * restrict __stream) __attribute__((availability(macosx,introduced=10.7)));
+ssize_t getline(char ** restrict __linep, size_t * restrict __linecapp, FILE * restrict __stream) __attribute__((availability(macosx,introduced=10.7)));
 FILE *fmemopen(void * restrict __buf, size_t __size, const char * restrict __mode) __attribute__((availability(macos,introduced=10.13))) __attribute__((availability(ios,introduced=11.0))) __attribute__((availability(tvos,introduced=11.0))) __attribute__((availability(watchos,introduced=4.0)));
 FILE *open_memstream(char **__bufp, size_t *__sizep) __attribute__((availability(macos,introduced=10.13))) __attribute__((availability(ios,introduced=11.0))) __attribute__((availability(tvos,introduced=11.0))) __attribute__((availability(watchos,introduced=4.0)));
-# 367 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 3 4
+# 371 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 3 4
 extern const int sys_nerr;
 extern const char *const sys_errlist[];
 
@@ -501,15 +504,15 @@ FILE *funopen(const void *,
                  int (* _Nullable)(void *, const char *, int),
                  fpos_t (* _Nullable)(void *, fpos_t, int),
                  int (* _Nullable)(void *));
-# 407 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/secure/_stdio.h" 1 3 4
-# 31 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/secure/_stdio.h" 3 4
-# 1 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/secure/_common.h" 1 3 4
-# 32 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/secure/_stdio.h" 2 3 4
-# 42 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/secure/_stdio.h" 3 4
+# 411 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/secure/_stdio.h" 1 3 4
+# 31 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/secure/_stdio.h" 3 4
+# 1 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/secure/_common.h" 1 3 4
+# 32 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/secure/_stdio.h" 2 3 4
+# 42 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/secure/_stdio.h" 3 4
 extern int __sprintf_chk (char * restrict, int, size_t,
      const char * restrict, ...);
-# 52 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/secure/_stdio.h" 3 4
+# 52 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/secure/_stdio.h" 3 4
 extern int __snprintf_chk (char * restrict, size_t, int, size_t,
       const char * restrict, ...);
 
@@ -530,7 +533,7 @@ extern int __vsprintf_chk (char * restrict, int, size_t,
 
 extern int __vsnprintf_chk (char * restrict, size_t, int, size_t,
        const char * restrict, va_list);
-# 408 "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/stdio.h" 2 3 4
+# 412 "/Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk/usr/include/stdio.h" 2 3 4
 # 25 "test.c" 2
 
 
@@ -545,7 +548,7 @@ int bigarray8[2*16777216L+1];
 int bigarray9[4*16777216L+1];
 int bigarray10[8*16777216L+1];
 int bigarray11[16*16777216L+1];
-int bigarray99[2147483647U/4];
+int bigarray99[2147483647U/1];
 static int staticbigarray1[256];
 static int staticbigarray2[2560];
 static int staticbigarray3[25600];

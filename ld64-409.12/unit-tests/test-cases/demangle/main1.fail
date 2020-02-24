@@ -1,5 +1,1 @@
-ld: warning: object file (main.o) was built for newer iOS version (9.0) than being linked (7.0)
-Undefined symbols for architecture arm64:
-  "__ZN3Foo4doitEv", referenced from:
-      _main in main.o
-ld: symbol(s) not found for architecture arm64
+Can't exec "/Users/michael/projects/ld64/ld64-409.12/unit-tests/test-cases/demangle/ld": No such file or directory at /Users/michael/projects/ld64/ld64-409.12/unit-tests/bin/fail-if-exit-zero.pl line 10.

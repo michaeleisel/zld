@@ -1,0 +1,2 @@
+RPATH successful expansion of @rpath/libtapi.dylib to: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/libtapi.dylib
+RPATH successful expansion of @rpath/libswiftDemangle.dylib to: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/libswiftDemangle.dylib
