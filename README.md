@@ -5,13 +5,13 @@
 
 For large projects, the linking phase ([explanation](https://stackoverflow.com/questions/6264249/how-does-the-compilation-linking-process-work)) can significantly increase incremental build times. This project is a fork of the Apple linker, `ld`. It is a drop-in replacement that can substantially speed things up.
 
-Note: it is only intended for debug builds.
+***Note***: it is only intended for debug builds, to make debugging faster.
 
 ### Performance
 
 <img src="img/benchmarks.svg">
 
-Feel free to file an issue if you find it's not at least 40% faster for your case (make sure to run it twice in a row to ensure that [caches](#caching) have been generated). zld's % speedup typically goes up when linking larger projects
+Feel free to file an issue if you find it's not at least 40% faster for your case (make sure to run it twice in a row to ensure that [caches](#caching) have been generated). zld's % speedup typically goes up when linking larger projects.
 
 ### Stability
 
@@ -19,15 +19,11 @@ Feel free to file an issue if you find it's not at least 40% faster for your cas
 
 ### Installation
 
-`zld` can be installed with Cocoapods:
-
-```
-gem install zld
-```
+Prebuilt binaries are available on the [Releases](https://github.com/michaeleisel/zld/releases) page.
 
 ### Usage
 
-If using Xcode, add `-fuse-ld=zld` to "Other Linker Flags" in the build settings (debug configuration):
+If using Xcode, add `-fuse-ld=<path to zld>` to "Other Linker Flags" in the build settings (debug configuration):
 
 <img src="img/usage.png" width="75%">
 
