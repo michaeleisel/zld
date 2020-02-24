@@ -15,7 +15,7 @@ Feel free to file an issue if you find it's not at least 40% faster for your cas
 
 ### Stability
 
-`zld` is forked from the most recently open-sourced version of `ld`. Without a few optimizations around hashing, it would produce byte-for-byte the same executables as the open-source one. Although it's not ideal to mix compiler and linker toolchain versions, and the open-source one is a bit old (Xcode 10.2), this has been tested to work on Swift 5 projects, and there's no apparent reason why it shouldn't. The linker, after all, is fairly language-agnostic. `zld` will be updated with more recent versions of the linker as Apple open-sources them.
+`zld` is forked from the most recently open-sourced version of `ld`. Without a few optimizations around hashing, it would produce byte-for-byte the same executables as the open-source one. Although it's not ideal to mix compiler and linker toolchain versions, and the open-source one is a bit old (Xcode 10.2), this has been tested to work on Swift 5 projects. There's no obvious reason why it shouldn't. The linker, after all, is fairly language-agnostic. `zld` will be updated with more recent versions of the linker as Apple open-sources them.
 
 ### Installation
 
