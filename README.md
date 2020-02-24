@@ -11,7 +11,7 @@ For large projects, the linking phase ([explanation](https://stackoverflow.com/q
 
 <img src="img/benchmarks.svg">
 
-Feel free to file an issue if you find it's not at least 40% faster for your case (make sure to run it twice in a row to ensure that [caches](#caching) have been generated). zld's % speedup typically goes up when linking larger projects.
+Feel free to file an issue if you find it's not at least 40% faster for your case (make sure to run it twice in a row to ensure that [caches](#caching) have been generated). Further benchmark details can be found [here](misc/benchmarks.md).
 
 ### Stability
 
