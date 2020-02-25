@@ -19,11 +19,13 @@ Feel free to file an issue if you find it's not at least 40% faster for your cas
 
 ### Installation
 
-Prebuilt binaries are available on the [Releases](https://github.com/michaeleisel/zld/releases) page.
+```
+brew install michaeleisel/zld/zld
+```
 
 ### Usage
 
-If using Xcode, add `-fuse-ld=<path to zld>` to "Other Linker Flags" in the build settings (debug configuration):
+If using Xcode, add `-fuse-ld=zld` to "Other Linker Flags" in the build settings (debug configuration):
 
 <img src="img/usage.png" width="75%">
 
