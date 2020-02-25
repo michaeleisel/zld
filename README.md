@@ -25,7 +25,7 @@ brew install michaeleisel/zld/zld
 
 ### Usage
 
-If using Xcode, add `-fuse-ld=zld` to "Other Linker Flags" in the build settings (debug configuration):
+If using Xcode, get the path of zld from `which zld`, then add `-fuse-ld=<path to zld>` to "Other Linker Flags" in the build settings (debug configuration):
 
 <img src="img/usage.png" width="75%">
 
