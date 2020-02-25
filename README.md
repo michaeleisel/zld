@@ -29,8 +29,6 @@ If using Xcode, get the path of zld from `which zld`, then add `-fuse-ld=<path t
 
 <img src="img/usage.png" width="75%">
 
-If running from the command line, just run `zld ...` instead of `ld ...`
-
 ### Caching
 
 By default, `zld` stores some metadata in `/tmp/zld-...` to speed things up. This is the first step towards making `zld` a truly incremental linker. Currently, the only things that are stored are object file and library names.
