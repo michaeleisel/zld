@@ -35,6 +35,9 @@
 #include "parsers/macho_relocatable_file.h"
 #include "parsers/lto_file.h"
 
+#define REPRO
+#include "MapDefines.h"
+
 const ld::VersionSet ld::File::_platforms;
 
 static bool			sDumpContent= true;
@@ -52,6 +55,21 @@ static const char* sMatchName = NULL;
 static int sPrintRestrict;
 static int sPrintAlign;
 static int sPrintName;
+
+const ld::Platform ld::basePlatform(const ld::Platform& platform)  {
+	switch(platform) {
+		case ld::kPlatform_iOSMac:
+		case ld::kPlatform_iOSSimulator:
+			return ld::kPlatform_iOS;
+		case ld::kPlatform_watchOSSimulator:
+			return kPlatform_watchOS;
+		case ld::kPlatform_tvOSSimulator:
+			return ld::kPlatform_tvOS;
+		default:
+			return platform;
+	}
+}
+
 
  __attribute__((noreturn))
 void throwf(const char* format, ...) 

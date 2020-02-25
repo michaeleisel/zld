@@ -38,6 +38,9 @@
 
 #include "configure.h"
 
+#define REPRO
+#include "MapDefines.h"
+
 #include "MachOFileAbstraction.hpp"
 #include "Architectures.hpp"
 
