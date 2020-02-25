@@ -39,6 +39,8 @@
 #include "MachOFileAbstraction.hpp"
 #include "Architectures.hpp"
 
+#define REPRO
+#include "MapDefines.h"
 
  __attribute__((noreturn))
 void throwf(const char* format, ...) 

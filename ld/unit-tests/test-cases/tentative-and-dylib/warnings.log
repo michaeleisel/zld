@@ -1,4 +1,0 @@
-RPATH successful expansion of @rpath/libtapi.dylib to: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/libtapi.dylib
-RPATH successful expansion of @rpath/libswiftDemangle.dylib to: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/libswiftDemangle.dylib
-ld: common symbol _var from libfoo.dylib conflicts with defintion from dylib /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/main-2fab9f.o for architecture x86_64
-clang: error: linker command failed with exit code 1 (use -v to see invocation)

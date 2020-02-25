@@ -1,4 +1,0 @@
-RPATH successful expansion of @rpath/libtapi.dylib to: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/libtapi.dylib
-RPATH successful expansion of @rpath/libswiftDemangle.dylib to: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/libswiftDemangle.dylib
-ld: warning: instance method 'instance_method' in category from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/cat-a4bd8e.o overrides method from class in /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/foo-e9b448.o
-ld: warning: meta method 'class_method' in category from /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/cat-a4bd8e.o overrides method from class in /var/folders/pm/6jgmcb416_sbd6ky4l2rhqjr0000gn/T/foo-e9b448.o

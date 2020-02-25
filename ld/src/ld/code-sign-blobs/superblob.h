@@ -8,6 +8,8 @@
 #include <assert.h>
 #include <utility>
 #include <map>
+#define REPRO
+#include "MapDefines.h"
 
 using namespace std;
 

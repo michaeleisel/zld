@@ -1,7 +1,0 @@
-RPATH successful expansion of @rpath/libtapi.dylib to: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/libtapi.dylib
-RPATH successful expansion of @rpath/libswiftDemangle.dylib to: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/libswiftDemangle.dylib
-Undefined symbols for architecture x86_64:
-  "_OBJC_CLASS_$_Foobar", referenced from:
-      objc-class-ref in libfoo.a(bar.o)
-ld: symbol(s) not found for architecture x86_64
-clang: error: linker command failed with exit code 1 (use -v to see invocation)

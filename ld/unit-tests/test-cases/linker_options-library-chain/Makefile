@@ -31,6 +31,7 @@ include ${TESTROOT}/include/common.makefile
 run: all
 
 all:
+	echo "hi"
 	${CC} ${CCFLAGS} subbar.c -dynamiclib -o libsubbar.dylib
 	${CC} ${CCFLAGS} bar.c -dynamiclib -o libbar.dylib -Wl,-reexport_library,libsubbar.dylib
 	${CC} ${CCFLAGS} foo.c -c -o foo.o

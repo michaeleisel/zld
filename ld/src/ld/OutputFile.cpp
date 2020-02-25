@@ -2750,7 +2750,7 @@ void OutputFile::writeAtoms(ld::Internal& state, uint8_t* wholeBuffer)
 	for (size_t i = 0; i < (size_t)queue.maxConcurrentOperationCount; i++) {
 		std::vector<AtomOperation> &bufferCopy = buffer;
 		[queue addOperationWithBlock:^{
-			for (auto bufIter = bufferCopy.begin() + i * stepSize; bufIter != bufferCopy.begin() + std::min(bufferCopy.size(), (i + 1) * stepSize); bufIter++) {
+			for (auto bufIter = bufferCopy.begin() + i * stepSize; bufIter < bufferCopy.begin() + std::min(bufferCopy.size(), (i + 1) * stepSize); bufIter++) {
 				auto op = *bufIter;
 				// check for alignment padding between atoms
 				if ( (op.fileOffset != op.fileOffsetOfEndOfLastAtom) && op.lastAtomUsesNoOps ) {
