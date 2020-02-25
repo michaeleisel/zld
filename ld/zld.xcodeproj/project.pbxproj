@@ -44,18 +44,11 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		4C223471240431C2007B3ADE /* libtbb.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C22346F240431C2007B3ADE /* libtbb.dylib */; };
-		4C223472240431C2007B3ADE /* libtbbmalloc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C223470240431C2007B3ADE /* libtbbmalloc.dylib */; };
-		4C223476240432CC007B3ADE /* libswiftDemangle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C223473240432CC007B3ADE /* libswiftDemangle.dylib */; };
-		4C223477240432CC007B3ADE /* libLTO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C223474240432CC007B3ADE /* libLTO.dylib */; };
-		4C223478240432CC007B3ADE /* libtapi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C223475240432CC007B3ADE /* libtapi.dylib */; };
-		4C22347924043598007B3ADE /* libLTO.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 4C223474240432CC007B3ADE /* libLTO.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		4C22347A24043599007B3ADE /* libswiftDemangle.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 4C223473240432CC007B3ADE /* libswiftDemangle.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		4C22347B2404359A007B3ADE /* libtapi.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 4C223475240432CC007B3ADE /* libtapi.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		4C755DAB23F7746D001D517E /* libtbb.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C755DAA23F7746D001D517E /* libtbb.dylib */; };
-		4C755DAC23F7746D001D517E /* libtbb.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 4C755DAA23F7746D001D517E /* libtbb.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		4C755DAF23F7746F001D517E /* libtbbmalloc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */; };
-		4C755DB023F7746F001D517E /* libtbbmalloc.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		4C8D9C8D2405818C0040CE7C /* libtbb.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8D9C8C2405818C0040CE7C /* libtbb.dylib */; };
+		4C8D9C90240581900040CE7C /* libtbbmalloc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8D9C8F240581900040CE7C /* libtbbmalloc.dylib */; };
+		4C8D9C93240587690040CE7C /* libswiftDemangle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C223473240432CC007B3ADE /* libswiftDemangle.dylib */; };
+		4C8D9C95240587690040CE7C /* libtapi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C223475240432CC007B3ADE /* libtapi.dylib */; };
+		4C8D9C99240587690040CE7C /* libLTO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8D9C98240587690040CE7C /* libLTO.dylib */; };
 		4C902D6F23FD979F0006EBAC /* libhash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C902D6E23FD979F0006EBAC /* libhash.a */; };
 		4CDA2DA923FDD2CB00C6009D /* Tweaks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */; };
 		83046A851C8FF2F700024A7E /* objcimageinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83046A841C8FF2D000024A7E /* objcimageinfo.cpp */; };
@@ -221,21 +214,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		4C755DAD23F7746D001D517E /* Embed Libraries */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				4C755DAC23F7746D001D517E /* libtbb.dylib in Embed Libraries */,
-				4C22347A24043599007B3ADE /* libswiftDemangle.dylib in Embed Libraries */,
-				4C22347B2404359A007B3ADE /* libtapi.dylib in Embed Libraries */,
-				4C755DB023F7746F001D517E /* libtbbmalloc.dylib in Embed Libraries */,
-				4C22347924043598007B3ADE /* libLTO.dylib in Embed Libraries */,
-			);
-			name = "Embed Libraries";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		F9A3DE140ED76D7700C590B9 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 8;
@@ -285,7 +263,6 @@
 		4C22346F240431C2007B3ADE /* libtbb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbb.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbb.dylib; sourceTree = "<group>"; };
 		4C223470240431C2007B3ADE /* libtbbmalloc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbbmalloc.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbbmalloc.dylib; sourceTree = "<group>"; };
 		4C223473240432CC007B3ADE /* libswiftDemangle.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libswiftDemangle.dylib; path = Toolchains/XcodeDefault.xctoolchain/usr/lib/libswiftDemangle.dylib; sourceTree = DEVELOPER_DIR; };
-		4C223474240432CC007B3ADE /* libLTO.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libLTO.dylib; path = Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib; sourceTree = DEVELOPER_DIR; };
 		4C223475240432CC007B3ADE /* libtapi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtapi.dylib; path = Toolchains/XcodeDefault.xctoolchain/usr/lib/libtapi.dylib; sourceTree = DEVELOPER_DIR; };
 		4C47258B23FD9E3C00AA02B2 /* MapDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapDefines.h; sourceTree = "<group>"; };
 		4C5E360723FB61D50073E2F5 /* configure.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = configure.h; sourceTree = "<group>"; };
@@ -293,6 +270,13 @@
 		4C755DAA23F7746D001D517E /* libtbb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbb.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbb.dylib; sourceTree = "<group>"; };
 		4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbbmalloc.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbbmalloc.dylib; sourceTree = "<group>"; };
 		4C7D5B8323D8D46B006E515E /* hash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hash.h; path = "../../examples/abseil-cpp/absl/hash/hash.h"; sourceTree = "<group>"; };
+		4C8D9C80240580EB0040CE7C /* libLTO-zld.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libLTO-zld.dylib"; path = "../lib/libLTO-zld.dylib"; sourceTree = "<group>"; };
+		4C8D9C81240580EC0040CE7C /* libtapi-zld.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libtapi-zld.dylib"; path = "../lib/libtapi-zld.dylib"; sourceTree = "<group>"; };
+		4C8D9C82240580EC0040CE7C /* libswiftDemangle-zld.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libswiftDemangle-zld.dylib"; path = "../lib/libswiftDemangle-zld.dylib"; sourceTree = "<group>"; };
+		4C8D9C8A240581650040CE7C /* libtbb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtbb.a; path = ../../../../../usr/local/lib/libtbb.a; sourceTree = "<group>"; };
+		4C8D9C8C2405818C0040CE7C /* libtbb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbb.dylib; path = ../../../../../usr/local/lib/libtbb.dylib; sourceTree = "<group>"; };
+		4C8D9C8F240581900040CE7C /* libtbbmalloc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbbmalloc.dylib; path = ../../../../../usr/local/lib/libtbbmalloc.dylib; sourceTree = "<group>"; };
+		4C8D9C98240587690040CE7C /* libLTO.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libLTO.dylib; path = Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib; sourceTree = DEVELOPER_DIR; };
 		4C902D6E23FD979F0006EBAC /* libhash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhash.a; path = ../../examples/build/libhash.a; sourceTree = "<group>"; };
 		4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tweaks.cpp; sourceTree = "<group>"; };
 		4CDA2DA823FDD2CB00C6009D /* Tweaks.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Tweaks.hpp; sourceTree = "<group>"; };
@@ -300,6 +284,7 @@
 		4CF05E9023EB0093009C0C95 /* libSystem.B.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libSystem.B.tbd; path = usr/lib/libSystem.B.tbd; sourceTree = SDKROOT; };
 		4CF05E9323EB0151009C0C95 /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/System.framework; sourceTree = DEVELOPER_DIR; };
 		4CF05E9523EB0201009C0C95 /* libsystem_malloc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsystem_malloc.dylib; path = ../../../../../usr/lib/system/libsystem_malloc.dylib; sourceTree = "<group>"; };
+		4CFE4F80240481F60072BC3D /* ld.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ld.entitlements; sourceTree = "<group>"; };
 		83046A831C8FF23E00024A7E /* objcimageinfo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = objcimageinfo; sourceTree = BUILT_PRODUCTS_DIR; };
 		83046A841C8FF2D000024A7E /* objcimageinfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = objcimageinfo.cpp; path = src/other/objcimageinfo.cpp; sourceTree = "<group>"; };
 		B028FCF01A9E7B4A00E3584B /* bitcode_bundle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bitcode_bundle.h; sourceTree = "<group>"; };
@@ -310,7 +295,7 @@
 		B3C7A09914295B9C005FC714 /* compile_stubs */ = {isa = PBXFileReference; lastKnownFileType = text.script.csh; path = compile_stubs; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		C1E27B571F6B1B67003B8FA6 /* thread_starts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_starts.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		C1E27B591F6B1B70003B8FA6 /* thread_starts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = thread_starts.h; sourceTree = "<group>"; };
-		F9023C3906D5A23E001BBF46 /* ld */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ld; sourceTree = BUILT_PRODUCTS_DIR; };
+		F9023C3906D5A23E001BBF46 /* zld */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = zld; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9023C3F06D5A254001BBF46 /* ld.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ld.cpp; path = src/ld/ld.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F91B7B0318987D5F0099486F /* AddressSpace.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AddressSpace.hpp; sourceTree = "<group>"; };
 		F91B7B0418987D5F0099486F /* DwarfInstructions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DwarfInstructions.hpp; sourceTree = "<group>"; };
@@ -419,14 +404,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4C223472240431C2007B3ADE /* libtbbmalloc.dylib in Frameworks */,
-				4C223476240432CC007B3ADE /* libswiftDemangle.dylib in Frameworks */,
-				4C755DAB23F7746D001D517E /* libtbb.dylib in Frameworks */,
-				4C223477240432CC007B3ADE /* libLTO.dylib in Frameworks */,
-				4C223478240432CC007B3ADE /* libtapi.dylib in Frameworks */,
-				4C223471240431C2007B3ADE /* libtbb.dylib in Frameworks */,
-				4C755DAF23F7746F001D517E /* libtbbmalloc.dylib in Frameworks */,
+				4C8D9C90240581900040CE7C /* libtbbmalloc.dylib in Frameworks */,
+				4C8D9C93240587690040CE7C /* libswiftDemangle.dylib in Frameworks */,
+				4C8D9C99240587690040CE7C /* libLTO.dylib in Frameworks */,
+				4C8D9C95240587690040CE7C /* libtapi.dylib in Frameworks */,
 				4C902D6F23FD979F0006EBAC /* libhash.a in Frameworks */,
+				4C8D9C8D2405818C0040CE7C /* libtbb.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -471,6 +454,10 @@
 		4CF05E8D23EB005B009C0C95 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4C8D9C98240587690040CE7C /* libLTO.dylib */,
+				4C8D9C8F240581900040CE7C /* libtbbmalloc.dylib */,
+				4C8D9C8C2405818C0040CE7C /* libtbb.dylib */,
+				4C8D9C8A240581650040CE7C /* libtbb.a */,
 				4C755DAE23F7746F001D517E /* libtbbmalloc.dylib */,
 				4C755DAA23F7746D001D517E /* libtbb.dylib */,
 				4CF05E9523EB0201009C0C95 /* libsystem_malloc.dylib */,
@@ -484,6 +471,7 @@
 		F9023C2C06D5A227001BBF46 = {
 			isa = PBXGroup;
 			children = (
+				4CFE4F80240481F60072BC3D /* ld.entitlements */,
 				F9B813A80EC27B6300F94C13 /* abstraction */,
 				F9B813AD0EC27B8500F94C13 /* ld */,
 				F9B813B00EC27B9E00F94C13 /* other */,
@@ -496,7 +484,7 @@
 		F9023C3A06D5A23E001BBF46 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F9023C3906D5A23E001BBF46 /* ld */,
+				F9023C3906D5A23E001BBF46 /* zld */,
 				F971EED306D5ACF60041D381 /* ObjectDump */,
 				F9EA72CB097454A6008B4F1D /* machocheck */,
 				F9EC77EE0A2F85F6002A3E39 /* rebase */,
@@ -621,6 +609,9 @@
 				4CDA2DA823FDD2CB00C6009D /* Tweaks.hpp */,
 				4C47258B23FD9E3C00AA02B2 /* MapDefines.h */,
 				F9AA69BF10583E19003E3539 /* Resolver.cpp */,
+				4C8D9C80240580EB0040CE7C /* libLTO-zld.dylib */,
+				4C8D9C82240580EC0040CE7C /* libswiftDemangle-zld.dylib */,
+				4C8D9C81240580EC0040CE7C /* libtapi-zld.dylib */,
 				F9AA69C010583E19003E3539 /* Resolver.h */,
 				F9AA69B410583C0C003E3539 /* SymbolTable.cpp */,
 				F9AA69B510583C0C003E3539 /* SymbolTable.h */,
@@ -628,7 +619,6 @@
 				4C22346F240431C2007B3ADE /* libtbb.dylib */,
 				4C223470240431C2007B3ADE /* libtbbmalloc.dylib */,
 				F9AA687A10572E27003E3539 /* InputFiles.cpp */,
-				4C223474240432CC007B3ADE /* libLTO.dylib */,
 				4C223473240432CC007B3ADE /* libswiftDemangle.dylib */,
 				4C223475240432CC007B3ADE /* libtapi.dylib */,
 				4C7D5B8323D8D46B006E515E /* hash.h */,
@@ -712,9 +702,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F933D91B09291AC90083EAC8 /* Build configuration list for PBXNativeTarget "zld" */;
 			buildPhases = (
-				F9023C3706D5A23E001BBF46 /* Frameworks */,
-				4C755DAD23F7746D001D517E /* Embed Libraries */,
 				F9023C3606D5A23E001BBF46 /* Sources */,
+				F9023C3706D5A23E001BBF46 /* Frameworks */,
 			);
 			buildRules = (
 				F9E8D4BE07FCAF2A00FD5801 /* PBXBuildRule */,
@@ -724,7 +713,7 @@
 			);
 			name = zld;
 			productName = ld64;
-			productReference = F9023C3906D5A23E001BBF46 /* ld */;
+			productReference = F9023C3906D5A23E001BBF46 /* zld */;
 			productType = "com.apple.product-type.tool";
 		};
 		F971EED206D5ACF60041D381 /* ObjectDump */ = {
@@ -840,6 +829,12 @@
 			attributes = {
 				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = "Apple Inc.";
+				TargetAttributes = {
+					F9023C3806D5A23E001BBF46 = {
+						DevelopmentTeam = LE4EC4296K;
+						ProvisioningStyle = Automatic;
+					};
+				};
 			};
 			buildConfigurationList = F933D92309291AC90083EAC8 /* Build configuration list for PBXProject "zld" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1239,10 +1234,15 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
+				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = "$(RC_ProjectSourceVersion)";
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = LE4EC4296K;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
@@ -1284,6 +1284,7 @@
 					/usr/lib/system,
 					/Users/michael/projects/rpmalloc/lib/macos/release,
 					/Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release,
+					/Users/michael/projects/zld/lib,
 				);
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
 				LLVM_LTO = NO;
@@ -1301,8 +1302,9 @@
 					"-Wl,-all_load",
 				);
 				PREBINDING = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.lddddddd;
-				PRODUCT_NAME = ld;
+				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
+				PRODUCT_NAME = zld;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -1318,10 +1320,15 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
+				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = "$(RC_ProjectSourceVersion)";
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = LE4EC4296K;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
@@ -1367,6 +1374,7 @@
 					/usr/lib/system,
 					/Users/michael/projects/rpmalloc/lib/macos/release,
 					/Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release,
+					/Users/michael/projects/zld/lib,
 				);
 				LLVM_LTO = NO;
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
@@ -1382,8 +1390,9 @@
 					"-Wl,-all_load",
 				);
 				PREBINDING = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.lddddddd;
-				PRODUCT_NAME = ld;
+				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
+				PRODUCT_NAME = zld;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -1507,13 +1516,15 @@
 					/Users/michael/projects/tbb/include,
 					"/Users/michael/projects/array-hash/include",
 				);
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
 					"-Wl,-t",
 					"-Wl,-U,_fnd_get_demangled_name",
+					"-Wl,-client_name,ld",
+					"-Wl,-alias,_zldVersionString,_ldVersionString",
 				);
 				SDKROOT = macosx;
 			};
@@ -1559,12 +1570,14 @@
 					/Users/michael/projects/tbb/include,
 					"/Users/michael/projects/array-hash/include",
 				);
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
 					"-Wl,-t",
 					"-Wl,-U,_fnd_get_demangled_name",
+					"-Wl,-client_name,ld",
+					"-Wl,-alias,_zldVersionString,_ldVersionString",
 				);
 				SDKROOT = macosx;
 			};
@@ -1628,13 +1641,15 @@
 					/Users/michael/projects/tbb/include,
 					"/Users/michael/projects/array-hash/include",
 				);
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_CFLAGS = "-DREPRO";
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
 					"-Wl,-t",
 					"-Wl,-U,_fnd_get_demangled_name",
+					"-Wl,-client_name,ld",
+					"-Wl,-alias,_zldVersionString,_ldVersionString",
 				);
 				SDKROOT = macosx;
 			};
@@ -1657,10 +1672,15 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
+				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = "$(RC_ProjectSourceVersion)";
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = LE4EC4296K;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
@@ -1705,6 +1725,7 @@
 					/usr/lib/system,
 					/Users/michael/projects/rpmalloc/lib/macos/release,
 					/Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release,
+					/Users/michael/projects/zld/lib,
 				);
 				LLVM_LTO = NO;
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
@@ -1719,8 +1740,9 @@
 					"-Wl,-all_load",
 				);
 				PREBINDING = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.lddddddd;
-				PRODUCT_NAME = ld;
+				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
+				PRODUCT_NAME = zld;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				STRIP_INSTALLED_PRODUCT = NO;
