@@ -15,7 +15,7 @@ Feel free to file an issue if you find it's not at least 40% faster for your cas
 
 ### Is it worth it for my project?
 
-It all depends on your risk tolerance and how much you value the speedup in incremental build time. When linking takes more than one second, I'd cut that time in half as the estimated time with this new linker. If that difference is compelling to you, then it'd be worth trying out. Personally, I'd use it in projects for a link time of even 500ms (but I am an impatient tinkerer).
+It all depends on your risk tolerance and how much you value the speedup in incremental build time. When linking takes more than one second, I'd cut that time in half as the estimated time with this new linker. If that difference is compelling to you, then it'd be worth trying out. Personally, I'd use it in projects with an existing link time of even 500ms (but I am an impatient tinkerer).
 
 ### Stability
 
