@@ -13,6 +13,10 @@ For large projects, the linking phase ([explanation](https://stackoverflow.com/q
 
 Feel free to file an issue if you find it's not at least 40% faster for your case (make sure to run it twice in a row to ensure that [caches](#caching) have been generated). Further benchmark details can be found [here](misc/benchmarks.md).
 
+### Is it worth it for my project?
+
+It all depends on your risk tolerance and how much you value the speedup in incremental build time. When linking takes more than one second, I'd cut that time in half as the estimated time with this new linker. If that difference is compelling to you, then it'd be worth trying out. Personally, I'd use it in projects for a link time of even 500ms (but I am an impatient tinkerer).
+
 ### Stability
 
 `zld` is forked from the most recently open-sourced version of `ld`. Without a few optimizations around hashing, it would produce byte-for-byte the same executables as the open-source one. Although it's not ideal to mix compiler and linker toolchain versions, and the open-source one is a bit old (Xcode 10.2), this has been tested to work on Swift 5 projects. There's no obvious reason why it shouldn't. The linker, after all, is fairly language-agnostic. `zld` will be updated with more recent versions of the linker as Apple open-sources them.
