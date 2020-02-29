@@ -59,6 +59,7 @@ Whether you use this project or not, there are a number of things that can speed
 
 - The linker flag `-Wl,-no_uuid`, which disables UUID creation
 - Turning off dead stripping (referred to as "Dead Code Stripping" in Xcode build settings)
+- For executables and xctest bundles, disable dyld exports trie creation with `-Wl,-exported_symbols_list,/dev/null` (cannot be when xctests that call into their test host app)
 - If you're not using `zld`, using `-Wl,-force_load` for libraries can sometimes speed things up
 - Linking with dynamic libraries instead of static ones
 
