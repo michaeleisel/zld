@@ -61,7 +61,7 @@ Whether you use this project or not, there are a number of things that can speed
 - Turning off dead stripping (referred to as "Dead Code Stripping" in Xcode build settings)
 - For executables and xctest bundles, disable dyld exports trie creation with `-Wl,-exported_symbols_list,/dev/null` (cannot be used by test host apps that provide symbols to xctests)
 - `-Wl,-no_deduplicate`, which disables the deduplication pass. In Xcode, this flag is added by default for Debug builds.
-- `-Wl,-no_compact_unwind`, which disables the creation of compact unwind info. Note that Objective-C and C++ functions that have been linked without their compact unwind info can crash if an exception unwinds into them, rather than continuing the unwind. It can also break crash reporting.
+- `-Wl,-no_compact_unwind`, which disables the creation of compact unwind info. Note that Objective-C and C++ functions that have been linked without their compact unwind info can crash if an exception unwinds into them, rather than continuing the unwind. Swift functions, however, are not affected (even if an Objective-C/C++ exception unwinds into them). So, it's best for pure Swift projects. It can also break crash reporting.
 - If you're not using `zld`, using `-Wl,-force_load` for libraries can sometimes speed things up
 - Linking with dynamic libraries instead of static ones
 
