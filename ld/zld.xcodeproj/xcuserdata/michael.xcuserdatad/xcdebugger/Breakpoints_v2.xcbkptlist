@@ -20,5 +20,161 @@
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "86262EFB-43B2-432C-AA0E-6D7F97CB2F40"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "src/ld/LinkEdit.hpp"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1252"
+            endingLineNumber = "1252"
+            landmarkName = "encode()"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  uuid = "86262EFB-43B2-432C-AA0E-6D7F97CB2F40 - 3b204d1df075095d"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ld::tool::ExportInfoAtom&lt;x86&gt;::encode() const"
+                  moduleName = "zld"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/michael/projects/zld/ld/src/ld/LinkEdit.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1252"
+                  endingLineNumber = "1252"
+                  offsetFromSymbolStart = "33">
+               </Location>
+               <Location
+                  uuid = "86262EFB-43B2-432C-AA0E-6D7F97CB2F40 - 6a6cb141aef982a9"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ld::tool::ExportInfoAtom&lt;x86_64&gt;::encode() const"
+                  moduleName = "zld"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/michael/projects/zld/ld/src/ld/LinkEdit.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1252"
+                  endingLineNumber = "1252"
+                  offsetFromSymbolStart = "33">
+               </Location>
+               <Location
+                  uuid = "86262EFB-43B2-432C-AA0E-6D7F97CB2F40 - 8128fe7f761f4737"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ld::tool::ExportInfoAtom&lt;arm&gt;::encode() const"
+                  moduleName = "zld"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/michael/projects/zld/ld/src/ld/LinkEdit.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1252"
+                  endingLineNumber = "1252"
+                  offsetFromSymbolStart = "33">
+               </Location>
+               <Location
+                  uuid = "86262EFB-43B2-432C-AA0E-6D7F97CB2F40 - f49a8bee2dce9a3"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ld::tool::ExportInfoAtom&lt;arm64&gt;::encode() const"
+                  moduleName = "zld"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/michael/projects/zld/ld/src/ld/LinkEdit.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1252"
+                  endingLineNumber = "1252"
+                  offsetFromSymbolStart = "33">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "90D07AE1-5D61-47D6-90BA-8CF55B38A1DD"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "src/ld/LinkEdit.hpp"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1256"
+            endingLineNumber = "1256"
+            landmarkName = "encode()"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  uuid = "90D07AE1-5D61-47D6-90BA-8CF55B38A1DD - 3b204d1df075095d"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ld::tool::ExportInfoAtom&lt;x86&gt;::encode() const"
+                  moduleName = "zld"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/michael/projects/zld/ld/src/ld/LinkEdit.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1256"
+                  endingLineNumber = "1256"
+                  offsetFromSymbolStart = "111">
+               </Location>
+               <Location
+                  uuid = "90D07AE1-5D61-47D6-90BA-8CF55B38A1DD - 6a6cb141aef982a9"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ld::tool::ExportInfoAtom&lt;x86_64&gt;::encode() const"
+                  moduleName = "zld"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/michael/projects/zld/ld/src/ld/LinkEdit.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1256"
+                  endingLineNumber = "1256"
+                  offsetFromSymbolStart = "111">
+               </Location>
+               <Location
+                  uuid = "90D07AE1-5D61-47D6-90BA-8CF55B38A1DD - 8128fe7f761f4737"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ld::tool::ExportInfoAtom&lt;arm&gt;::encode() const"
+                  moduleName = "zld"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/michael/projects/zld/ld/src/ld/LinkEdit.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1256"
+                  endingLineNumber = "1256"
+                  offsetFromSymbolStart = "111">
+               </Location>
+               <Location
+                  uuid = "90D07AE1-5D61-47D6-90BA-8CF55B38A1DD - f49a8bee2dce9a3"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ld::tool::ExportInfoAtom&lt;arm64&gt;::encode() const"
+                  moduleName = "zld"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/michael/projects/zld/ld/src/ld/LinkEdit.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1256"
+                  endingLineNumber = "1256"
+                  offsetFromSymbolStart = "111">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
    </Breakpoints>
 </Bucket>

@@ -1526,6 +1526,7 @@
 				LIBRARY_SEARCH_PATHS = /Users/michael/projects/examples/build/;
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "-DNDEBUG";
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
 					"-Wl,-t",
