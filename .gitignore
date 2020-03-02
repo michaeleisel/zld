@@ -1,9 +1,11 @@
-**/.DS_Store
-cfe-7.0.1.src/
-dyld-635.2/
-llvm-7.0.1.src/
-tapi-master/
-*.xcscheme
-tmp/
+/abseil-cpp-20200225/
+/cfe-7.0.1.src/
+/dyld-635.2/
+/llvm-7.0.1.src/
+/pstl/
+/tapi-b920569/
+/tbb/
 
+.DS_Store
+*.xcscheme
 xcuserdata/
