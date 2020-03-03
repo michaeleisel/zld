@@ -1,6 +1,12 @@
 
 abseil-cpp-20200225:
 	curl -# -L https://github.com/abseil/abseil-cpp/archive/20200225.tar.gz | tar xz
+	cd abseil-cpp-20200225
+	mkdir build
+	cd build
+	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 ..
+	make -j
+	find absl -name '*.a' | xargs libtool -static -o libabsl.a
 
 cfe-7.0.1.src:
 	curl -# http://releases.llvm.org/7.0.1/cfe-7.0.1.src.tar.xz | tar xJ
