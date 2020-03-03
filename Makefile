@@ -1,18 +1,19 @@
 
+build: fetch
+	xcodebuild -project ld/zld.xcodeproj -scheme zld -derivedDataPath build -configuration Release build
+
 abseil-cpp-20200225:
 	curl -# -L https://github.com/abseil/abseil-cpp/archive/20200225.tar.gz | tar xz
-	cd abseil-cpp-20200225
-	mkdir build
-	cd build
-	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 ..
-	make -j
-	find absl -name '*.a' | xargs libtool -static -o libabsl.a
+	mkdir $@/build
+	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -S $@ -B $@/build
+	make -C $@/build -j
+	find $@/build/absl -name '*.a' | xargs libtool -static -o $@/build/libabsl.a
 
 cfe-7.0.1.src:
 	curl -# http://releases.llvm.org/7.0.1/cfe-7.0.1.src.tar.xz | tar xJ
 
 clean:
-	rm -rf abseil-cpp-20200225 cfe-7.0.1.src dyld-635.2 llvm-7.0.1.src pstl tapi-b920569 tbb
+	rm -rf abseil-cpp-20200225 build cfe-7.0.1.src dyld-635.2 llvm-7.0.1.src pstl tapi-b920569 tbb
 
 dyld-635.2:
 	curl -# https://opensource.apple.com/tarballs/dyld/dyld-635.2.tar.gz | tar xz
