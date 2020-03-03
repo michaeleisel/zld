@@ -44,15 +44,14 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		4C8D9C8D2405818C0040CE7C /* libtbb.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8D9C8C2405818C0040CE7C /* libtbb.dylib */; };
-		4C8D9C90240581900040CE7C /* libtbbmalloc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8D9C8F240581900040CE7C /* libtbbmalloc.dylib */; };
+		418D3B4C240DD305000B9934 /* libtbb.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 418D3B49240DD2EE000B9934 /* libtbb.dylib */; };
+		418D3B4D240DD305000B9934 /* libtbbmalloc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 418D3B48240DD2EE000B9934 /* libtbbmalloc.dylib */; };
 		4C8D9C93240587690040CE7C /* libswiftDemangle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C223473240432CC007B3ADE /* libswiftDemangle.dylib */; };
 		4C8D9C95240587690040CE7C /* libtapi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C223475240432CC007B3ADE /* libtapi.dylib */; };
 		4C8D9C99240587690040CE7C /* libLTO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8D9C98240587690040CE7C /* libLTO.dylib */; };
 		4C8D9C9B240597220040CE7C /* Tweaks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */; };
 		4C8D9C9E2405978D0040CE7C /* libhash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C902D6E23FD979F0006EBAC /* libhash.a */; };
 		4C8D9CA0240597C10040CE7C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8D9C9F240597C10040CE7C /* Foundation.framework */; };
-		4C902D6F23FD979F0006EBAC /* libhash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C902D6E23FD979F0006EBAC /* libhash.a */; };
 		4CDA2DA923FDD2CB00C6009D /* Tweaks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */; };
 		83046A851C8FF2F700024A7E /* objcimageinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83046A841C8FF2D000024A7E /* objcimageinfo.cpp */; };
 		B028FCF21A9E7C3F00E3584B /* bitcode_bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B028FCF11A9E7C3F00E3584B /* bitcode_bundle.cpp */; };
@@ -263,6 +262,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		418D3B48240DD2EE000B9934 /* libtbbmalloc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbbmalloc.dylib; path = ../tbb/lib/libtbbmalloc.dylib; sourceTree = "<group>"; };
+		418D3B49240DD2EE000B9934 /* libtbb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbb.dylib; path = ../tbb/lib/libtbb.dylib; sourceTree = "<group>"; };
+		418D3B4E240DD31E000B9934 /* libabsl_hash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libabsl_hash.a; path = "../abseil-cpp-20200225/build/absl/hash/libabsl_hash.a"; sourceTree = "<group>"; };
+		418D3B50240DD55E000B9934 /* libabsl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libabsl.a; path = "../abseil-cpp-20200225/build/libabsl.a"; sourceTree = "<group>"; };
 		4C22346F240431C2007B3ADE /* libtbb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbb.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbb.dylib; sourceTree = "<group>"; };
 		4C223470240431C2007B3ADE /* libtbbmalloc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbbmalloc.dylib; path = ../../tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release/libtbbmalloc.dylib; sourceTree = "<group>"; };
 		4C223473240432CC007B3ADE /* libswiftDemangle.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libswiftDemangle.dylib; path = Toolchains/XcodeDefault.xctoolchain/usr/lib/libswiftDemangle.dylib; sourceTree = DEVELOPER_DIR; };
@@ -407,12 +410,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4C8D9C90240581900040CE7C /* libtbbmalloc.dylib in Frameworks */,
+				418D3B4C240DD305000B9934 /* libtbb.dylib in Frameworks */,
+				418D3B4D240DD305000B9934 /* libtbbmalloc.dylib in Frameworks */,
 				4C8D9C93240587690040CE7C /* libswiftDemangle.dylib in Frameworks */,
 				4C8D9C99240587690040CE7C /* libLTO.dylib in Frameworks */,
 				4C8D9C95240587690040CE7C /* libtapi.dylib in Frameworks */,
-				4C902D6F23FD979F0006EBAC /* libhash.a in Frameworks */,
-				4C8D9C8D2405818C0040CE7C /* libtbb.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -459,6 +461,10 @@
 		4CF05E8D23EB005B009C0C95 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				418D3B50240DD55E000B9934 /* libabsl.a */,
+				418D3B4E240DD31E000B9934 /* libabsl_hash.a */,
+				418D3B49240DD2EE000B9934 /* libtbb.dylib */,
+				418D3B48240DD2EE000B9934 /* libtbbmalloc.dylib */,
 				4C8D9C9F240597C10040CE7C /* Foundation.framework */,
 				4C8D9C98240587690040CE7C /* libLTO.dylib */,
 				4C8D9C8F240581900040CE7C /* libtbbmalloc.dylib */,
@@ -836,7 +842,7 @@
 				ORGANIZATIONNAME = "Apple Inc.";
 				TargetAttributes = {
 					F9023C3806D5A23E001BBF46 = {
-						DevelopmentTeam = LE4EC4296K;
+						DevelopmentTeam = 5F83KRY2FH;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -1247,7 +1253,7 @@
 				CURRENT_PROJECT_VERSION = "$(RC_ProjectSourceVersion)";
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = LE4EC4296K;
+				DEVELOPMENT_TEAM = 5F83KRY2FH;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
@@ -1280,17 +1286,24 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(DT_TOOLCHAIN_DIR)/usr/local/include",
+					"$(TOOLCHAIN_DIR)/usr/local/include",
+					"$(SRCROOT)/../tapi-b920569/include",
+					"$(SRCROOT)/../dyld-635.2/include",
+					"$(SRCROOT)/../llvm-7.0.1.src/include",
+					"$(SRCROOT)/../cfe-7.0.1.src/include",
+					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/../pstl/include",
+					"$(SRCROOT)/../pstl/stdlib",
+					"$(SRCROOT)/../tbb/include",
+				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					/Users/michael/projects/jemalloc/lib,
-					/Users/michael/projects/examples/build,
 					"$(SDKROOT)/usr/lib/system",
-					/usr/lib/system,
-					/Users/michael/projects/rpmalloc/lib/macos/release,
-					/Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release,
-					/Users/michael/projects/zld/lib,
+					"$(SRCROOT)/../tbb/lib",
 				);
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
 				LLVM_LTO = NO;
@@ -1306,6 +1319,7 @@
 					"-ltapi",
 					"-Wl,-stack_size,0x10000000",
 					"-Wl,-all_load",
+					"$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
 				);
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
@@ -1333,7 +1347,7 @@
 				CURRENT_PROJECT_VERSION = "$(RC_ProjectSourceVersion)";
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = LE4EC4296K;
+				DEVELOPMENT_TEAM = 5F83KRY2FH;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
@@ -1370,17 +1384,24 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(DT_TOOLCHAIN_DIR)/usr/local/include",
+					"$(TOOLCHAIN_DIR)/usr/local/include",
+					"$(SRCROOT)/../tapi-b920569/include",
+					"$(SRCROOT)/../dyld-635.2/include",
+					"$(SRCROOT)/../llvm-7.0.1.src/include",
+					"$(SRCROOT)/../cfe-7.0.1.src/include",
+					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/../pstl/include",
+					"$(SRCROOT)/../pstl/stdlib",
+					"$(SRCROOT)/../tbb/include",
+				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					/Users/michael/projects/jemalloc/lib,
-					/Users/michael/projects/examples/build,
 					"$(SDKROOT)/usr/lib/system",
-					/usr/lib/system,
-					/Users/michael/projects/rpmalloc/lib/macos/release,
-					/Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release,
-					/Users/michael/projects/zld/lib,
+					"$(SRCROOT)/../tbb/lib",
 				);
 				LLVM_LTO = NO;
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
@@ -1394,6 +1415,7 @@
 					"-ltapi",
 					"-Wl,-stack_size,0x01000000",
 					"-Wl,-all_load",
+					"$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
 				);
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
@@ -1511,19 +1533,12 @@
 				HEADER_SEARCH_PATHS = (
 					"$(DT_TOOLCHAIN_DIR)/usr/local/include",
 					"$(TOOLCHAIN_DIR)/usr/local/include",
-					"$(SRCROOT)/../tapi-master/include",
+					"$(SRCROOT)/../tapi-b920569/include",
 					"$(SRCROOT)/../dyld-635.2/include",
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
-					/usr/local/include,
-					/Users/michael/projects/zld/ld/src/ld,
-					/Users/michael/projects/parallelstl/stdlib,
-					/Users/michael/projects/parallelstl/include,
-					/Users/michael/projects/tbb/include,
-					"/Users/michael/projects/array-hash/include",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
-				LIBRARY_SEARCH_PATHS = /Users/michael/projects/examples/build/;
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
@@ -1566,19 +1581,12 @@
 				HEADER_SEARCH_PATHS = (
 					"$(DT_TOOLCHAIN_DIR)/usr/local/include",
 					"$(TOOLCHAIN_DIR)/usr/local/include",
-					"$(SRCROOT)/../tapi-master/include",
+					"$(SRCROOT)/../tapi-b920569/include",
 					"$(SRCROOT)/../dyld-635.2/include",
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
-					/usr/local/include,
-					/Users/michael/projects/zld/ld/src/ld,
-					/Users/michael/projects/parallelstl/stdlib,
-					/Users/michael/projects/parallelstl/include,
-					/Users/michael/projects/tbb/include,
-					"/Users/michael/projects/array-hash/include",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
-				LIBRARY_SEARCH_PATHS = /Users/michael/projects/examples/build/;
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
@@ -1638,19 +1646,12 @@
 				HEADER_SEARCH_PATHS = (
 					"$(DT_TOOLCHAIN_DIR)/usr/local/include",
 					"$(TOOLCHAIN_DIR)/usr/local/include",
-					"$(SRCROOT)/../tapi-master/include",
+					"$(SRCROOT)/../tapi-b920569/include",
 					"$(SRCROOT)/../dyld-635.2/include",
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
-					/usr/local/include,
-					/Users/michael/projects/zld/ld/src/ld,
-					/Users/michael/projects/parallelstl/stdlib,
-					/Users/michael/projects/parallelstl/include,
-					/Users/michael/projects/tbb/include,
-					"/Users/michael/projects/array-hash/include",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
-				LIBRARY_SEARCH_PATHS = /Users/michael/projects/examples/build/;
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_CFLAGS = "-DREPRO";
 				OTHER_LDFLAGS = (
@@ -1688,7 +1689,7 @@
 				CURRENT_PROJECT_VERSION = "$(RC_ProjectSourceVersion)";
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = LE4EC4296K;
+				DEVELOPMENT_TEAM = 5F83KRY2FH;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
@@ -1724,17 +1725,24 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(DT_TOOLCHAIN_DIR)/usr/local/include",
+					"$(TOOLCHAIN_DIR)/usr/local/include",
+					"$(SRCROOT)/../tapi-b920569/include",
+					"$(SRCROOT)/../dyld-635.2/include",
+					"$(SRCROOT)/../llvm-7.0.1.src/include",
+					"$(SRCROOT)/../cfe-7.0.1.src/include",
+					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/../pstl/include",
+					"$(SRCROOT)/../pstl/stdlib",
+					"$(SRCROOT)/../tbb/include",
+				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					/Users/michael/projects/jemalloc/lib,
-					/Users/michael/projects/examples/build,
 					"$(SDKROOT)/usr/lib/system",
-					/usr/lib/system,
-					/Users/michael/projects/rpmalloc/lib/macos/release,
-					/Users/michael/projects/tbb/build/macos_intel64_clang_cc11.0.0_os10.14.4_release,
-					/Users/michael/projects/zld/lib,
+					"$(SRCROOT)/../tbb/lib",
 				);
 				LLVM_LTO = NO;
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
@@ -1747,6 +1755,7 @@
 					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
 					"-ltapi",
 					"-Wl,-all_load",
+					"$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
 				);
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
