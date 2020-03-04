@@ -1,4 +1,5 @@
-dir = "/Users/michael/Library/Developer/Xcode/DerivedData/zld-bjskpeidtiujmgcpwkcpcjfjafhe/Build/Products"
+Dir.chdir(__dir__)
+dir = "../build/Build/Products"
 files = `ls #{dir}/Release/*`.split("\n").select { |file| File.file?(file) }
 
 Dir.chdir("#{__dir__}/../ld")#/unit-tests")
