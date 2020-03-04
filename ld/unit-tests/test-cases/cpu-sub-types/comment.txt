@@ -1,2 +1,0 @@
-The point of this test is validate cpu subtypes processsing for PowerPC
-

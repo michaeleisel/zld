@@ -34,8 +34,8 @@ ifdef BUILT_PRODUCTS_DIR
 else
 	ifneq "$(findstring /unit-tests/test-cases/, $(shell pwd))" ""
 		# if run from Terminal inside unit-test directory
-		RELEASEADIR=$(shell cd ../../../build/Release-assert;pwd)
-		DEBUGDIR=$(shell cd ../../../build/Debug;pwd)
+		RELEASEADIR=$(shell cd ../../../build/Build/Products/Release;pwd)
+		DEBUGDIR=$(shell cd ../../../build/Build/Products/Release;pwd)
 		PATH := ${RELEASEADIR}:${RELEASEDIR}:${DEBUGDIR}:${MYDIR}:${PATH}
 		COMPILER_PATH := ${RELEASEADIR}:${RELEASEDIR}:${DEBUGDIR}:${COMPILER_PATH}
 		LD_PATH     	= ${DEBUGDIR}
