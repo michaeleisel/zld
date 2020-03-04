@@ -56,7 +56,7 @@ export COMPILER_PATH
 export GCC_EXEC_PREFIX=garbage
 
 IOS_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk
-OSX_SDK = /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk
+OSX_SDK = /var/db/xcode_select_link/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 ifeq ($(ARCH),ppc)
 	OSX_SDK = /Developer/SDKs/MacOSX10.6.sdk
 endif
