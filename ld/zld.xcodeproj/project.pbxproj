@@ -1264,7 +1264,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(SDKROOT)/usr/lib/system",
-					"$(SRCROOT)/../tbb/lib",
 				);
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
 				LLVM_LTO = NO;
@@ -1363,7 +1362,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(SDKROOT)/usr/lib/system",
-					"$(SRCROOT)/../tbb/lib",
 				);
 				LLVM_LTO = NO;
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
@@ -1705,7 +1703,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(SDKROOT)/usr/lib/system",
-					"$(SRCROOT)/../tbb/lib",
 				);
 				LLVM_LTO = NO;
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
