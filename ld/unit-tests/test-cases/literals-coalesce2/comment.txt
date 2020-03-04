@@ -1,1 +1,0 @@
-The point of this test is to verify that literals are uniqued.  After running ld -r all duplicates should be removed.

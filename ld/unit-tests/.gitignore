@@ -14,3 +14,4 @@
 *.macho
 *.preload
 *.lib
+test-cases

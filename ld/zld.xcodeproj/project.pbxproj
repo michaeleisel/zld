@@ -1262,7 +1262,6 @@
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)",
 					"$(SDKROOT)/usr/lib/system",
 				);
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
@@ -1278,8 +1277,6 @@
 					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
 					"-ltapi",
 					"-Wl,-stack_size,0x10000000",
-					"-Wl,-all_load",
-					"$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
 				);
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
@@ -1360,7 +1357,6 @@
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)",
 					"$(SDKROOT)/usr/lib/system",
 				);
 				LLVM_LTO = NO;
@@ -1374,8 +1370,6 @@
 					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
 					"-ltapi",
 					"-Wl,-stack_size,0x01000000",
-					"-Wl,-all_load",
-					"$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
 				);
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
@@ -1418,6 +1412,7 @@
 					"$(OTHER_CFLAGS)",
 				);
 				OTHER_LDFLAGS = (
+					"$(inherited)",
 					"-stdlib=libc++",
 					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
 				);
@@ -1450,6 +1445,7 @@
 					"$(OTHER_CFLAGS)",
 				);
 				OTHER_LDFLAGS = (
+					"$(inherited)",
 					"-stdlib=libc++",
 					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
 				);
@@ -1497,8 +1493,11 @@
 					"$(SRCROOT)/../dyld-635.2/include",
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
+					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/src/ld",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
@@ -1507,6 +1506,8 @@
 					"-Wl,-U,_fnd_get_demangled_name",
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
+					"-Wl,-all_load",
+					"-Wl,$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
 				);
 				SDKROOT = macosx;
 			};
@@ -1545,8 +1546,11 @@
 					"$(SRCROOT)/../dyld-635.2/include",
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
+					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/src/ld",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
@@ -1554,6 +1558,8 @@
 					"-Wl,-U,_fnd_get_demangled_name",
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
+					"-Wl,-all_load",
+					"-Wl,$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
 				);
 				SDKROOT = macosx;
 			};
@@ -1610,8 +1616,11 @@
 					"$(SRCROOT)/../dyld-635.2/include",
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
+					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/src/ld",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_CFLAGS = "-DREPRO";
 				OTHER_LDFLAGS = (
@@ -1620,6 +1629,8 @@
 					"-Wl,-U,_fnd_get_demangled_name",
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
+					"-Wl,-all_load",
+					"-Wl,$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
 				);
 				SDKROOT = macosx;
 			};
@@ -1701,7 +1712,6 @@
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)",
 					"$(SDKROOT)/usr/lib/system",
 				);
 				LLVM_LTO = NO;
@@ -1714,8 +1724,6 @@
 					"-Wl,-exported_symbol,__mh_execute_header",
 					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
 					"-ltapi",
-					"-Wl,-all_load",
-					"$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
 				);
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
@@ -1795,6 +1803,7 @@
 					"$(OTHER_CFLAGS)",
 				);
 				OTHER_LDFLAGS = (
+					"$(inherited)",
 					"-stdlib=libc++",
 					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
 				);

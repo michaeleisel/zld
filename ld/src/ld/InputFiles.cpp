@@ -1282,7 +1282,9 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 				break;
 		}
 		try {
-			file->forEachAtom(handler);
+			if (file->type() != ld::File::Archive) {
+    			file->forEachAtom(handler);
+			}
 		}
 		catch (const char* msg) {
 			asprintf((char**)&_exception, "%s file '%s'", msg, file->path());
@@ -1298,11 +1300,20 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 	addLinkerOptionLibraries(state, handler);
 	createIndirectDylibs();
 	createOpaqueFileSections();
-	
+
 	while (fileIndex < _inputFiles.size()) {
 		ld::File *file = _inputFiles[fileIndex];
-		file->forEachAtom(handler);
+		if (file->type() != ld::File::Archive) {
+    		file->forEachAtom(handler);
+		}
 		fileIndex++;
+	}
+
+	preParseLibraries();
+	for (auto &file : _inputFiles) {
+		if (file->type() == ld::File::Archive) {
+			file->forEachAtom(handler);
+		}
 	}
     
     switch ( _options.outputKind() ) {

@@ -1,1 +1,0 @@
-The point of this test that -dead_strip removes unreference code/data from archives

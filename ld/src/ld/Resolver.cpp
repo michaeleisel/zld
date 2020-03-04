@@ -880,7 +880,6 @@ void Resolver::addInitialUndefines()
 
 void Resolver::resolveUndefines()
 {
-	_inputFiles.preParseLibraries();
 	// keep looping until no more undefines were added in last loop
 	unsigned int undefineGenCount = 0xFFFFFFFF;
 	while ( undefineGenCount != _symbolTable.updateCount() ) {

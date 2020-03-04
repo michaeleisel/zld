@@ -1,1 +1,0 @@
-The point of this test is to verify an Objective-C object file is parsed to find the proper class references

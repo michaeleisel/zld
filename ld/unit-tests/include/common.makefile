@@ -34,8 +34,8 @@ ifdef BUILT_PRODUCTS_DIR
 else
 	ifneq "$(findstring /unit-tests/test-cases/, $(shell pwd))" ""
 		# if run from Terminal inside unit-test directory
-		RELEASEADIR=$(shell cd ../../../build/Release-assert;pwd)
-		DEBUGDIR=$(shell cd ../../../build/Debug;pwd)
+		RELEASEADIR=$(shell cd ../../../build/Build/Products/Release;pwd)
+		DEBUGDIR=$(shell cd ../../../build/Build/Products/Release;pwd)
 		PATH := ${RELEASEADIR}:${RELEASEDIR}:${DEBUGDIR}:${MYDIR}:${PATH}
 		COMPILER_PATH := ${RELEASEADIR}:${RELEASEDIR}:${DEBUGDIR}:${COMPILER_PATH}
 		LD_PATH     	= ${DEBUGDIR}
@@ -56,7 +56,7 @@ export COMPILER_PATH
 export GCC_EXEC_PREFIX=garbage
 
 IOS_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk
-OSX_SDK = /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk
+OSX_SDK = /var/db/xcode_select_link/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 ifeq ($(ARCH),ppc)
 	OSX_SDK = /Developer/SDKs/MacOSX10.6.sdk
 endif
