@@ -46,6 +46,7 @@
 /* Begin PBXBuildFile section */
 		418D3B4C240DD305000B9934 /* libtbb.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 418D3B49240DD2EE000B9934 /* libtbb.dylib */; };
 		418D3B4D240DD305000B9934 /* libtbbmalloc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 418D3B48240DD2EE000B9934 /* libtbbmalloc.dylib */; };
+		41F71C50240F5814006DCEF9 /* libswiftDemangle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41F71C4F240F5814006DCEF9 /* libswiftDemangle.dylib */; };
 		4C8D9C99240587690040CE7C /* libLTO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8D9C98240587690040CE7C /* libLTO.dylib */; };
 		4C8D9C9B240597220040CE7C /* Tweaks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */; };
 		4C8D9CA0240597C10040CE7C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8D9C9F240597C10040CE7C /* Foundation.framework */; };
@@ -261,6 +262,7 @@
 /* Begin PBXFileReference section */
 		418D3B48240DD2EE000B9934 /* libtbbmalloc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbbmalloc.dylib; path = ../tbb/lib/libtbbmalloc.dylib; sourceTree = "<group>"; };
 		418D3B49240DD2EE000B9934 /* libtbb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbb.dylib; path = ../tbb/lib/libtbb.dylib; sourceTree = "<group>"; };
+		41F71C4F240F5814006DCEF9 /* libswiftDemangle.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libswiftDemangle.dylib; path = Toolchains/XcodeDefault.xctoolchain/usr/lib/libswiftDemangle.dylib; sourceTree = DEVELOPER_DIR; };
 		4C47258B23FD9E3C00AA02B2 /* MapDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapDefines.h; sourceTree = "<group>"; };
 		4C5E360723FB61D50073E2F5 /* configure.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = configure.h; sourceTree = "<group>"; };
 		4C5E360823FB61DC0073E2F5 /* compile_stubs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = compile_stubs.h; sourceTree = "<group>"; };
@@ -394,6 +396,7 @@
 				418D3B4C240DD305000B9934 /* libtbb.dylib in Frameworks */,
 				418D3B4D240DD305000B9934 /* libtbbmalloc.dylib in Frameworks */,
 				4C8D9C99240587690040CE7C /* libLTO.dylib in Frameworks */,
+				41F71C50240F5814006DCEF9 /* libswiftDemangle.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -439,6 +442,7 @@
 		4CF05E8D23EB005B009C0C95 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				41F71C4F240F5814006DCEF9 /* libswiftDemangle.dylib */,
 				418D3B49240DD2EE000B9934 /* libtbb.dylib */,
 				418D3B48240DD2EE000B9934 /* libtbbmalloc.dylib */,
 				4C8D9C9F240597C10040CE7C /* Foundation.framework */,
