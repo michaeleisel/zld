@@ -101,6 +101,7 @@ private:
 	static bool										validLTOFile(const uint8_t* fileContent, uint64_t fileLength, 
 																	const mach_o::relocatable::ParserOptions& opts);
 	static cpu_type_t								architecture();
+	bool										    hasSwift() const;
 
 	class Entry : ar_hdr
 	{
@@ -467,7 +468,7 @@ template <typename A>
 bool File<A>::forEachAtom(ld::File::AtomHandler& handler) const
 {
 	bool didSome = false;
-	if ( _forceLoadAll || _forceLoadThis ) {
+	if ( _forceLoadAll || _forceLoadThis || hasSwift() ) {
 		// call handler on all .o files in this archive
 		const Entry* const start = (Entry*)&_archiveFileContent[8];
 		const Entry* const end = (Entry*)&_archiveFileContent[_archiveFilelength];
@@ -534,6 +535,17 @@ bool File<A>::forEachAtom(ld::File::AtomHandler& handler) const
 		}
 	}
 	return didSome;
+}
+
+template <typename A>
+bool File<A>::hasSwift() const {
+	for (const auto& entry : _hashTable) {
+		if ( (strncmp(entry.first, "$s", 2) == 0) || (strncmp(entry.first, "_$s", 3) == 0) ) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 template <typename A>
