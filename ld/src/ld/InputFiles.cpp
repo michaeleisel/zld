@@ -1244,6 +1244,10 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 #else
 		file = _inputFiles[fileIndex];
 #endif
+	}
+	preParseLibraries(_inputFiles);
+	for (fileIndex=0; fileIndex<_inputFiles.size(); fileIndex++) {
+		const auto file = _inputFiles[fileIndex];
 		const Options::FileInfo& info = files[fileIndex];
 		switch (file->type()) {
 			case ld::File::Reloc:
@@ -1282,9 +1286,7 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 				break;
 		}
 		try {
-			if (file->type() != ld::File::Archive) {
-    			file->forEachAtom(handler);
-			}
+			file->forEachAtom(handler);
 		}
 		catch (const char* msg) {
 			asprintf((char**)&_exception, "%s file '%s'", msg, file->path());
@@ -1303,19 +1305,10 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 
 	while (fileIndex < _inputFiles.size()) {
 		ld::File *file = _inputFiles[fileIndex];
-		if (file->type() != ld::File::Archive) {
-    		file->forEachAtom(handler);
-		}
+		file->forEachAtom(handler);
 		fileIndex++;
 	}
 
-	preParseLibraries();
-	for (auto &file : _inputFiles) {
-		if (file->type() == ld::File::Archive) {
-			file->forEachAtom(handler);
-		}
-	}
-    
     switch ( _options.outputKind() ) {
         case Options::kStaticExecutable:
         case Options::kDynamicExecutable:
@@ -1360,7 +1353,7 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 }
 
 
-void InputFiles::preParseLibraries() const {
+void InputFiles::preParseLibraries(const std::vector<ld::File *>& files) const {
 	std::string line;
 	std::ifstream infile(_options.cacheFilePath());
 	LDSet<std::string> currentSet;
@@ -1392,27 +1385,20 @@ void InputFiles::preParseLibraries() const {
 	}
 	queue.maxConcurrentOperationCount = ncpus;
 
-    for (std::vector<LibraryInfo>::const_iterator it=_searchLibraries.begin(); it != _searchLibraries.end(); ++it) {
-		auto lib = *it;
-		if (lib.isDylib()) {
-			auto dylib = lib.dylib();
-			auto it = map.find(dylib->path());
-			if (it == map.end()) {
-				continue;
-			}
-			//dylib->insertFilesToLoad();
-		} else {
-			auto archiveFile = lib.archive();
-			auto it = map.find(archiveFile->path());
-			if (it == map.end()) {
-				continue;
-			}
-			auto members = archiveFile->membersToParse(it->second);
-			for (auto member : members) {
-				[queue addOperationWithBlock:^{
-    				archiveFile->parseMember(member);
-				}];
-			}
+	for (const auto &file : files) {
+		if (file->type() != ld::File::Archive) {
+			continue;
+		}
+		ld::archive::File* archiveFile = (ld::archive::File*)file;
+		auto it = map.find(archiveFile->path());
+		if (it == map.end()) {
+			continue;
+		}
+		auto members = archiveFile->membersToParse(it->second);
+		for (auto member : members) {
+			[queue addOperationWithBlock:^{
+				archiveFile->parseMember(member);
+			}];
 		}
 	}
 	[queue waitUntilAllOperationsAreFinished];

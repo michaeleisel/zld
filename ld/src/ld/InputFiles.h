@@ -64,7 +64,7 @@ public:
 	
 	// iterates all atoms in initial files
 	void						forEachInitialAtom(ld::File::AtomHandler&, ld::Internal& state);
-	void preParseLibraries() const;
+	void preParseLibraries(const std::vector<ld::File *>& files) const;
 	// searches libraries for name
 	void dumpMembersParsed(std::ofstream &stream) const;
 	bool						searchLibraries(const char* name, bool searchDylibs, bool searchArchives,  
