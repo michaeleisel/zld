@@ -3857,6 +3857,10 @@ void Options::parse(int argc, const char* argv[])
 			else if (strcmp(arg, "-debug_variant") == 0) {
 			    fDebugVariant = true;
             }
+			else if (strcmp(arg, "-platform_version") == 0) {
+				i += 3;
+				// no-op until we understand exactly what this flag does
+			}
 			else if (strcmp(arg, "-no_new_main") == 0) {
 				// HACK until 39514191 is fixed
 			}
