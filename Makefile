@@ -10,19 +10,24 @@ abseil-cpp-20200225:
 	find $@/build/absl -name '*.a' | xargs libtool -static -o $@/build/libabsl.a
 
 cfe-7.0.1.src:
-	curl -# http://releases.llvm.org/7.0.1/cfe-7.0.1.src.tar.xz | tar xJ
+	curl -# -L http://releases.llvm.org/7.0.1/cfe-7.0.1.src.tar.xz | tar xJ
 
 clean:
 	rm -rf abseil-cpp-20200225 build cfe-7.0.1.src dyld-635.2 llvm-7.0.1.src pstl tapi-b920569 tbb
 
 dyld-635.2:
-	curl -# https://opensource.apple.com/tarballs/dyld/dyld-635.2.tar.gz | tar xz
+	curl -# -L https://opensource.apple.com/tarballs/dyld/dyld-635.2.tar.gz | tar xz
 	patch -p1 -d dyld-635.2 < patches/dyld.patch
 
 fetch: abseil-cpp-20200225 cfe-7.0.1.src dyld-635.2 llvm-7.0.1.src tapi-b920569 tbb
 
 llvm-7.0.1.src:
-	curl -# http://releases.llvm.org/7.0.1/llvm-7.0.1.src.tar.xz | tar xJ
+	curl -# -L http://releases.llvm.org/7.0.1/llvm-7.0.1.src.tar.xz | tar xJ
+
+HASH := $(shell git rev-parse --short HEAD)
+package:
+	tar -C build/Build/Products/Release -cvJf build/Build/Products/Release/zld.$(HASH).tar.xz zld
+	tar -C build/Build/Products/Release -cvJf build/Build/Products/Release/zld.dSYM.$(HASH).tar.xz zld.dSYM
 
 tapi-b920569:
 	mkdir -p $@
