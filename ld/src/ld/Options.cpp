@@ -3858,8 +3858,16 @@ void Options::parse(int argc, const char* argv[])
 			    fDebugVariant = true;
             }
 			else if (strcmp(arg, "-platform_version") == 0) {
-				i += 3;
-				// no-op until we understand exactly what this flag does
+				// https://reviews.llvm.org/D71579
+				const char* platformStr = checkForNullVersionArgument(arg, argv[++i]);
+				const char* minVersion = checkForNullVersionArgument(arg, argv[++i]);
+				const char* sdkVersion = checkForNullVersionArgument(arg, argv[++i]);
+				fSDKVersion = parseVersionNumber32(sdkVersion);
+				ld::Platform platform = ld::platformFromString(platformStr);
+				if (platform == ld::kPlatform_unknown) {
+					throwf("unknown platform: %s", platformStr);
+				}
+				setVersionMin(platform, minVersion);
 			}
 			else if (strcmp(arg, "-no_new_main") == 0) {
 				// HACK until 39514191 is fixed
