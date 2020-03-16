@@ -23,8 +23,12 @@
  */
 
 
+#ifndef NDEBUG
+#define NDEBUG
 #include "pstl/execution"
 #include "pstl/algorithm"
+#undef NDEBUG
+#endif
 #include <stdint.h>
 #include <math.h>
 #include <unistd.h>
