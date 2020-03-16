@@ -1004,7 +1004,7 @@ void InputFiles::startThread(void (*threadFunc)(InputFiles *)) const {
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
 	// set a nice big stack (same as main thread) because some code uses potentially large stack buffers
-	//pthread_attr_setstacksize(&attr, 100 * 1024);
+	pthread_attr_setstacksize(&attr, 8 * 1024 * 1024);
 	pthread_create(&thread, &attr, (void *(*)(void*))threadFunc, (void *)this);
 	pthread_detach(thread);
 	pthread_attr_destroy(&attr);
