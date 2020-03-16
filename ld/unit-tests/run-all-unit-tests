@@ -27,7 +27,7 @@ version_ge()
 }
 if [ -d $ios_sdk_directory ]
 then
-	arm_arch="arm64"
+       arm_arch="arm64"
     all_archs="${all_archs}  ${arm_arch}"
     valid_archs="${valid_archs} ${arm_arch}"
 fi

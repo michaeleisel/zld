@@ -1,0 +1,15 @@
+data-in-code
+blank-stubs
+dwarf-debug-notes-lto
+efi-basic
+dwarf-debug-notes-r
+lto-symbol-section-move
+lto-llvm-options
+custom-segment-layout
+init-order
+empty-object
+dylib-main
+linker-optimization-hints
+lto-weak-native-override
+llvm-integration
+objc-category-class-property-mismatch
