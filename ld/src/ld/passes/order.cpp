@@ -28,6 +28,9 @@
 #include "pstl/execution"
 #include "pstl/algorithm"
 #undef NDEBUG
+#else
+#include "pstl/execution"
+#include "pstl/algorithm"
 #endif
 #include <stdint.h>
 #include <math.h>
