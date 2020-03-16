@@ -56,7 +56,6 @@
 		F307EBD4241AB309009AC4F3 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F307EBD2241AB2F3009AC4F3 /* CoreFoundation.framework */; };
 		F307EBD5241AB347009AC4F3 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F307EBD2241AB2F3009AC4F3 /* CoreFoundation.framework */; };
 		F3176404241011E300D68E7F /* libtbb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F3176402241011E300D68E7F /* libtbb.a */; };
-		F3B81C91241FDD3A002AF5C7 /* fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = F3B81C90241FDD3A002AF5C7 /* fishhook.c */; };
 		F9023C4E06D5A272001BBF46 /* ld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9023C3F06D5A254001BBF46 /* ld.cpp */; };
 		F933E3D9092E855B0083EAC8 /* ObjectDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F971EED706D5AD240041D381 /* ObjectDump.cpp */; };
 		F93CB248116E69EB003233B8 /* tlvp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F93CB246116E69EB003233B8 /* tlvp.cpp */; };
@@ -286,8 +285,6 @@
 		C1E27B591F6B1B70003B8FA6 /* thread_starts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = thread_starts.h; sourceTree = "<group>"; };
 		F307EBD2241AB2F3009AC4F3 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		F3176402241011E300D68E7F /* libtbb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libtbb.a; sourceTree = "<group>"; };
-		F3B81C8F241FDD3A002AF5C7 /* fishhook.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fishhook.h; sourceTree = "<group>"; };
-		F3B81C90241FDD3A002AF5C7 /* fishhook.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = fishhook.c; sourceTree = "<group>"; };
 		F9023C3906D5A23E001BBF46 /* zld */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = zld; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9023C3F06D5A254001BBF46 /* ld.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ld.cpp; path = src/ld/ld.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F91B7B0318987D5F0099486F /* AddressSpace.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AddressSpace.hpp; sourceTree = "<group>"; };
@@ -626,8 +623,6 @@
 				F98565241E98090F00528B1C /* dwarf2.h */,
 				B3B672411406D42800A376BB /* Snapshot.cpp */,
 				B3B672441406D44300A376BB /* Snapshot.h */,
-				F3B81C8F241FDD3A002AF5C7 /* fishhook.h */,
-				F3B81C90241FDD3A002AF5C7 /* fishhook.c */,
 			);
 			name = ld;
 			sourceTree = "<group>";
@@ -1004,7 +999,6 @@
 				F989D30D106826020014B60C /* OutputFile.cpp in Sources */,
 				F9AA65111051BD2B003E3539 /* stubs.cpp in Sources */,
 				F9AA6786105700C2003E3539 /* opaque_section_file.cpp in Sources */,
-				F3B81C91241FDD3A002AF5C7 /* fishhook.c in Sources */,
 				F9AA67B610570C41003E3539 /* dtrace_dof.cpp in Sources */,
 				F98498A310AE2159009E9878 /* compact_unwind.cpp in Sources */,
 				F98498A410AE2159009E9878 /* got.cpp in Sources */,
