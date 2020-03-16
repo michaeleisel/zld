@@ -46,6 +46,7 @@ extern "C" double log2 ( double );
 #include <mach-o/dyld.h>
 #include <dlfcn.h>
 #include <AvailabilityMacros.h>
+#include <tbb/global_control.h>
 
 #include <string>
 #include <map>
@@ -1355,6 +1356,7 @@ const char* dyld_lazy_dylib_path_fix(const char* path)
 
 int main(int argc, const char* argv[])
 {
+	tbb::global_control c(tbb::global_control::thread_stack_size, 8 * 1024 * 1024);
 	const char* archName = NULL;
 	bool showArch = false;
 	bool archInferred = false;

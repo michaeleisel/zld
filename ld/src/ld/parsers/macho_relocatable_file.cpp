@@ -2517,7 +2517,7 @@ void Parser<A>::makeSortedSymbolsArray(uint32_t array[], const uint32_t sectionA
 		*p++ = i;
 	}
 	assert(p == &array[_symbolsInSections] && "second pass over symbol table yield a different number of symbols");
-	
+
 	// sort by symbol table address
 	ParserAndSectionsArray extra = { this, sectionArray };
 	::qsort_r(array, _symbolsInSections, sizeof(uint32_t), &extra, &symbolIndexSorter);
