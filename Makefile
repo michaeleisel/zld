@@ -2,6 +2,9 @@
 build: fetch
 	xcodebuild -project ld/zld.xcodeproj -scheme zld -derivedDataPath build -configuration Release build
 
+test: fetch
+	xcodebuild -project ld/zld.xcodeproj -scheme unit-tests -derivedDataPath build -configuration Debug build
+
 abseil-cpp-20200225:
 	curl -# -L https://github.com/abseil/abseil-cpp/archive/20200225.tar.gz | tar xz
 	mkdir $@/build
