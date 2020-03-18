@@ -767,7 +767,7 @@ void InputFiles::addLinkerOptionLibraries(ld::Internal& state, ld::File::AtomHan
     		}
     		catch (const char* msg) {
 				if ( strstr(msg, "but linking") != nullptr )
-					warning("%s '%s'", msg, libName);
+					warning("%s '%s'", msg, "<libname>");
     			// <rdar://problem/40829444> only warn about missing auto-linked library if some missing symbol error happens later
     			state.missingLinkerOptionLibraries.insert(std::get<2>(triple));
     		}
