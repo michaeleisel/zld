@@ -1272,7 +1272,6 @@
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
 				LLVM_LTO = NO;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-stdlib=libc++",
@@ -1365,7 +1364,6 @@
 					"$(SDKROOT)/usr/lib/system",
 				);
 				LLVM_LTO = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-stdlib=libc++",

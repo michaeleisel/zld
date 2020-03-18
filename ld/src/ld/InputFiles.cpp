@@ -1378,19 +1378,12 @@ void InputFiles::preParseLibraries() const {
 		}
 	}
 	map[currentLib] = currentSet;
-	auto queue = [[NSOperationQueue alloc] init];
-	queue.qualityOfService = NSQualityOfServiceUserInteractive;
-	// initialize info for parsing input files on worker threads
-	unsigned int ncpus;
-	int mib[2];
-	size_t len = sizeof(ncpus);
-	mib[0] = CTL_HW;
-	mib[1] = HW_NCPU;
-	auto res = sysctl(mib, 2, &ncpus, &len, NULL, 0);
-	if (res != 0) {
-		ncpus = 1;
-	}
-	queue.maxConcurrentOperationCount = ncpus;
+	struct Operation {
+		void *_member;
+		ld::archive::File *_file;
+		Operation(void *member, ld::archive::File *file) : _member(member), _file(file) {}
+	};
+	std::vector<Operation> ops;
 
     for (std::vector<LibraryInfo>::const_iterator it=_searchLibraries.begin(); it != _searchLibraries.end(); ++it) {
 		auto lib = *it;
@@ -1409,13 +1402,16 @@ void InputFiles::preParseLibraries() const {
 			}
 			auto members = archiveFile->membersToParse(it->second);
 			for (auto member : members) {
-				[queue addOperationWithBlock:^{
-    				archiveFile->parseMember(member);
-				}];
+				ops.emplace_back(member, archiveFile);
 			}
 		}
 	}
-	[queue waitUntilAllOperationsAreFinished];
+	const tbb::blocked_range<size_t> range(0, ops.size());
+	tbb::parallel_for(range, [=](const tbb::blocked_range<size_t>& subrange) {
+		for (auto i = subrange.begin(); i != subrange.end(); i++) {
+			ops[i]._file->parseMember(ops[i]._member);
+		}
+	});
 }
 
 void InputFiles::dumpMembersParsed(std::ofstream &stream) const {
