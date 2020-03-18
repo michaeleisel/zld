@@ -17,17 +17,17 @@
 
 #ifdef REPRO
 
-#define std::map std::map
-#define std::unordered_map std::unordered_map
-#define std::unordered_set std::unordered_set
-#define std::set std::set
+#define LDOrderedMap std::map
+#define LDMap std::unordered_map
+#define LDSet std::unordered_set
+#define LDOrderedSet std::set
 
 #else
 
-#define std::map absl::btree_map
-#define std::unordered_map absl::flat_hash_map
-#define std::unordered_set absl::flat_hash_set
-#define std::set absl::btree_set
+#define LDOrderedMap absl::btree_map
+#define LDMap absl::flat_hash_map
+#define LDSet absl::flat_hash_set
+#define LDOrderedSet absl::btree_set
 
 #endif
 
