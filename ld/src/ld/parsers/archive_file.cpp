@@ -463,12 +463,18 @@ bool File<A>::loadMember(MemberState& state, ld::File::AtomHandler& handler, con
 	return didSomething;
 }
 
+static const char kForceLoad[] = "__swift_FORCE_LOAD";
 
 template <typename A>
 bool File<A>::forEachAtom(ld::File::AtomHandler& handler) const
 {
 	bool didSome = false;
 	if ( _forceLoadAll || _forceLoadThis || hasSwift() ) {
+		for (const auto& entry : _hashTable) {
+			if (strncmp(entry.first, kForceLoad, sizeof(kForceLoad) - 1)) {
+				
+			}
+		}
 		// call handler on all .o files in this archive
 		const Entry* const start = (Entry*)&_archiveFileContent[8];
 		const Entry* const end = (Entry*)&_archiveFileContent[_archiveFilelength];

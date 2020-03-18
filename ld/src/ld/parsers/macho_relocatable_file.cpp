@@ -1946,6 +1946,15 @@ ld::relocatable::File* Parser<A>::parse(const ParserOptions& opts)
 	}
 	assert( _file->_atomsArrayCount == computedAtomCount && "more atoms allocated than expected");
 
+	auto count = _file->_atomsArrayCount;
+	uint8_t* atomPtr = _file->_atomsArray;
+	for (int i = 0; i < count; i++) {
+		Atom<A>* atom = (Atom<A>*)atomPtr;
+		if (atom->name()) {
+			<#statements#>
+		}
+		atomPtr += sizeof(Atom<A>);
+	}
 	
 	// have each section add all fix-ups for its atoms
 	_allFixups.reserve(computedAtomCount*5);
