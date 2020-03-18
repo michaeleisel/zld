@@ -41,3 +41,9 @@ if [ -n "${RC_ProjectSourceVersion}" ]; then
 else
 	echo "#define LD64_VERSION_NUM 0" >> ${DERIVED_FILE_DIR}/configure.h
 fi
+
+if [ -n "${LD_FORCE_16KB_PAGES}" ]; then
+	echo "#define LD_PAGE_SIZE 0x4000" >> ${DERIVED_FILE_DIR}/configure.h
+else
+	echo "#define LD_PAGE_SIZE 0x1000" >> ${DERIVED_FILE_DIR}/configure.h
+fi

@@ -32,7 +32,7 @@ run: all
 
 all:
 	touch empty.s
-	as -arch ${ARCH} empty.s -o empty.o
+	as -arch ${ARCH} -n empty.s -o empty.o
 	${CC} ${CCFLAGS} main.c empty.o -o main
 	${PASS_IFF_GOOD_MACHO} main
 

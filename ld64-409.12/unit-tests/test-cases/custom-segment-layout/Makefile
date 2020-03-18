@@ -6,7 +6,7 @@ include ${TESTROOT}/include/common.makefile
 # Check that a large page zero works
 #
 ifeq (,${findstring "macosx","$(VERSION_NEW_LINKEDIT)"})
-	SEG_ADDR = 0xb8000000
+	SEG_ADDR = 0x20000000
 else
 	SEG_ADDR = 0xb8000000
 endif

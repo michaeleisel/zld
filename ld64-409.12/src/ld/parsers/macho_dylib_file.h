@@ -32,7 +32,7 @@ namespace mach_o {
 namespace dylib {
 
 
-extern bool isDylibFile(const uint8_t* fileContent, cpu_type_t* result, cpu_subtype_t* subResult);					
+extern bool isDylibFile(const uint8_t* fileContent, uint64_t fileLength, cpu_type_t* result, cpu_subtype_t* subResult, ld::Platform* platform, uint32_t* minOsVers);					
 
 extern const char* archName(const uint8_t* fileContent);
 

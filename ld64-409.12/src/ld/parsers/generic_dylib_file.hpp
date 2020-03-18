@@ -148,9 +148,8 @@ public:
 	virtual bool							allSymbolsAreWeakImported() const override final;
 	virtual bool							installPathVersionSpecific() const override final { return _installPathOverride; }
 	virtual bool							appExtensionSafe() const override final	{ return _appExtensionSafe; };
+    virtual void                            forEachExportedSymbol(void (^handler)(const char* symbolName, bool weakDef)) const override;
 
-
-	bool									wrongOS() const { return _wrongOS; }
 
 private:
 	using pint_t = typename A::P::uint_t;
@@ -208,7 +207,6 @@ protected:
 	std::unique_ptr<ld::Bitcode>		_bitcode;
 	ld::VersionSet                      _platforms;
 	uint8_t								_swiftVersion;
-	bool								_wrongOS;
 	bool								_linkingFlat;
 	bool								_noRexports;
 	bool								_explictReExportFound;
@@ -242,7 +240,6 @@ File<A>::File(const char* path, time_t mTime, ld::File::Ordinal ord, const ld::V
 	  _parentUmbrella(nullptr),
     _platforms(platforms),
 	  _swiftVersion(0),
-	  _wrongOS(false),
 	  _linkingFlat(linkingFlatNamespace),
 	  _noRexports(false),
 	  _explictReExportFound(false),
@@ -377,6 +374,14 @@ bool File<A>::justInTimeforEachAtom(const char* name, ld::File::AtomHandler& han
 }
 
 template <typename A>
+void File<A>::forEachExportedSymbol(void (^handler)(const char* symbolName, bool weakDef)) const
+{
+    for (const auto& entry : _atoms) {
+        handler(entry.first, entry.second.weakDef);
+    }
+}
+
+template <typename A>
 void File<A>::assertNoReExportCycles(ReExportChain* prev) const
 {
 	// recursively check my re-exported dylibs
@@ -421,7 +426,7 @@ void File<A>::processIndirectLibraries(ld::dylib::File::DylibHandler* handler, b
 					fprintf(stderr, "processIndirectLibraries() parent=%s, child=%s\n", this->installPath(), dep.path);
 				// a LC_REEXPORT_DYLIB, LC_SUB_UMBRELLA or LC_SUB_LIBRARY says we re-export this child
 				dep.dylib = (File<A>*)handler->findDylib(dep.path, this, this->speculativelyLoaded());
-				if ( dep.dylib->hasPublicInstallName() && !dep.dylib->wrongOS() ) {
+				if ( dep.dylib->hasPublicInstallName() ) {
 					// promote this child to be automatically added as a direct dependent if this already is
 					if ( (this->explicitlyLinked() || this->implicitlyLinked()) && (strcmp(dep.path, dep.dylib->installPath()) == 0) ) {
 						if ( log )

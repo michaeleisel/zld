@@ -150,7 +150,7 @@ private:
 class SectionBoundaryAtom : public ld::Atom
 {
 public:
-	static SectionBoundaryAtom*			makeSectionBoundaryAtom(const char* name, bool start, const char* segSectName); 
+	static SectionBoundaryAtom*			makeSectionBoundaryAtom(const char* name, bool start, const char* segSectName, const Options&	opts);
 	static SectionBoundaryAtom*			makeOldSectionBoundaryAtom(const char* name, bool start);
 	
 	// overrides of ld::Atom
@@ -177,7 +177,7 @@ private:
 	const char*							_name;
 };
 
-SectionBoundaryAtom* SectionBoundaryAtom::makeSectionBoundaryAtom(const char* name, bool start, const char* segSectName)
+SectionBoundaryAtom* SectionBoundaryAtom::makeSectionBoundaryAtom(const char* name, bool start, const char* segSectName, const Options&	opts)
 {
 
 	const char* segSectDividor = strrchr(segSectName, '$');
@@ -193,6 +193,14 @@ SectionBoundaryAtom* SectionBoundaryAtom::makeSectionBoundaryAtom(const char* na
 	ld::Section::Type sectType = ld::Section::typeUnclassified;
 	if (!strcmp(segName, "__TEXT") && !strcmp(sectionName, "__thread_starts"))
 		sectType = ld::Section::typeThreadStarts;
+	else if (!strcmp(segName, "__TEXT") && !strcmp(sectionName, "__chain_starts"))
+		sectType = ld::Section::typeChainStarts;
+	else if (!strcmp(segName, "__DATA") && !strcmp(sectionName, "__zerofill")) {
+		if ( opts.mergeZeroFill() )
+			sectType = ld::Section::typeZeroFill;
+		else
+			warning("reference to non-existent __zerofill section because -merge_zero_fill_sections option not used");
+	}
 
 	const ld::Section* section = new ld::Section(strdup(segName), sectionName, sectType);
 	return new SectionBoundaryAtom(name, *section, (start ? ld::Atom::typeSectionStart : typeSectionEnd));
@@ -293,7 +301,7 @@ void Resolver::initializeState()
 		}
 	}
 #ifdef LD64_VERSION_NUM
-	uint32_t packedNum = 0x01c20300;
+	uint32_t packedNum = Options::parseVersionNumber32(STRINGIFY(LD64_VERSION_NUM));
 	uint64_t combined = (uint64_t)TOOL_LD << 32 | packedNum;
 	_internal.toolsVersions.insert(combined);
 #endif
@@ -370,31 +378,19 @@ void Resolver::doFile(const ld::File& file)
 				// Handle the special case for compiler_rt objects. Add the file to the list to be process.
 				if ( objFile->sourceKind() == ld::relocatable::File::kSourceCompilerArchive ) {
 					_internal.filesFromCompilerRT.push_back(objFile);
-				} else if (objFile->sourceKind() != ld::relocatable::File::kSourceLTO  ) {
+				}
+				else if (objFile->sourceKind() != ld::relocatable::File::kSourceLTO  ) {
 					// No bitcode section, figure out if the object file comes from LTO/compiler static library
-					_options.platforms().forEach(^(ld::Platform platform, uint32_t version, bool &stop) {
-						switch ( platform ) {
-							case ld::kPlatform_macOS:
-							case ld::kPlatform_bridgeOS:
-							case ld::kPlatform_iOSMac:
-							case ld::kPlatform_unknown:
-								warning("all bitcode will be dropped because '%s' was built without bitcode. "
-										"You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target. ", file.path());
-								_internal.filesWithBitcode.clear();
-								_internal.dropAllBitcode = true;
-								break;
-							case ld::kPlatform_iOS:
-							case ld::kPlatform_iOSSimulator:
-								throwf("'%s' does not contain bitcode. "
-									   "You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target.", file.path());
-								break;
-							case ld::kPlatform_watchOS:
-							case ld::kPlatform_watchOSSimulator:
-							case ld::kPlatform_tvOS:
-							case ld::kPlatform_tvOSSimulator:
-								throwf("'%s' does not contain bitcode. "
-									   "You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE) or obtain an updated library from the vendor", file.path());
-								break;
+					_options.platforms().forEach(^(ld::Platform platform, uint32_t minVersion, uint32_t sdkVersion, bool &stop) {
+						if ( platformInfo(platform).supportsEmbeddedBitcode ) {
+							throwf("'%s' does not contain bitcode. "
+								   "You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target.", file.path());
+						}
+						else {
+							warning("all bitcode will be dropped because '%s' was built without bitcode. "
+									"You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target. ", file.path());
+							_internal.filesWithBitcode.clear();
+							_internal.dropAllBitcode = true;
 						}
 					});
 				}
@@ -432,8 +428,8 @@ void Resolver::doFile(const ld::File& file)
 						warning("%s compiled with newer version of Swift language (%s) than previous files (%s)",
 						        file.path(), fileVersion, otherVersion);
 					} else {
-						throwf("%s compiled with newer version of Swift language (%s) than previous files (%s)",
-						       file.path(), fileVersion, otherVersion);
+						throwf("not all .o files built with same Swift language version. Started with (%s), now found (%s) in",
+						       otherVersion, fileVersion);
 					}
 				}
 				else {
@@ -441,11 +437,17 @@ void Resolver::doFile(const ld::File& file)
 						warning("%s compiled with older version of Swift language (%s) than previous files (%s)",
 						        file.path(), fileVersion, otherVersion);
 					} else {
-						throwf("%s compiled with older version of Swift language (%s) than previous files (%s)",
-						       file.path(), fileVersion, otherVersion);
+						throwf("not all .o files built with same Swift language version. Started with (%s), now found (%s) in",
+						       otherVersion, fileVersion);
 					}
 				}
 			}
+		}
+
+		// record minimums swift language version used
+		if ( file.swiftLanguageVersion() != 0 ) {
+			if ( (_internal.swiftLanguageVersion == 0) || (_internal.swiftLanguageVersion > file.swiftLanguageVersion()) )
+				_internal.swiftLanguageVersion = file.swiftLanguageVersion();
 		}
 		
 		// in -r mode, if any .o files have dwarf then add UUID to output .o file
@@ -468,10 +470,6 @@ void Resolver::doFile(const ld::File& file)
 		if ( (_options.outputKind() == Options::kObjectFile) && (objMinOS > _internal.minOSVersion) )
 			_internal.minOSVersion = objMinOS;
 #endif
-
-		auto objPlatforms = objFile->platforms();
-		if ( (!objPlatforms.empty()) && (_options.outputKind() == Options::kObjectFile) && (_internal.derivedPlatforms.empty())  )
-			_internal.derivedPlatforms = objPlatforms;
 		// update set of known tools used
 		for (const std::pair<uint32_t,uint32_t>& entry : objFile->toolVersions()) {
 			uint64_t combined = (uint64_t)entry.first << 32 | entry.second;
@@ -519,6 +517,9 @@ void Resolver::doFile(const ld::File& file)
 				
 			case CPU_TYPE_X86_64:
 				if ( _options.subArchitecture() != nextObjectSubType ) {
+					// <rdar://problem/47240066> allow x86_64h to link with x86_64 .o files
+					if ( (_options.subArchitecture() == CPU_SUBTYPE_X86_64_H) && (nextObjectSubType == CPU_SUBTYPE_X86_64_ALL) )
+						break;
 					if ( _options.allowSubArchitectureMismatches() ) {
 						warning("object file %s was built for different x86_64 sub-type (%d) than link command line (%d)", 
 							file.path(), nextObjectSubType, _options.subArchitecture());
@@ -535,6 +536,19 @@ void Resolver::doFile(const ld::File& file)
 		// Check dylib for bitcode, if the library install path is relative path or @rpath, it has to contain bitcode
 		if ( _options.bundleBitcode() ) {
 			bool isSystemFramework = ( dylibFile->installPath() != NULL ) && ( dylibFile->installPath()[0] == '/' );
+			if (!isSystemFramework) {
+				// rdar://52804818 The swift dylibs in the SDK do not have absolute installnames in order to support
+				// back deployment
+				for (const auto& sdkPath : _options.sdkPaths()) {
+					char swiftPath[MAXPATHLEN];
+					strlcpy(swiftPath, sdkPath, MAXPATHLEN);
+					strlcat(swiftPath, "/usr/lib/swift/", MAXPATHLEN);
+					if (strncmp(swiftPath, dylibFile->path(), strlen(swiftPath)) == 0) {
+						isSystemFramework = true;
+						break;
+					}
+				}
+			}
 			if ( dylibFile->getBitcode() == NULL && !isSystemFramework ) {
 				// Check if the dylib is from toolchain by checking the path
 				char tcLibPath[PATH_MAX];
@@ -553,29 +567,16 @@ void Resolver::doFile(const ld::File& file)
 				if ( realpath(tempPath, tcLibPath) == NULL ||
 					 realpath(dylibFile->path(), tempPath) == NULL ||
 					 strncmp(tcLibPath, tempPath, strlen(tcLibPath)) != 0 ) {
-					_options.platforms().forEach(^(ld::Platform platform, uint32_t version, bool &stop) {
-						switch ( platform ) {
-							case ld::kPlatform_macOS:
-							case ld::kPlatform_bridgeOS:
-							case ld::kPlatform_iOSMac:
-							case ld::kPlatform_unknown:
-								warning("all bitcode will be dropped because '%s' was built without bitcode. "
-										"You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target.", file.path());
-								_internal.filesWithBitcode.clear();
-								_internal.dropAllBitcode = true;
-								break;
-							case ld::kPlatform_iOS:
-							case ld::kPlatform_iOSSimulator:
-								throwf("'%s' does not contain bitcode. "
-									   "You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target.", file.path());
-								break;
-							case ld::kPlatform_watchOS:
-							case ld::kPlatform_watchOSSimulator:
-							case ld::kPlatform_tvOS:
-							case ld::kPlatform_tvOSSimulator:
-								throwf("'%s' does not contain bitcode. "
-									   "You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE) or obtain an updated library from the vendor", file.path());
-								break;
+					_options.platforms().forEach(^(ld::Platform platform, uint32_t minVersion, uint32_t sdkVersion, bool &stop) {
+						if ( platformInfo(platform).supportsEmbeddedBitcode ) {
+							throwf("'%s' does not contain bitcode. "
+								   "You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target.", file.path());
+						}
+						else {
+							warning("all bitcode will be dropped because '%s' was built without bitcode. "
+									"You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target.", file.path());
+							_internal.filesWithBitcode.clear();
+							_internal.dropAllBitcode = true;
 						}
 					});
 				}
@@ -642,7 +643,7 @@ void Resolver::doFile(const ld::File& file)
 		const char* depInstallName = dylibFile->installPath();
 		// <rdar://problem/17229513> embedded frameworks are only supported on iOS 8 and later
 		if ( (depInstallName != NULL) && (depInstallName[0] != '/') ) {
-			if ( _options.platforms().contains(ld::kPlatform_iOS) && !_options.platforms().minOS(iOS_8_0) ) {
+			if ( _options.platforms().contains(ld::Platform::iOS) && !_options.platforms().minOS(iOS_8_0) ) {
 				// <rdar://problem/17598404> only warn about linking against embedded dylib if it is built for iOS 8 or later
 				if ( dylibFile->platforms().minOS(ld::iOS_8_0) )
 					throwf("embedded dylibs/frameworks are only supported on iOS 8.0 and later (%s)", depInstallName);
@@ -653,16 +654,15 @@ void Resolver::doFile(const ld::File& file)
 			if ( depInstallName[0] == '@' ) {
 				warning("invalid -install_name (%s) in dependent dylib (%s). Dylibs/frameworks which might go in dyld shared cache "
 						"cannot link with dylib that uses @rpath, @loader_path, etc.", depInstallName, dylibFile->path());
-			} else if ( (strncmp(depInstallName, "/usr/lib/", 9) != 0)
-					   && (strncmp(depInstallName, "/System/Library/", 16) != 0)
-					   && (strncmp(depInstallName, "/System/iOSSupport/usr/lib/", 27) != 0)
-					   && (strncmp(depInstallName, "/System/iOSSupport/System/Library/", 34) != 0) ) {
+			}
+			else if ( !_options.sharedCacheEligiblePath(depInstallName) ) {
 				warning("invalid -install_name (%s) in dependent dylib (%s). Dylibs/frameworks which might go in dyld shared cache "
 						"cannot link with dylibs that won't be in the shared cache", depInstallName, dylibFile->path());
 			}
 		}
 	}
 }
+
 
 void Resolver::doAtom(const ld::Atom& atom)
 {
@@ -723,7 +723,7 @@ void Resolver::doAtom(const ld::Atom& atom)
 					(const_cast<ld::Atom*>(&atom))->setScope(ld::Atom::scopeLinkageUnit);
 					//fprintf(stderr, "demote %s to hidden\n", name);
 				}
-				if ( _options.canReExportSymbols() && _options.shouldReExport(name) ) {
+				if ( _options.canReExportSymbols() && _options.shouldReExport(name) && (atom.definition() != ld::Atom::definitionProxy) ) {
 					throwf("requested re-export symbol %s is not from a dylib, but from %s\n", _options.demangleSymbol(name), atom.safeFilePath());
 				}
 				break;
@@ -739,7 +739,14 @@ void Resolver::doAtom(const ld::Atom& atom)
 
 	// tell symbol table about non-static atoms
 	if ( atom.scope() != ld::Atom::scopeTranslationUnit ) {
-		_symbolTable.add(atom, _options.deadCodeStrip() && (_completedInitialObjectFiles || _options.allowDeadDuplicates()));
+		Options::Treatment duplicates = Options::Treatment::kError;
+		if (_options.deadCodeStrip() ) {
+			if ( _options.allowDeadDuplicates() )
+				duplicates = Options::Treatment::kSuppress;
+			else if ( _completedInitialObjectFiles )
+				duplicates = Options::Treatment::kWarning;
+		}
+		_symbolTable.add(atom, duplicates);
 		
 		// add symbol aliases defined on the command line
 		if ( _options.haveCmdLineAliases() ) {
@@ -892,18 +899,18 @@ void Resolver::resolveUndefines()
 				if ( !_symbolTable.hasName(undef) && (_options.outputKind() != Options::kObjectFile) ) {
 					if ( strncmp(undef, "section$", 8) == 0 ) {
 						if ( strncmp(undef, "section$start$", 14) == 0 ) {
-							this->doAtom(*SectionBoundaryAtom::makeSectionBoundaryAtom(undef, true, &undef[14])); 
+							this->doAtom(*SectionBoundaryAtom::makeSectionBoundaryAtom(undef, true, &undef[14], _options));
 						}
 						else if ( strncmp(undef, "section$end$", 12) == 0 ) {
-							this->doAtom(*SectionBoundaryAtom::makeSectionBoundaryAtom(undef, false, &undef[12])); 
+							this->doAtom(*SectionBoundaryAtom::makeSectionBoundaryAtom(undef, false, &undef[12], _options));
 						}
 					}
 					else if ( strncmp(undef, "segment$", 8) == 0 ) {
 						if ( strncmp(undef, "segment$start$", 14) == 0 ) {
-							this->doAtom(*SegmentBoundaryAtom::makeSegmentBoundaryAtom(undef, true, &undef[14])); 
+							this->doAtom(*SegmentBoundaryAtom::makeSegmentBoundaryAtom(undef, true, &undef[14]));
 						}
 						else if ( strncmp(undef, "segment$end$", 12) == 0 ) {
-							this->doAtom(*SegmentBoundaryAtom::makeSegmentBoundaryAtom(undef, false, &undef[12])); 
+							this->doAtom(*SegmentBoundaryAtom::makeSegmentBoundaryAtom(undef, false, &undef[12]));
 						}
 					}
 					else if ( _options.outputKind() == Options::kPreload ) {
@@ -1172,8 +1179,14 @@ void Resolver::deadStripOptimize(bool force)
 			// unset liveness, so markLive() will recurse
 			(const_cast<ld::Atom*>(atom))->setLive(0);
 		}
+		// <rdar://problem/49468634> if doing LTO, mark all libclang_rt* mach-o atoms as live since the backend may suddenly codegen uses of them
+		else if ( _haveLLVMObjs && !force && (atom->contentType() !=  ld::Atom::typeLTOtemporary) ) {
+			if ( strstr(atom->safeFilePath(), "libclang_rt") != nullptr ) {
+				_deadStripRoots.insert(atom);
+			}
+		}
 	}
-	
+
 	// mark all roots as live, and all atoms they reference
 	for (std::set<const ld::Atom*>::iterator it=_deadStripRoots.begin(); it != _deadStripRoots.end(); ++it) {
 		WhyLiveBackChain rootChain;
@@ -1463,9 +1476,9 @@ void Resolver::checkUndefines(bool force)
 	if ( unresolvableCount != 0 ) {
 		if ( doPrint ) {
 			for (const auto& lib : _internal.missingLinkerOptionLibraries)
-				warning("Could not find auto-linked library '%s'", lib);
+				warning("Could not find or use auto-linked library '%s'", lib);
 			for (const auto& frm : _internal.missingLinkerOptionFrameworks)
-				warning("Could not find auto-linked framework '%s'", frm);
+				warning("Could not find or use auto-linked framework '%s'", frm);
 			if ( _options.printArchPrefix() )
 				fprintf(stderr, "Undefined symbols for architecture %s:\n", _options.architectureName());
 			else
@@ -1513,11 +1526,11 @@ void Resolver::checkUndefines(bool force)
 					const ld::Atom* atom = *sit;
 					if ( (atom != NULL) && (atom->symbolTableInclusion() == ld::Atom::symbolTableIn) && (strstr(atom->name(), name) != NULL) ) {
 						if ( ! printedStart ) {
-							fprintf(stderr, "     (maybe you meant: %s", atom->name());
+							fprintf(stderr, "     (maybe you meant: %s", _options.demangleSymbol(atom->name()));
 							printedStart = true;
 						}
 						else {
-							fprintf(stderr, ", %s ", atom->name());
+							fprintf(stderr, ", %s ", _options.demangleSymbol(atom->name()));
 						}
 					}
 				}
@@ -1623,7 +1636,7 @@ void Resolver::fillInHelpersInInternalState()
 	
 	_internal.classicBindingHelper = NULL;
 	// FIXME: What about fMakeThreadedStartsSection?
-	if ( needsStubHelper && !_options.makeCompressedDyldInfo() ) { 
+	if ( needsStubHelper && !_options.makeCompressedDyldInfo() && !_options.makeChainedFixups() ) { 
 		// "dyld_stub_binding_helper" comes from .o file, so should already exist in symbol table
 		if ( _symbolTable.hasName("dyld_stub_binding_helper") ) {
 			SymbolTable::IndirectBindingSlot slot = _symbolTable.findSlotForName("dyld_stub_binding_helper");
@@ -1768,7 +1781,6 @@ void Resolver::linkTimeOptimize()
 	optOpt.verboseOptimizationHints     = _options.verboseOptimizationHints();
 	optOpt.armUsesZeroCostExceptions    = _options.armUsesZeroCostExceptions();
 	optOpt.simulator					= _options.targetIOSSimulator();
-	optOpt.ignoreMismatchPlatform		= ((_options.outputKind() == Options::kPreload) || (_options.outputKind() == Options::kStaticExecutable));
 #if SUPPORT_ARCH_arm64e
 	optOpt.supportsAuthenticatedPointers = _options.supportsAuthenticatedPointers();
 #endif

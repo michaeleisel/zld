@@ -1,6 +1,0 @@
-final section layout:
-    __TEXT/__text addr=0x00007F28, size=0x00000090, fileOffset=0x00007F28, type=1
-    __TEXT/__unwind_info addr=0x00007FB8, size=0x00000048, fileOffset=0x00007FB8, type=22
-    __DATA/__common addr=0x00008000, size=0x1DCD65FB0, fileOffset=0x00000000, type=25
-ld: ARM64 ADRP out of range (6000005120 max is +/-4GB): from _getsmall3 (0x00007F88) to _small3 (0x165A14BA8) in '_getsmall3' from test3.o for architecture arm64
-clang: error: linker command failed with exit code 1 (use -v to see invocation)

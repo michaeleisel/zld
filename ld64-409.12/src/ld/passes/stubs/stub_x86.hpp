@@ -60,11 +60,11 @@ class ImageCachePointerAtom : public ld::Atom {
 public:
 											ImageCachePointerAtom(ld::passes::stubs::Pass& pass)
 				: ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
-							ld::Atom::scopeLinkageUnit, ld::Atom::typeNonLazyPointer, 
-							symbolTableNotIn, false, false, false, ld::Atom::Alignment(2)) { pass.addAtom(*this); }
+							ld::Atom::scopeTranslationUnit, ld::Atom::typeUnclassified,
+							symbolTableIn, false, false, false, ld::Atom::Alignment(2)) { pass.addAtom(*this); }
 
 	virtual const ld::File*					file() const					{ return NULL; }
-	virtual const char*						name() const					{ return "image cache pointer"; }
+	virtual const char*						name() const					{ return "__dyld_private"; }
 	virtual uint64_t						size() const					{ return 4; }
 	virtual uint64_t						objectAddress() const			{ return 0; }
 	virtual void							copyRawContent(uint8_t buffer[]) const { }
@@ -75,7 +75,7 @@ private:
 	static ld::Section						_s_section;
 };
 
-ld::Section ImageCachePointerAtom::_s_section("__DATA", "__nl_symbol_ptr", ld::Section::typeNonLazyPointer);
+ld::Section ImageCachePointerAtom::_s_section("__DATA", "__data", ld::Section::typeUnclassified);
 
 
 

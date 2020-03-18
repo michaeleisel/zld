@@ -31,7 +31,7 @@ all: all-${FILEARCH}
 
 all-i386: all-cu
 all-x86_64: all-cu
-all-arm64: all-good
+all-arm: all-good
 
 all-cu:
 	${CC} ${CCFLAGS} test.s -c -o test.o

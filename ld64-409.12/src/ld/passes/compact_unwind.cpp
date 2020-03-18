@@ -87,7 +87,8 @@ private:
 	typedef macho_unwind_info_compressed_second_level_page_header<P> CSLP;
 
 	bool						encodingMeansUseDwarf(compact_unwind_encoding_t enc);
-	void						compressDuplicates(const std::vector<UnwindEntry>& entries, 
+	bool						encodingCannotBeMerged(compact_unwind_encoding_t enc);
+	void						compressDuplicates(const std::vector<UnwindEntry>& entries,
 													std::vector<UnwindEntry>& uniqueEntries);
 	void						makePersonalityIndexes(std::vector<UnwindEntry>& entries, 
 														std::map<const ld::Atom*, uint32_t>& personalityIndexMap);
@@ -311,6 +312,27 @@ bool UnwindInfoAtom<arm>::encodingMeansUseDwarf(compact_unwind_encoding_t enc)
 }
 
 
+
+
+template <>
+bool UnwindInfoAtom<x86>::encodingCannotBeMerged(compact_unwind_encoding_t enc)
+{
+	return ((enc & UNWIND_X86_MODE_MASK) == UNWIND_X86_MODE_STACK_IND);
+}
+
+template <>
+bool UnwindInfoAtom<x86_64>::encodingCannotBeMerged(compact_unwind_encoding_t enc)
+{
+	return ((enc & UNWIND_X86_64_MODE_MASK) == UNWIND_X86_64_MODE_STACK_IND);
+}
+
+template <typename A>
+bool UnwindInfoAtom<A>::encodingCannotBeMerged(compact_unwind_encoding_t enc)
+{
+	return false;
+}
+
+
 template <typename A>
 void UnwindInfoAtom<A>::compressDuplicates(const std::vector<UnwindEntry>& entries, std::vector<UnwindEntry>& uniqueEntries)
 {
@@ -320,9 +342,10 @@ void UnwindInfoAtom<A>::compressDuplicates(const std::vector<UnwindEntry>& entri
 	for(std::vector<UnwindEntry>::const_iterator it=entries.begin(); it != entries.end(); ++it) {
 		const UnwindEntry& next = *it;
 		bool newNeedsDwarf = encodingMeansUseDwarf(next.encoding);
+		bool cannotBeMerged = encodingCannotBeMerged(next.encoding);
 		// remove entries which have same encoding and personalityPointer as last one
 		if ( newNeedsDwarf || (next.encoding != last.encoding) || (next.personalityPointer != last.personalityPointer) 
-						|| (next.lsda != NULL) || (last.lsda != NULL) ) {
+			 || cannotBeMerged	|| (next.lsda != NULL) || (last.lsda != NULL) ) {
 			uniqueEntries.push_back(next);
 		}
 		last = next;

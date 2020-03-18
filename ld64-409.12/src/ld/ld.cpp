@@ -73,6 +73,7 @@ extern "C" double log2 ( double );
 #include "passes/got.h"
 #include "passes/tlvp.h"
 #include "passes/huge.h"
+#include "passes/inits.h"
 #include "passes/compact_unwind.h"
 #include "passes/order.h"
 #include "passes/branch_island.h"
@@ -89,19 +90,6 @@ extern "C" double log2 ( double );
 #include "parsers/lto_file.h"
 #include "parsers/opaque_section_file.h"
 
-const ld::Platform ld::basePlatform(const ld::Platform& platform)  {
-	switch(platform) {
-		case ld::kPlatform_iOSMac:
-		case ld::kPlatform_iOSSimulator:
-			return ld::kPlatform_iOS;
-		case ld::kPlatform_watchOSSimulator:
-			return kPlatform_watchOS;
-		case ld::kPlatform_tvOSSimulator:
-			return ld::kPlatform_tvOS;
-		default:
-			return platform;
-	}
-}
 
 const ld::VersionSet ld::File::_platforms;
 
@@ -322,19 +310,22 @@ uint32_t InternalState::FinalSection::segmentOrder(const ld::Section& sect, cons
 			return order.size()+2;
 	}
 	else {
+		bool armCloseStubs = (options.architecture() == CPU_TYPE_ARM) && !options.sharedRegionEligible() && !options.makeEncryptable() && !options.makeChainedFixups();
 		if ( strcmp(sect.segmentName(), "__PAGEZERO") == 0 ) 
 			return 0;
 		if ( strcmp(sect.segmentName(), "__TEXT") == 0 ) 
 			return 1;
 		if ( strcmp(sect.segmentName(), "__TEXT_EXEC") == 0 )
 			return 2;
+		if ( strcmp(sect.segmentName(), "__DATA_CONST") == 0 )
+			return ((options.outputKind() == Options::kKextBundle) || armCloseStubs) ? 5 : 3;
 		// in -r mode, want __DATA  last so zerofill sections are at end
-		if ( strcmp(sect.segmentName(), "__DATA") == 0 ) 
-			return (options.outputKind() == Options::kObjectFile) ? 6 : 3;
+		if ( strcmp(sect.segmentName(), "__DATA") == 0 )
+			return (options.outputKind() == Options::kObjectFile) ? 7 : 4;
 		if ( strcmp(sect.segmentName(), "__OBJC") == 0 ) 
-			return 4;
-		if ( strcmp(sect.segmentName(), "__IMPORT") == 0 )
 			return 5;
+		if ( strcmp(sect.segmentName(), "__IMPORT") == 0 )
+			return 6;
 	}
 	// layout non-standard segments in order seen (+100 to shift beyond standard segments)
 	for (uint32_t i=0; i < _s_segmentsSeen.size(); ++i) {
@@ -369,25 +360,34 @@ uint32_t InternalState::FinalSection::sectionOrder(const ld::Section& sect, uint
 					return 10;
 				else
 					return 11;
-			case ld::Section::typeNonStdCString:
-				if ( (strcmp(sect.sectionName(), "__oslogstring") == 0) && options.makeEncryptable() )
-					return INT_MAX-1;
-				else
-					return sectionsSeen+20;
 			case ld::Section::typeStub:
 				return 12;
 			case ld::Section::typeStubHelper:
 				return 13;
+			case ld::Section::typeInitOffsets:
+				return 14;
 			case ld::Section::typeThreadStarts:
-				return INT_MAX-5;
+				return INT_MAX-8;
 			case ld::Section::typeLSDA:
-				return INT_MAX-4;
+				return INT_MAX-7;
 			case ld::Section::typeUnwindInfo:
-				return INT_MAX-3;
+				return INT_MAX-6;
 			case ld::Section::typeCFI:
-				return INT_MAX-2;
+				return INT_MAX-5;
 			case ld::Section::typeStubClose:
-				return INT_MAX;
+				return INT_MAX - 3;
+			case ld::Section::typeNonStdCString:
+				if ( (strcmp(sect.sectionName(), "__oslogstring") == 0) && options.makeEncryptable() )
+					return INT_MAX-4;
+				if ( options.sharedRegionEligible() ) {
+					if ( (strcmp(sect.sectionName(), "__objc_classname") == 0) )
+						return INT_MAX - 2;
+					if ( (strcmp(sect.sectionName(), "__objc_methname") == 0) )
+						return INT_MAX - 1;
+					if ( (strcmp(sect.sectionName(), "__objc_methtype") == 0) )
+						return INT_MAX;
+				}
+				return sectionsSeen+20;
 			default:
 				return sectionsSeen+20;
 		}
@@ -417,6 +417,8 @@ uint32_t InternalState::FinalSection::sectionOrder(const ld::Section& sect, uint
 				else
 					return INT_MAX-256+sectionsSeen; // <rdar://problem/25448494> zero fill need to be last and in "seen" order
 			default:
+				if ( strcmp(sect.sectionName(), "__auth_ptr") == 0 )
+					return 11;
 				// <rdar://problem/14348664> __DATA,__const section should be near __mod_init_func not __data
 				if ( strcmp(sect.sectionName(), "__const") == 0 )
 					return 14;
@@ -731,14 +733,14 @@ ld::Internal::FinalSection* InternalState::addAtom(const ld::Atom& atom)
 	// support for -rename_section and -rename_segment
 	for (const Options::SectionRename& rename : _options.sectionRenames()) {
 		if ( (strcmp(curSectName, rename.fromSection) == 0) && (strcmp(curSegName, rename.fromSegment) == 0) ) {
-			if ( _options.useDataConstSegment() && (strcmp(curSectName, "__const") == 0) && (strcmp(curSegName, "__DATA") == 0) && hasReferenceToWeakExternal(atom) ) {
+			if ( _options.useDataConstSegment() && _options.sharedRegionEligible() && (strcmp(curSectName, "__const") == 0) && (strcmp(curSegName, "__DATA") == 0) && hasReferenceToWeakExternal(atom) ) {
 				// if __DATA,__const atom has pointer to weak external symbol, don't move to __DATA_CONST
 				curSectName = "__const_weak";
 				fs = this->getFinalSection(curSegName, curSectName, sectType);
 				if ( _options.traceSymbolLayout() )
 					printf("symbol '%s', contains pointers to weak symbols, so mapped it to __DATA/__const_weak\n", atom.name());
 			}
-			else if ( _options.useDataConstSegment() && (sectType == ld::Section::typeNonLazyPointer) && hasReferenceToWeakExternal(atom) ) {
+			else if ( _options.useDataConstSegment() && _options.sharedRegionEligible() && (sectType == ld::Section::typeNonLazyPointer) && hasReferenceToWeakExternal(atom) ) {
 				// if __DATA,__nl_symbol_ptr atom has pointer to weak external symbol, don't move to __DATA_CONST
 				curSectName = "__got_weak";
 				fs = this->getFinalSection("__DATA", curSectName, sectType);
@@ -1312,28 +1314,11 @@ static void getVMInfo(vm_statistics_data_t& info)
 
 
 
-static const char* sOverridePathlibLTO = NULL;
-
-//
-// This is magic glue that overrides the default behaviour 
-// of lazydylib1.o which is used to lazily load libLTO.dylib.
-//
-extern "C" const char* dyld_lazy_dylib_path_fix(const char* path);
-const char* dyld_lazy_dylib_path_fix(const char* path)
-{
-	if ( sOverridePathlibLTO != NULL )
-		return sOverridePathlibLTO;
-	else
-		return path;
-}
-
-
 
 int main(int argc, const char* argv[])
 {
 	const char* archName = NULL;
 	bool showArch = false;
-	bool archInferred = false;
 	try {
 		PerformanceStatistics statistics;
 		statistics.startTool = mach_absolute_time();
@@ -1343,7 +1328,8 @@ int main(int argc, const char* argv[])
 		InternalState state(options);
 		
 		// allow libLTO to be overridden by command line -lto_library
-		sOverridePathlibLTO = options.overridePathlibLTO();
+		if (const char *dylib = options.overridePathlibLTO())
+			lto::set_library(dylib);
 		
 		// gather vm stats
 		if ( options.printStatistics() )
@@ -1352,11 +1338,10 @@ int main(int argc, const char* argv[])
 		// update strings for error messages
 		showArch = options.printArchPrefix();
 		archName = options.architectureName();
-		archInferred = (options.architecture() == 0);
 		
 		// open and parse input files
 		statistics.startInputFileProcessing = mach_absolute_time();
-		ld::tool::InputFiles inputFiles(options, &archName);
+		ld::tool::InputFiles inputFiles(options);
 		
 		// load and resolve all references
 		statistics.startResolver = mach_absolute_time();
@@ -1374,6 +1359,7 @@ int main(int argc, const char* argv[])
 		statistics.startPasses = mach_absolute_time();
 		ld::passes::objc::doPass(options, state);
 		ld::passes::stubs::doPass(options, state);
+		ld::passes::inits::doPass(options, state);
 		ld::passes::huge::doPass(options, state);
 		ld::passes::got::doPass(options, state);
 		ld::passes::tlvp::doPass(options, state);
@@ -1433,9 +1419,7 @@ int main(int argc, const char* argv[])
 	catch (const char* msg) {
 		if ( strstr(msg, "malformed") != NULL )
 			fprintf(stderr, "ld: %s\n", msg);
-		else if ( archInferred )
-			fprintf(stderr, "ld: %s for inferred architecture %s\n", msg, archName);
-		else if ( showArch )
+		else if ( showArch && (strstr(msg, archName) == NULL) )
 			fprintf(stderr, "ld: %s for architecture %s\n", msg, archName);
 		else
 			fprintf(stderr, "ld: %s\n", msg);

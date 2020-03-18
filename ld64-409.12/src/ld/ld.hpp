@@ -38,64 +38,90 @@
 #include <unordered_set>
 
 #include "configure.h"
+#include "PlatformSupport.h"
+
+//FIXME: Only needed until we move VersionSet into PlatformSupport
+class Options;
 
 namespace ld {
-
-//
-// platform
-//
-
-enum Platform {
-	kPlatform_unknown=0,
-	kPlatform_macOS=1,
-	kPlatform_iOS=2,
-	kPlatform_tvOS=3,
-	kPlatform_watchOS=4,
-	kPlatform_bridgeOS=5,
-	kPlatform_iOSMac=6,
-	kPlatform_iOSSimulator=7,
-	kPlatform_tvOSSimulator=8,
-	kPlatform_watchOSSimulator=9
-};
-
-const ld::Platform basePlatform(const ld::Platform& platform);
-
-typedef std::set<Platform> PlatformSet;
 
 //
 // minumum OS versions
 //
 
-typedef std::pair<Platform, uint32_t> Version;
+struct PlatformVersion {
+	Platform platform;
+	uint32_t minVersion;
+	uint32_t sdkVersion;
+	PlatformVersion(Platform P) : PlatformVersion(P, 0, 0) {}
+	PlatformVersion(Platform P, uint32_t V) : PlatformVersion(P, V, V) {}
+	PlatformVersion(Platform P, uint32_t M, uint32_t S) : platform(P), minVersion(M), sdkVersion(S) {}
+	bool operator==(const PlatformVersion& other) const { return platform == other.platform; }
+	bool operator<(const PlatformVersion& other) const { return platform < other.platform; }
+};
 
 struct VersionSet {
 private:
-	std::map<Platform, uint32_t> _versions;
+	std::set<PlatformVersion> _versions;
 public:
 	VersionSet() {}
-	VersionSet(const std::map<Platform, uint32_t>& P) : _versions(P) {}
-	void add(ld::Version platformVersion) {
+	VersionSet(const std::set<PlatformVersion>& V) : _versions(V) {}
+	void insert(PlatformVersion platformVersion) {
+		assert(_versions.find(platformVersion) == _versions.end());
 		_versions.insert(platformVersion);
 	}
 	void erase(const Platform& platform) {
-		_versions.erase(platform);
+		auto i = std::find_if(_versions.begin(), _versions.end(), [&platform](const PlatformVersion& version) {
+			return platform == version.platform;
+		});
+		if (i == _versions.end()) return;
+		_versions.erase(i);
+	}
+	void updateMinVersion(const Platform& platform, uint32_t minVersion) {
+		auto i = std::find_if(_versions.begin(), _versions.end(), [&platform](const PlatformVersion& version) {
+			return platform == version.platform;
+		});
+		if (i == _versions.end()) return;
+		auto newVersion = *i;
+		newVersion.minVersion = minVersion;
+		newVersion.sdkVersion = i->sdkVersion;
+		_versions.erase(i);
+		_versions.insert(newVersion);
+	}
+	void updateSDKVersion(const Platform& platform, uint32_t sdkVersion) {
+		auto i = std::find_if(_versions.begin(), _versions.end(), [&platform](const PlatformVersion& version) {
+			return platform == version.platform;
+		});
+		if (i == _versions.end()) return;
+		auto newVersion = *i;
+		newVersion.minVersion = i->minVersion;
+		newVersion.sdkVersion = sdkVersion;
+		_versions.erase(i);
+		_versions.insert(newVersion);
 	}
 	size_t count() const { return _versions.size(); }
 	size_t empty() const { return _versions.empty(); }
+	void   clear() { _versions.clear(); }
 
-	void forEach(void (^callback)(ld::Platform platform, uint32_t version, bool &stop)) const {
+	void forEach(void (^callback)(ld::Platform platform, uint32_t minVersion, uint32_t sdkVersion, bool &stop)) const {
 		bool stop = false;
 		for (const auto& version : _versions) {
-			callback(version.first, version.second, stop);
+			callback(version.platform, version.minVersion, version.sdkVersion, stop);
 			if (stop)
 				return;
 		}
 	}
 
-	bool contains(ld::Platform platform) const { return _versions.count(platform) != 0; }
-	bool contains(ld::PlatformSet platforms) const {
+	bool contains(ld::Platform platform) const {
+		auto i = std::find_if(_versions.begin(), _versions.end(), [&platform](const PlatformVersion& version) {
+			return platform == version.platform;
+		});
+		return (i != _versions.end());
+	}
+
+	bool contains(const ld::PlatformSet& platforms) const {
 		__block bool retval = true;
-		forEach(^(ld::Platform platform, uint32_t version, bool &stop) {
+		forEach(^(ld::Platform platform, uint32_t minVersion, uint32_t sdkVersion, bool &stop) {
 			if (platforms.find(platform) == platforms.end()) {
 				stop = true;
 				retval = false;
@@ -104,25 +130,25 @@ public:
 		return retval;
 	}
 
-	uint32_t minOS(const ld::Platform& platform) const {
+	uint32_t minOS(ld::Platform platform) const {
 		for (const auto& version : _versions) {
-			if (basePlatform(version.first) == platform) {
-				return version.second;
+			if (basePlatform(version.platform) == platform) {
+				return version.minVersion;
 			}
 		}
 		return 0;
 	}
 
-	bool minOS(const Version& version) const {
-		return minOS(version.first) >= version.second;
+	bool minOS(const PlatformVersion& version) const {
+		return minOS(version.platform) >= version.minVersion;
 	}
 
 	bool minOS(const ld::VersionSet& requiredMinVersions) const {
 		__block bool retval = true;
-		forEach(^(ld::Platform platform, uint32_t version, bool &stop) {
+		forEach(^(ld::Platform platform, uint32_t minVersion, uint32_t sdkVersion, bool &stop) {
 			if (!requiredMinVersions.contains(basePlatform(platform)))
 				return;
-			if (version < requiredMinVersions.minOS(basePlatform(platform))) {
+			if (minVersion < requiredMinVersions.minOS(basePlatform(platform))) {
 				stop = true;
 				retval = false;
 			}
@@ -141,64 +167,67 @@ public:
 			}
 		};
 
-		forEach(^(ld::Platform platform, uint32_t version, bool &stop) {
-			switch (platform) {
-				case ld::kPlatform_macOS: 				appendPlatform("macOS"); break;
-				case ld::kPlatform_iOSMac:				appendPlatform("iOSMac"); break;
-				case ld::kPlatform_iOS:					appendPlatform("iOS"); break;
-				case ld::kPlatform_iOSSimulator:		appendPlatform("iOS Simulator"); break;
-				case ld::kPlatform_watchOS:				appendPlatform("watchOS"); break;
-				case ld::kPlatform_watchOSSimulator:	appendPlatform("watchOS Simulator"); break;
-				case ld::kPlatform_tvOS:				appendPlatform("tvOS"); break;
-				case ld::kPlatform_tvOSSimulator:		appendPlatform("tvOS Simulator"); break;
-				case ld::kPlatform_bridgeOS:			appendPlatform("bridgeOS"); break;
-				case ld::kPlatform_unknown:				appendPlatform("Unkown"); break;
-			}
+		forEach(^(ld::Platform platform, uint32_t minVersion, uint32_t sdkVersion, bool &stop) {
+			appendPlatform(platformInfo(platform).printName);
 		});
 
 		return retval;
 	}
+
+	void checkObjectCrosslink(const VersionSet& objectPlatforms, const std::string& targetPath, bool internalSDK,
+							  bool bitcode) const;
+	void checkDylibCrosslink(const VersionSet& dylibPlatforms, const std::string& targetPath,
+										 const std::string& dylibType, bool internalSDK, bool indirectDylib,
+										 bool bitcode) const;
+	bool operator==(const VersionSet& other) const { return _versions == other._versions; }
+	bool operator<(const VersionSet& other) const { return _versions < other._versions; }
 };
 
-static const Version mac10_4		({kPlatform_macOS, 0x000A0400});
-static const Version mac10_5		({kPlatform_macOS, 0x000A0500});
-static const Version mac10_6 		({kPlatform_macOS, 0x000A0600});
-static const Version mac10_7 		({kPlatform_macOS, 0x000A0700});
-static const Version mac10_8 		({kPlatform_macOS, 0x000A0800});
-static const Version mac10_9 		({kPlatform_macOS, 0x000A0900});
-static const Version mac10_12 		({kPlatform_macOS, 0x000A0C00});
-static const Version mac10_14 		({kPlatform_macOS, 0x000A0E00});
-static const Version mac10_Future 	({kPlatform_macOS, 0x10000000});
+static const PlatformVersion mac10_4		(Platform::macOS, 0x000A0400);
+static const PlatformVersion mac10_5		(Platform::macOS, 0x000A0500);
+static const PlatformVersion mac10_6 		(Platform::macOS, 0x000A0600);
+static const PlatformVersion mac10_7 		(Platform::macOS, 0x000A0700);
+static const PlatformVersion mac10_8 		(Platform::macOS, 0x000A0800);
+static const PlatformVersion mac10_9 		(Platform::macOS, 0x000A0900);
+static const PlatformVersion mac10_12 		(Platform::macOS, 0x000A0C00);
+static const PlatformVersion mac10_14 		(Platform::macOS, 0x000A0E00);
+static const PlatformVersion mac10_15		(Platform::macOS, 0x000A0F00);
+static const PlatformVersion mac10_Future 	(Platform::macOS, 0x10000000);
 
-static const Version iOS_2_0 		({kPlatform_iOS, 0x00020000});
-static const Version iOS_3_1 		({kPlatform_iOS, 0x00030100});
-static const Version iOS_4_2 		({kPlatform_iOS, 0x00040200});
-static const Version iOS_4_3 		({kPlatform_iOS, 0x00040300});
-static const Version iOS_5_0 		({kPlatform_iOS, 0x00050000});
-static const Version iOS_6_0 		({kPlatform_iOS, 0x00060000});
-static const Version iOS_7_0 		({kPlatform_iOS, 0x00070000});
-static const Version iOS_8_0 		({kPlatform_iOS, 0x00080000});
-static const Version iOS_9_0 		({kPlatform_iOS, 0x00090000});
-static const Version iOS_10_0 		({kPlatform_iOS, 0x000A0000});
-static const Version iOS_11_0 		({kPlatform_iOS, 0x000B0000});
-static const Version iOS_12_0 		({kPlatform_iOS, 0x000C0000});
-static const Version iOS_Future 	({kPlatform_iOS, 0x10000000});
+static const PlatformVersion iOS_2_0 		(Platform::iOS, 0x00020000);
+static const PlatformVersion iOS_3_1 		(Platform::iOS, 0x00030100);
+static const PlatformVersion iOS_4_2 		(Platform::iOS, 0x00040200);
+static const PlatformVersion iOS_4_3 		(Platform::iOS, 0x00040300);
+static const PlatformVersion iOS_5_0 		(Platform::iOS, 0x00050000);
+static const PlatformVersion iOS_6_0 		(Platform::iOS, 0x00060000);
+static const PlatformVersion iOS_7_0 		(Platform::iOS, 0x00070000);
+static const PlatformVersion iOS_8_0 		(Platform::iOS, 0x00080000);
+static const PlatformVersion iOS_9_0 		(Platform::iOS, 0x00090000);
+static const PlatformVersion iOS_10_0 		(Platform::iOS, 0x000A0000);
+static const PlatformVersion iOS_11_0 		(Platform::iOS, 0x000B0000);
+static const PlatformVersion iOS_12_0 		(Platform::iOS, 0x000C0000);
+static const PlatformVersion iOS_13_0 		(Platform::iOS, 0x000D0000);
+static const PlatformVersion iOS_Future 	(Platform::iOS, 0x10000000);
 
-static const Version watchOS_1_0 		({kPlatform_watchOS, 0x00010000});
-static const Version watchOS_2_0 		({kPlatform_watchOS, 0x00020000});
-static const Version watchOS_5_0 		({kPlatform_watchOS, 0x00050000});
-static const Version watchOS_Future		({kPlatform_watchOS, 0x10000000});
+static const PlatformVersion watchOS_1_0 		(Platform::watchOS, 0x00010000);
+static const PlatformVersion watchOS_2_0 		(Platform::watchOS, 0x00020000);
+static const PlatformVersion watchOS_5_0 		(Platform::watchOS, 0x00050000);
+static const PlatformVersion watchOS_6_0 		(Platform::watchOS, 0x00060000);
+static const PlatformVersion watchOS_Future		(Platform::watchOS, 0x10000000);
 
-static const Version tvOS_9_0 			({kPlatform_tvOS, 0x00090000});
-static const Version tvOS_12_0 			({kPlatform_tvOS, 0x000C0000});
-static const Version tvOS_Future		({kPlatform_tvOS, 0x10000000});
-	
-static const Version bridgeOS_1_0 			({kPlatform_bridgeOS, 0x00010000});
-static const Version bridgeOS_Future		({kPlatform_bridgeOS, 0x10000000});
+static const PlatformVersion tvOS_9_0 			(Platform::tvOS, 0x00090000);
+static const PlatformVersion tvOS_12_0 			(Platform::tvOS, 0x000C0000);
+static const PlatformVersion tvOS_13_0 			(Platform::tvOS, 0x000D0000);
+static const PlatformVersion tvOS_Future		(Platform::tvOS, 0x10000000);
+
+static const PlatformVersion bridgeOS_1_0 			(Platform::bridgeOS, 0x00010000);
+static const PlatformVersion bridgeOS_4_0 			(Platform::bridgeOS, 0x00040000);
+static const PlatformVersion bridgeOS_Future		(Platform::bridgeOS, 0x10000000);
+
 
 // Platform Sets
 
-static const PlatformSet simulatorPlatforms ( {kPlatform_iOSSimulator, kPlatform_tvOSSimulator, kPlatform_watchOSSimulator} );
+static const PlatformSet simulatorPlatforms ( {Platform::iOS_simulator, Platform::tvOS_simulator, Platform::watchOS_simulator} );
 
 //FIXME do we need to add simulatots to these?
 //FIXME Are the dates correct?
@@ -211,12 +240,14 @@ static const VersionSet version2010Fall ({mac10_7, iOS_4_3});
 
 static const VersionSet version2012 	({mac10_8, iOS_6_0});
 static const VersionSet version2013 	({mac10_9, iOS_7_0});
-	
+static const VersionSet version2019Fall ({mac10_15, iOS_13_0, watchOS_6_0, tvOS_13_0, bridgeOS_4_0});
+
 static const VersionSet supportsSplitSegV2 		({mac10_12, iOS_9_0, watchOS_2_0, tvOS_9_0});
 // FIXME: Use the comment out line instead.
 static const VersionSet supportsLCBuildVersion 	({mac10_14, iOS_12_0, watchOS_5_0, tvOS_12_0, bridgeOS_1_0});
 static const VersionSet supportsPIE				({mac10_5, iOS_4_2});
 static const VersionSet supportsTLV  			({mac10_7, iOS_9_0});
+static const VersionSet supportsChainedFixups 	({mac10_15, iOS_13_0, watchOS_6_0, tvOS_13_0, bridgeOS_Future});
 
 // Forward declaration for bitcode support
 class Bitcode;
@@ -325,13 +356,16 @@ public:
 	Ordinal								ordinal() const			{ return _ordinal; }
 	virtual bool						forEachAtom(AtomHandler&) const = 0;
 	virtual bool						justInTimeforEachAtom(const char* name, AtomHandler&) const = 0;
-	virtual uint8_t						swiftVersion() const	{ return 0; }
+	virtual uint8_t						swiftVersion() const	{ return 0; }		// ABI version, now fixed
+	virtual uint16_t					swiftLanguageVersion() const	{ return 0; }	// language version in 4.4 format
 	virtual uint32_t					cpuSubType() const		{ return 0; }
 	virtual uint32_t					subFileCount() const	{ return 1; }
 	virtual const VersionSet&			platforms() const		{ return _platforms; }
     bool								fileExists() const     { return _modTime != 0; }
 	Type								type() const { return _type; }
 	virtual Bitcode*					getBitcode() const		{ return NULL; }
+	const char*							leafName() const;
+
 private:
 	const char*							_path;
 	time_t								_modTime;
@@ -340,6 +374,16 @@ private:
 	// Note this is just a placeholder as platforms() needs something to return
 	static const VersionSet				_platforms;
 };
+
+
+inline const char* File::leafName() const {
+	const char* pth = this->path();
+	if ( pth == NULL )
+		return "<internal>";
+	const char* lastSlash = strrchr(pth, '/');
+	return (lastSlash != NULL) ? lastSlash+1 : pth;
+}
+
 
 namespace relocatable {
 	//
@@ -457,6 +501,7 @@ namespace dylib {
 		virtual bool						allSymbolsAreWeakImported() const = 0;
 		virtual bool						installPathVersionSpecific() const { return false; }
 		virtual bool						appExtensionSafe() const = 0;
+		virtual void						forEachExportedSymbol(void (^handler)(const char* symbolName, bool weakDef)) const = 0;
 
 	public:
 		const char*							_dylibInstallPath;
@@ -505,9 +550,9 @@ public:
 				typeCFI, typeLSDA, typeDtraceDOF, typeUnwindInfo, typeObjCClassRefs, typeObjC2CategoryList,
 				typeZeroFill, typeTentativeDefs, typeLazyPointer, typeStub, typeNonLazyPointer, typeDyldInfo, 
 				typeLazyDylibPointer, typeStubHelper, typeInitializerPointers, typeTerminatorPointers,
-				typeStubClose, typeLazyPointerClose, typeAbsoluteSymbols, typeThreadStarts,
+				typeStubClose, typeLazyPointerClose, typeAbsoluteSymbols, typeThreadStarts, typeChainStarts,
 				typeTLVDefs, typeTLVZeroFill, typeTLVInitialValues, typeTLVInitializerPointers, typeTLVPointers,
-				typeFirstSection, typeLastSection, typeDebug, typeSectCreate };
+				typeFirstSection, typeLastSection, typeDebug, typeSectCreate, typeInitOffsets };
 
 
 					Section(const char* sgName, const char* sctName,
@@ -1029,14 +1074,14 @@ public:
 	};
  
 											Atom(const Section& sect, Definition d, Combine c, Scope s, ContentType ct, 
-												SymbolTableInclusion i, bool dds, bool thumb, bool al, Alignment a) :  
+												SymbolTableInclusion i, bool dds, bool thumb, bool al, Alignment a, bool cold=false) :
 													_section(&sect), _address(0), _alignmentModulus(a.modulus), 
 													_alignmentPowerOf2(a.powerOf2), _definition(d), _combine(c),   
 													_dontDeadStrip(dds), _thumb(thumb), _alias(al), _autoHide(false), 
 													_contentType(ct), _symbolTableInclusion(i),
 													_scope(s), _mode(modeSectionOffset), 
 													_overridesADylibsWeakDef(false), _coalescedAway(false),
-													_live(false), _dontDeadStripIfRefLive(false),
+													_live(false), _dontDeadStripIfRefLive(false), _cold(cold),
 													_machoSection(0), _weakImportState(weakImportUnset)
 													 {
 													#ifndef NDEBUG
@@ -1070,6 +1115,7 @@ public:
 	bool									weakImported() const		{ return _weakImportState == weakImportTrue; }
 	WeakImportState							weakImportState() const		{ return _weakImportState; }
 	bool									autoHide() const			{ return _autoHide; }
+	bool									cold() const			    { return _cold; }
 	bool									live() const				{ return _live; }
 	uint8_t									machoSection() const		{ assert(_machoSection != 0); return _machoSection; }
 
@@ -1126,6 +1172,7 @@ public:
 													_combine = a._combine;
 													_dontDeadStrip = a._dontDeadStrip;
 													_dontDeadStripIfRefLive = a._dontDeadStripIfRefLive;
+													_cold = a._cold;
 													_thumb = a._thumb;
 													_autoHide = a._autoHide;
 													_contentType = a._contentType;
@@ -1166,6 +1213,7 @@ protected:
 	bool								_coalescedAway : 1;
 	bool								_live : 1;
 	bool								_dontDeadStripIfRefLive : 1;
+	bool								_cold : 1;
 	unsigned							_machoSection : 8;
 	WeakImportState						_weakImportState : 2;
 };
@@ -1233,7 +1281,8 @@ public:
 											entryPoint(NULL), classicBindingHelper(NULL),
 											lazyBindingHelper(NULL), compressedFastBinderProxy(NULL),
 											hasObjC(false),
-											swiftVersion(0), cpuSubType(0), minOSVersion(0),
+											swiftVersion(0), swiftLanguageVersion(0),
+											cpuSubType(0), minOSVersion(0),
 											objectFileFoundWithNoVersion(false),
 											allObjectFilesScatterable(true), 
 											someObjectFileHasDwarf(false), usingHugeSections(false),
@@ -1268,9 +1317,9 @@ public:
 	const Atom*									compressedFastBinderProxy;
 	bool										hasObjC;
 	uint8_t										swiftVersion;
+	uint16_t									swiftLanguageVersion;
 	uint32_t									cpuSubType;
 	uint32_t									minOSVersion;
-	VersionSet									derivedPlatforms;
 	bool										objectFileFoundWithNoVersion;
 	bool										allObjectFilesScatterable;
 	bool										someObjectFileHasDwarf;

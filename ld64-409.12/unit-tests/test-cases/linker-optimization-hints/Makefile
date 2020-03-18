@@ -1732,6 +1732,3 @@ AdrpLdrGot:  main.o
 
 clean:
 	rm -f *.o   *.exe   *.dylib
-
-skip:
-	echo "PASS"

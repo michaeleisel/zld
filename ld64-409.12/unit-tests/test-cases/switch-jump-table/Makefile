@@ -36,7 +36,7 @@ all: test-${FILEARCH}
 test-ppc:  test-good
 test-x86_64: test-good
 test-i386: test
-test-arm64: test
+test-arm: test
 
 test:
 	# check jump table in a weak function

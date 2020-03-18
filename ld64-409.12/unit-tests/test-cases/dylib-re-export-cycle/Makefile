@@ -36,7 +36,6 @@ all-i386: all-mac
 all-x86_64: all-mac
 all-armv6: all-good
 all-armv7: all-good
-all-arm64: all-good
 
 
 all-mac: 

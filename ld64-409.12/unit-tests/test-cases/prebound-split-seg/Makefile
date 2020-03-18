@@ -36,7 +36,6 @@ all-ppc: all-32
 all-x86_64: all-good
 all-armv6: all-good
 all-armv7: all-good
-all-arm64: all-good
 
 
 all-good:

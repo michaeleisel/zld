@@ -93,26 +93,25 @@ sub process_entry
     {
 	printf "%-40s FAIL Makefile failure\n", $test_name;
 	$total_count++;
-	my $line1;
-	foreach $line1 (@{$$tbl{stdout}})
-	{
-	    printf "%s\n", $line1;
-	}
-	foreach $line1 (@{$$tbl{stderr}})
-	{
-	    printf "%s\n", $line1;
-	}
-        printf "###########################";
+	#my $line1;
+	#foreach $line1 (@{$$tbl{stdout}})
+	#{
+	#    printf "stdout: %s\n", $line1;
+	#}
+	#foreach $line1 (@{$$tbl{stderr}})
+	#{
+	#    printf "stderr: %s\n", $line1;
+	#}
 	return;
     }
 
     #if there was any output to stderr, mark this as a failure
-    #foreach $line (@{$$tbl{stderr}})
-    #{
-    #printf "%-40s FAIL spurious stderr failure: %s\n", $test_name, $line;
-    #$total_count++;
-    #return;
-    #}
+    foreach $line (@{$$tbl{stderr}})
+    {
+	printf "%-40s FAIL spurious stderr failure: %s\n", $test_name, $line;
+	$total_count++;
+	return;
+    }
 
     # scan all stdout looking for lines that start with PASS or FAIL
     my $seen_result = 0;

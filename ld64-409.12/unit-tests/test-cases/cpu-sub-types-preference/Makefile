@@ -40,7 +40,6 @@ test-x86_64:
 
 test-armv6: test-arm
 test-armv7: test-arm
-test-arm64: test-arm
 
 test-arm:
 	clang foo.c -arch armv4t -c -DAAA=1 -o foo4.o

@@ -117,18 +117,29 @@ bool SymbolTable::ReferencesHashFuncs::operator()(const ld::Atom* left, const ld
 }
 
 
-void SymbolTable::addDuplicateSymbol(const char *name, const ld::Atom *atom)
+void SymbolTable::addDuplicateSymbolError(const char* name, const ld::Atom* atom)
+{
+	addDuplicateSymbol(_duplicateSymbolErrors, name, atom);
+}
+
+void SymbolTable::addDuplicateSymbolWarning(const char* name, const ld::Atom* atom)
+{
+	addDuplicateSymbol(_duplicateSymbolWarnings, name, atom);
+}
+
+void SymbolTable::addDuplicateSymbol(DuplicateSymbols& dups, const char *name, const ld::Atom *atom)
 {
     // Look up or create the file list for name.
-    DuplicateSymbols::iterator symbolsIterator = _duplicateSymbols.find(name);
+    DuplicateSymbols::iterator symbolsIterator = dups.find(name);
     DuplicatedSymbolAtomList *atoms = NULL;
-    if (symbolsIterator != _duplicateSymbols.end()) {
+    if (symbolsIterator != dups.end()) {
         atoms = symbolsIterator->second;
-    } else {
-        atoms = new std::vector<const ld::Atom *>;
-        _duplicateSymbols.insert(std::pair<const char *, DuplicatedSymbolAtomList *>(name, atoms));
     }
-    
+    else {
+        atoms = new std::vector<const ld::Atom *>;
+        dups.insert(std::pair<const char *, DuplicatedSymbolAtomList *>(name, atoms));
+    }
+
     // check if file is already in the list, add it if not
     bool found = false;
     for (DuplicatedSymbolAtomList::iterator it = atoms->begin(); !found && it != atoms->end(); it++)
@@ -138,10 +149,12 @@ void SymbolTable::addDuplicateSymbol(const char *name, const ld::Atom *atom)
         atoms->push_back(atom);
 }
 
+
 void SymbolTable::checkDuplicateSymbols() const
 {
+	// print duplicate errors
     bool foundDuplicate = false;
-    for (DuplicateSymbols::const_iterator symbolIt = _duplicateSymbols.begin(); symbolIt != _duplicateSymbols.end(); symbolIt++) {
+    for (DuplicateSymbols::const_iterator symbolIt = _duplicateSymbolErrors.begin(); symbolIt != _duplicateSymbolErrors.end(); symbolIt++) {
         DuplicatedSymbolAtomList *atoms = symbolIt->second;
         bool reportDuplicate;
         if (_options.deadCodeStrip()) {
@@ -156,20 +169,29 @@ void SymbolTable::checkDuplicateSymbols() const
         }
         if (reportDuplicate) {
             foundDuplicate = true;
-            fprintf(stderr, "duplicate symbol %s in:\n", symbolIt->first);
+            fprintf(stderr, "duplicate symbol '%s' in:\n", _options.demangleSymbol(symbolIt->first));
             for (DuplicatedSymbolAtomList::iterator atomIt = atoms->begin(); atomIt != atoms->end(); atomIt++) {
                 fprintf(stderr, "    %s\n", (*atomIt)->safeFilePath());
             }
         }
     }
     if (foundDuplicate)
-        throwf("%d duplicate symbol%s", (int)_duplicateSymbols.size(), _duplicateSymbols.size()==1?"":"s");
+        throwf("%d duplicate symbol%s", (int)_duplicateSymbolErrors.size(), _duplicateSymbolErrors.size()==1?"":"s");
+
+	// print duplicates warnings
+    for (DuplicateSymbols::const_iterator symbolIt = _duplicateSymbolWarnings.begin(); symbolIt != _duplicateSymbolWarnings.end(); symbolIt++) {
+        std::string msg = "duplicate symbol '" + std::string(_options.demangleSymbol(symbolIt->first)) + "' in:";
+		for (const ld::Atom* atom : *symbolIt->second) {
+			msg += "\n    " + std::string(atom->safeFilePath());
+		}
+		warning("%s", msg.c_str());
+    }
 }
 
 // AtomPicker encapsulates the logic for picking which atom to use when adding an atom by name results in a collision
 class NameCollisionResolution {
 public:
-	NameCollisionResolution(const ld::Atom& a, const ld::Atom& b, bool ignoreDuplicates, const Options& options) : _atomA(a), _atomB(b), _options(options), _reportDuplicate(false), _ignoreDuplicates(ignoreDuplicates) {
+	NameCollisionResolution(const ld::Atom& a, const ld::Atom& b, Options::Treatment duplicates, const Options& options) : _atomA(a), _atomB(b), _options(options), _reportDuplicate(false), _duplicates(duplicates) {
 		pickAtom();
 	}
 	
@@ -178,15 +200,16 @@ public:
 	bool choseAtom(const ld::Atom& atom) { return _chosen == &atom; }
 
 	// Returns true if the two atoms should be reported as a duplicate symbol
-	bool reportDuplicate()  { return _reportDuplicate; }
-	
+	bool reportDuplicateError()    { return _reportDuplicate && (_duplicates == Options::Treatment::kError); }
+	bool reportDuplicateWarning()  { return _reportDuplicate && (_duplicates == Options::Treatment::kWarning); }
+
 private:
 	const ld::Atom& _atomA;
 	const ld::Atom& _atomB;
 	const Options& _options;
 	const ld::Atom* _chosen;
 	bool _reportDuplicate;
-	bool _ignoreDuplicates;
+	Options::Treatment _duplicates;
 
 	void pickAtom(const ld::Atom& atom) { _chosen = &atom; } // primitive to set which atom is picked
 	void pickAtomA() { pickAtom(_atomA); }	// primitive to pick atom A
@@ -266,11 +289,19 @@ private:
 					pickAtomB();
 				} 
 				else {
-					if ( _ignoreDuplicates ) {
-						pickLowerOrdinal();
-					}
-					else {
-						_reportDuplicate = true;
+					switch (_duplicates) {
+						case Options::Treatment::kError:
+							_reportDuplicate = true;
+							break;
+						case Options::Treatment::kWarning:
+							pickLowerOrdinal();
+							_reportDuplicate = true;
+							break;
+						case Options::Treatment::kSuppress:
+							pickLowerOrdinal();
+							break;
+						default:
+							break;
 					}
 				}
 			}
@@ -394,7 +425,7 @@ private:
 	}
 };
 
-bool SymbolTable::addByName(const ld::Atom& newAtom, bool ignoreDuplicates)
+bool SymbolTable::addByName(const ld::Atom& newAtom, Options::Treatment duplicates)
 {
 	bool useNew = true;
 	assert(newAtom.name() != NULL);
@@ -404,10 +435,14 @@ bool SymbolTable::addByName(const ld::Atom& newAtom, bool ignoreDuplicates)
 	//fprintf(stderr, "addByName(%p) name=%s, slot=%u, existing=%p\n", &newAtom, newAtom.name(), slot, existingAtom);
 	if ( existingAtom != NULL ) {
 		assert(&newAtom != existingAtom);
-		NameCollisionResolution picker(newAtom, *existingAtom, ignoreDuplicates, _options);
-		if (picker.reportDuplicate()) {
-			addDuplicateSymbol(name, existingAtom);
-			addDuplicateSymbol(name, &newAtom);
+		NameCollisionResolution picker(newAtom, *existingAtom, duplicates, _options);
+		if ( picker.reportDuplicateError() ) {
+			addDuplicateSymbolError(name, existingAtom);
+			addDuplicateSymbolError(name, &newAtom);
+		}
+		else if ( picker.reportDuplicateWarning() ) {
+			addDuplicateSymbolWarning(name, existingAtom);
+			addDuplicateSymbolWarning(name, &newAtom);
 		}
 		useNew = picker.choseAtom(newAtom);
 	}
@@ -478,14 +513,14 @@ bool SymbolTable::addByReferences(const ld::Atom& newAtom)
 }
 
 
-bool SymbolTable::add(const ld::Atom& atom, bool ignoreDuplicates)
+bool SymbolTable::add(const ld::Atom& atom, Options::Treatment duplicates)
 {
 	//fprintf(stderr, "SymbolTable::add(%p), name=%s\n", &atom, atom.name());
 	assert(atom.scope() != ld::Atom::scopeTranslationUnit);
 	switch ( atom.combine() ) {
 		case ld::Atom::combineNever:
 		case ld::Atom::combineByName:
-			return this->addByName(atom, ignoreDuplicates);
+			return this->addByName(atom, duplicates);
 			break;
 		case ld::Atom::combineByNameAndContent:
 			return this->addByContent(atom);

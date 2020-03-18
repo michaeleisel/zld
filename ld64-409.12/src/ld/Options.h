@@ -92,36 +92,6 @@ public:
 	enum DebugInfoStripping { kDebugInfoNone, kDebugInfoMinimal, kDebugInfoFull };
 	enum UnalignedPointerTreatment { kUnalignedPointerError, kUnalignedPointerWarning, kUnalignedPointerIgnore };
 
-	static ld::Platform platformForLoadCommand(uint32_t lc, bool useSimulatorVariant) {
-		switch (lc) {
-			case LC_VERSION_MIN_MACOSX:
-				return ld::kPlatform_macOS;
-			case LC_VERSION_MIN_IPHONEOS:
-				return useSimulatorVariant ? ld::kPlatform_iOSSimulator : ld::kPlatform_iOS;
-			case LC_VERSION_MIN_WATCHOS:
-				return useSimulatorVariant ? ld::kPlatform_watchOSSimulator : ld::kPlatform_watchOS;
-			case LC_VERSION_MIN_TVOS:
-				return useSimulatorVariant ? ld::kPlatform_tvOSSimulator : ld::kPlatform_tvOS;
-		}
-		assert(!lc && "unknown LC_VERSION_MIN load command");
-		return ld::kPlatform_unknown;
-	}
-
-	static const char* platformName(ld::Platform platform) {
-		switch (platform) {
-			case ld::kPlatform_macOS: 				return "OSX";
-			case ld::kPlatform_iOS: 				return "iOS";
-			case ld::kPlatform_iOSSimulator:		return "iOS Simulator";
-			case ld::kPlatform_iOSMac:				return "iOSMac";
-			case ld::kPlatform_watchOS: 			return "watchOS";
-			case ld::kPlatform_watchOSSimulator:	return "watchOS Simulator";
-			case ld::kPlatform_tvOS: 				return "tvOS";
-			case ld::kPlatform_tvOSSimulator: 		return "tvOS Simulator";
-			case ld::kPlatform_bridgeOS: 			return "bridgeOS";
-			case ld::kPlatform_unknown:				return "(unknown)";
-		}
-	}
-
 	static void userReadableSwiftVersion(uint8_t value, char versionString[64])
 	{
 		switch (value) {
@@ -139,6 +109,12 @@ public:
 				break;
 			case 5:
 				strcpy(versionString, "4.0");
+				break;
+			case 6:
+				strcpy(versionString, "4.1/4.2");
+				break;
+			case 7:
+				strcpy(versionString, "5 or later");
 				break;
 			default:
 				sprintf(versionString, "unknown ABI version 0x%02X", value);
@@ -296,9 +272,11 @@ public:
 	bool						warnOnSwiftABIVersionMismatches() const { return fWarnOnSwiftABIVersionMismatches; }
 	bool						forceCpuSubtypeAll() const { return fForceSubtypeAll; }
 	const char*					architectureName() const { return fArchitectureName; }
-	void						setArchitecture(cpu_type_t, cpu_subtype_t subtype, ld::Platform platform, uint32_t minOsVers);
+	void						setInferredArch(cpu_type_t, cpu_subtype_t subtype);
+	void						setInferredPlatform(ld::Platform platform, uint32_t minOsVers);
 	bool						archSupportsThumb2() const { return fArchSupportsThumb2; }
 	OutputKind					outputKind() const { return fOutputKind; }
+	bool						dyldLoadsOutput() const;
 	bool						bindAtLoad() const { return fBindAtLoad; }
 	NameSpace					nameSpace() const { return fNameSpace; }
 	const char*					installPath() const;			// only for kDynamicLibrary
@@ -364,6 +342,7 @@ public:
 	void						gotoClassicLinker(int argc, const char* argv[]);
 	bool						sharedRegionEligible() const { return fSharedRegionEligible; }
 	bool						printOrderFileStatistics() const { return fPrintOrderFileStatistics; }
+	const char*					orderFilePath() const { return fOrderFilePath; }
 	const char*					dTraceScriptName() { return fDtraceScriptName; }
 	bool						dTrace() { return (fDtraceScriptName != NULL); }
 	unsigned long				orderedSymbolsCount() const { return fOrderedSymbols.size(); }
@@ -373,10 +352,12 @@ public:
 	uint64_t					segmentAlignment() const { return fSegmentAlignment; }
 	uint64_t					segPageSize(const char* segName) const;
 	uint64_t					customSegmentAddress(const char* segName) const;
+	uint64_t					machHeaderVmAddr() const;
 	bool						hasCustomSegmentAddress(const char* segName) const;
 	bool						hasCustomSectionAlignment(const char* segName, const char* sectName) const;
 	uint8_t						customSectionAlignment(const char* segName, const char* sectName) const;
-	uint32_t					initialSegProtection(const char*) const; 
+	uint32_t					initialSegProtection(const char*) const;
+	bool						readOnlyDataSegment(const char*) const;
 	uint32_t					maxSegProtection(const char*) const; 
 	bool						saveTempFiles() const { return fSaveTempFiles; }
 	const std::vector<const char*>&   rpaths() const { return fRPaths; }
@@ -437,8 +418,9 @@ public:
 	bool						objcGc() const { return fObjCGc; }
 	bool						objcGcOnly() const { return fObjCGcOnly; }
 	bool						canUseThreadLocalVariables() const { return fTLVSupport; }
+	bool						forceLegacyVersionLoadCommands() const { return fForceLegacyVersionLoadCommands; }
 	bool						shouldUseBuildVersion(ld::Platform plat, uint32_t minOSvers) const;
-	bool						addVersionLoadCommand() const { return fVersionLoadCommand && (platforms().count() != 0); }
+	bool						addVersionLoadCommand() const { return fVersionLoadCommand && (platforms().count() != 0) && !platforms().contains(ld::Platform::freestanding); }
 	bool						addFunctionStarts() const { return fFunctionStartsLoadCommand; }
 	bool						addDataInCodeInfo() const { return fDataInCodeInfoLoadCommand; }
 	bool						canReExportSymbols() const { return fCanReExportSymbols; }
@@ -470,7 +452,9 @@ public:
 	bool						renameReverseSymbolMap() const { return fReverseMapUUIDRename; }
 	bool						deduplicateFunctions() const { return fDeDupe; }
 	bool						verboseDeduplicate() const { return fVerboseDeDupe; }
+	bool						makeInitializersIntoOffsets() const { return fMakeInitializersIntoOffsets; }
 	bool						useLinkedListBinding() const { return fUseLinkedListBinding; }
+	bool						makeChainedFixups() const { return fMakeChainedFixups; }
 #if SUPPORT_ARCH_arm64e
 	bool						useAuthenticatedStubs() const { return fUseAuthenticatedStubs; }
 	bool						supportsAuthenticatedPointers() const { return fSupportsAuthenticatedPointers; }
@@ -503,7 +487,6 @@ public:
 	bool						allowSimulatorToLinkWithMacOSX() const { return fAllowSimulatorToLinkWithMacOSX; }
 	bool						isSimulatorSupportDylib() const { return fSimulatorSupportDylib; }
 	uint64_t					sourceVersion() const { return fSourceVersion; }
-	uint32_t					sdkVersion() const { return fSDKVersion; }
 	const char*					demangleSymbol(const char* sym) const;
     bool						pipelineEnabled() const { return fPipelineFifo != NULL; }
     const char*					pipelineFifo() const { return fPipelineFifo; }
@@ -522,6 +505,7 @@ public:
 	bool						moveAXMethodList(const char* className) const;
 	const ld::VersionSet& 		platforms() const { return fPlatforms; }
 	const std::vector<const char*>&	sdkPaths() const { return fSDKPaths; }
+	bool						internalSDK() const { return fInternalSDK; }
 	std::vector<std::string>	writeBitcodeLinkOptions() const;
 	std::string					getSDKVersionStr() const;
 	uint8_t						maxDefaultCommonAlign() const { return fMaxDefaultCommonAlign; }
@@ -534,6 +518,8 @@ public:
 	std::vector<TAPIInterface>	&TAPIFiles() { return fTAPIFiles; }
 	void						addTAPIInterface(tapi::LinkerInterfaceFile* interface, const char *path) const;
 	const char*					buildContextName() const { return fBuildContextName; }
+	bool 						sharedCacheEligiblePath(const char* path) const;
+	const char* 				debugMapObjectPrefixPath() const { return fOSOPrefixPath; }
 
 	static uint32_t				parseVersionNumber32(const char*);
 
@@ -600,7 +586,6 @@ private:
 	void						parsePreCommandLineEnvironmentSettings();
 	void						parsePostCommandLineEnvironmentSettings();
 	void						setUndefinedTreatment(const char* treatment);
-	void 						setVersionMin(const ld::Platform& platform, const char *version);
 	void						setWeakReferenceMismatchTreatment(const char* treatment);
 	void						addDylibOverride(const char* paths);
 	void						addSectionAlignment(const char* segment, const char* section, const char* alignment);
@@ -617,7 +602,8 @@ private:
 	void						addSegmentRename(const char* srcSegment, const char* dstSegment);
 	void						addSymbolMove(const char* dstSegment, const char* symbolList, std::vector<SymbolsMove>& list, const char* optionName);
 	void						cannotBeUsedWithBitcode(const char* arg);
-	bool 						sharedCacheEligiblePath(const char* path);
+	void						loadImplictZipperFile(const char *path,std::vector<const char*>& paths);
+	void 						inferArchAndPlatform();
 
 
 //	ObjectFile::ReaderOptions			fReaderOptions;
@@ -685,6 +671,7 @@ private:
 	int     							fKextObjectsEnable;
 	const char*							fKextObjectsDirPath;
 	const char*							fToolchainPath;
+	const char*							fOrderFilePath;
 	uint64_t							fZeroPageSize;
 	uint64_t							fStackSize;
 	uint64_t							fStackAddr;
@@ -813,7 +800,10 @@ private:
 	bool								fReverseMapUUIDRename;
 	bool								fDeDupe;
 	bool								fVerboseDeDupe;
+	bool								fMakeInitializersIntoOffsets;
 	bool								fUseLinkedListBinding;
+	bool								fMakeChainedFixups;
+	bool								fMakeChainedFixupsSection;
 #if SUPPORT_ARCH_arm64e
 	bool								fUseAuthenticatedStubs = false;
 	bool								fSupportsAuthenticatedPointers = false;
@@ -832,6 +822,8 @@ private:
 	DebugInfoStripping					fDebugInfoStripping;
 	const char*							fTraceOutputFile;
 	ld::VersionSet						fPlatforms;
+	bool								fPlatfromVersionCmdFound;
+	bool								fInternalSDK;
 	std::vector<AliasPair>				fAliases;
 	std::vector<const char*>			fInitialUndefines;
 	NameSet								fAllowedUndefined;
@@ -868,7 +860,8 @@ private:
 	UnalignedPointerTreatment			fUnalignedPointerTreatment;
 	mutable std::vector<DependencyEntry> fDependencies;
 	mutable std::vector<Options::TAPIInterface> fTAPIFiles;
-
+	bool								fPreferTAPIFile;
+	const char*							fOSOPrefixPath;
 };
 
 

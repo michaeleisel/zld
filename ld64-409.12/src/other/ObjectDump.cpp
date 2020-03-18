@@ -37,6 +37,7 @@
 
 const ld::VersionSet ld::File::_platforms;
 
+
 static bool			sDumpContent= true;
 static bool			sDumpStabs	= false;
 static bool			sSort		= true;
@@ -558,6 +559,9 @@ const char*	dumper::attributeString(const ld::Atom& atom)
 	if ( atom.isAlias() )
 		strcat(buffer, "alias ");
 		
+	if ( atom.cold() )
+		strcat(buffer, "cold ");
+
 	if ( atom.contentType() == ld::Atom::typeResolver )
 		strcat(buffer, "resolver ");
 		
@@ -1253,6 +1257,9 @@ static ld::relocatable::File* createReader(const char* path)
 	objOpts.forceDwarfConversion = false;
 	objOpts.verboseOptimizationHints = true;
 	objOpts.armUsesZeroCostExceptions = true;
+#if SUPPORT_ARCH_arm64e
+	objOpts.supportsAuthenticatedPointers = true;
+#endif
 	objOpts.subType				= sPreferredSubArch;
 	objOpts.treateBitcodeAsData  = false;
 	objOpts.usingBitcode		= true;
@@ -1262,7 +1269,7 @@ static ld::relocatable::File* createReader(const char* path)
 		cpu_subtype_t subArchOfObj;
 		ld::Platform platform;
 		uint32_t minOS;
-		if ( mach_o::relocatable::isObjectFile(p, &archOfObj, &subArchOfObj, &platform, &minOS) ) {
+		if ( mach_o::relocatable::isObjectFile(p, fileLen, &archOfObj, &subArchOfObj, &platform, &minOS) ) {
 			objOpts.architecture = archOfObj;
 			objOpts.subType = subArchOfObj;
 		}

@@ -3,10 +3,10 @@
 SHELL = /bin/sh
 
 # set default to be host
-ARCH ?= x86_64
+ARCH ?= $(shell arch)
 
 # set default to be all
-VALID_ARCHS ?= "x86_64 arm64"
+VALID_ARCHS ?= "i386 x86_64 armv6"
 
 
 MYDIR=$(shell cd ../../bin;pwd)
@@ -55,14 +55,14 @@ export PATH
 export COMPILER_PATH
 export GCC_EXEC_PREFIX=garbage
 
-IOS_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk
-OSX_SDK = /Users/michael/projects/MacOSX-SDKs/MacOSX10.14.sdk
+IOS_SDK = $(shell xcodebuild -sdk iphoneos.internal -version Path  2>/dev/null)
+OSX_SDK = $(shell xcodebuild -sdk macosx.internal -version Path  2>/dev/null)
 ifeq ($(ARCH),ppc)
 	OSX_SDK = /Developer/SDKs/MacOSX10.6.sdk
 endif
 
-CC		= $(shell xcrun -find clang) -arch ${ARCH} -mmacosx-version-min=10.14 -isysroot $(OSX_SDK)
-AS		= $(shell xcrun -f as) -arch ${ARCH} -mmacosx-version-min=10.14
+CC		= $(shell xcrun -find clang) -arch ${ARCH} -mmacosx-version-min=10.8 -isysroot $(OSX_SDK)
+AS		= $(shell xcrun -f as) -arch ${ARCH} -mmacosx-version-min=10.8
 CCFLAGS = -Wall 
 LDFLAGS = -syslibroot $(OSX_SDK)
 ASMFLAGS =
@@ -138,13 +138,13 @@ endif
 ifeq ($(ARCH),arm64)
   LDFLAGS := -syslibroot $(IOS_SDK)
   AS = $(shell xcrun -f as) -arch ${ARCH} -miphoneos-version-min=5.0
-  CC  = $(shell xcrun -find clang) -arch ${ARCH} -ccc-install-dir ${LD_PATH} -miphoneos-version-min=9.0 -isysroot $(IOS_SDK)
-  CXX = $(shell xcrun -find clang++) -arch ${ARCH} -ccc-install-dir ${LD_PATH} -miphoneos-version-min=9.0 -isysroot $(IOS_SDK)
+  CC  = $(shell xcrun --sdk iphoneos.internal -find clang) -arch ${ARCH} -ccc-install-dir ${LD_PATH} -miphoneos-version-min=9.0 -isysroot $(IOS_SDK)
+  CXX = $(shell xcrun --sdk iphoneos.internal -find clang++) -arch ${ARCH} -ccc-install-dir ${LD_PATH} -miphoneos-version-min=9.0 -isysroot $(IOS_SDK)
   VERSION_NEW_LINKEDIT = -miphoneos-version-min=7.0
   VERSION_OLD_LINKEDIT = -miphoneos-version-min=3.0
   LD_SYSROOT = -syslibroot $(IOS_SDK)
   LD_NEW_LINKEDIT = -ios_version_min 7.0
-  OTOOL =  $(shell xcrun -find otool)
+  OTOOL =  $(shell xcrun --sdk iphoneos.internal -find otool)
 else
   FILEARCH = $(ARCH)
 endif

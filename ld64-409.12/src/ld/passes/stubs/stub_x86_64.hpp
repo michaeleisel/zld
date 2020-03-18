@@ -53,29 +53,34 @@ private:
 	static ld::Section						_s_section;
 };
 
-ld::Section FastBindingPointerAtom::_s_section("__DATA", "__nl_symbol_ptr", ld::Section::typeNonLazyPointer);
+ld::Section FastBindingPointerAtom::_s_section("__DATA", "__got", ld::Section::typeNonLazyPointer);
 
 
 class ImageCachePointerAtom : public ld::Atom {
 public:
 											ImageCachePointerAtom(ld::passes::stubs::Pass& pass)
-				: ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
-							ld::Atom::scopeLinkageUnit, ld::Atom::typeNonLazyPointer, 
-							symbolTableNotIn, false, false, false, ld::Atom::Alignment(3)) { pass.addAtom(*this); }
+				: ld::Atom( (pass.usingDataConstSegment ? _s_section : _s_sectionOld),
+					        ld::Atom::definitionRegular, ld::Atom::combineNever,
+							(pass.usingDataConstSegment ? ld::Atom::scopeTranslationUnit : ld::Atom::scopeLinkageUnit),
+							(pass.usingDataConstSegment ? ld::Atom::typeUnclassified : ld::Atom::typeNonLazyPointer),
+							(pass.usingDataConstSegment ? symbolTableIn : symbolTableNotIn),
+							false, false, false, ld::Atom::Alignment(3)) { pass.addAtom(*this); }
 
 	virtual const ld::File*					file() const					{ return NULL; }
-	virtual const char*						name() const					{ return "image cache pointer"; }
+	virtual const char*						name() const					{ return "__dyld_private"; }
 	virtual uint64_t						size() const					{ return 8; }
 	virtual uint64_t						objectAddress() const			{ return 0; }
 	virtual void							copyRawContent(uint8_t buffer[]) const { }
 	virtual void							setScope(Scope)					{ }
 
 private:
-	
+
 	static ld::Section						_s_section;
+	static ld::Section						_s_sectionOld;
 };
 
-ld::Section ImageCachePointerAtom::_s_section("__DATA", "__nl_symbol_ptr", ld::Section::typeNonLazyPointer);
+ld::Section ImageCachePointerAtom::_s_section(   "__DATA", "__data",          ld::Section::typeUnclassified);
+ld::Section ImageCachePointerAtom::_s_sectionOld("__DATA", "__nl_symbol_ptr", ld::Section::typeNonLazyPointer);
 
 
 
@@ -147,14 +152,14 @@ ld::Section StubHelperHelperAtom::_s_section("__TEXT", "__stub_helper", ld::Sect
 class StubHelperAtom : public ld::Atom {
 public:
 											StubHelperAtom(ld::passes::stubs::Pass& pass, const ld::Atom* lazyPointer,
-																							const ld::Atom& stubTo)
+															const ld::Atom& stubTo, bool stubToResolver)
 				: ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
 							ld::Atom::scopeLinkageUnit, ld::Atom::typeStubHelper, 
 							symbolTableNotIn, false, false, false, ld::Atom::Alignment(1)), 
 				_stubTo(stubTo),
 				_fixup1(1, ld::Fixup::k1of2, ld::Fixup::kindSetLazyOffset, lazyPointer),
 				_fixup2(1, ld::Fixup::k2of2, ld::Fixup::kindStoreLittleEndian32),
-				_fixup3(6, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressX86BranchPCRel32, helperHelper(pass)) { }
+				_fixup3(6, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressX86BranchPCRel32, helperHelper(pass, *this, stubToResolver)) { }
 				
 	virtual const ld::File*					file() const					{ return _stubTo.file(); }
 	virtual const char*						name() const					{ return _stubTo.name(); }
@@ -177,8 +182,11 @@ public:
 	virtual ld::Fixup::iterator				fixupsEnd() const				{ return &((ld::Fixup*)&_fixup3)[1]; }
 
 private:
-	static ld::Atom* helperHelper(ld::passes::stubs::Pass& pass) {
-		if ( pass.compressedHelperHelper == NULL ) 
+	static ld::Atom* helperHelper(ld::passes::stubs::Pass& pass, StubHelperAtom& stub, bool stubToResolver) {
+		// hack for resolvers in chained fixups.  StubHelper is not used by needs to be constructed, so use dummy values
+		if ( stubToResolver )
+			return &stub;
+		if ( pass.compressedHelperHelper == NULL )
 			pass.compressedHelperHelper = new StubHelperHelperAtom(pass);
 		return pass.compressedHelperHelper;
 	}
@@ -274,7 +282,7 @@ public:
 							ld::Atom::scopeTranslationUnit, ld::Atom::typeLazyPointer, 
 							symbolTableNotIn, false, false, false, ld::Atom::Alignment(3)), 
 				_stubTo(stubTo),
-				_helper(pass, this, stubTo),
+				_helper(pass, this, stubTo, stubToResolver),
 				_resolverHelper(pass, this, stubTo),
 				_fixup1(0, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressLittleEndian64, 
 													stubToResolver ? &_resolverHelper : 

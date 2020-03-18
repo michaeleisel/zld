@@ -39,7 +39,7 @@ all-i386:
 all-x86_64:
 	${PASS_IFF} true
 
-all-arm64:
+all-armv7:
 	${CC} ${CCFLAGS} -static foo.c -c 
 	${CC} ${CCFLAGS} bar.s -c 
 	# verify islands are created and used
