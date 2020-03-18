@@ -1177,7 +1177,7 @@ void Resolver::deadStripOptimize(bool force)
 	}
 	
 	// mark all roots as live, and all atoms they reference
-	for (LDOrderedSet<const ld::Atom*>::iterator it=_deadStripRoots.begin(); it != _deadStripRoots.end(); ++it) {
+	for (std::set<const ld::Atom*>::iterator it=_deadStripRoots.begin(); it != _deadStripRoots.end(); ++it) {
 		WhyLiveBackChain rootChain;
 		rootChain.previous = NULL;
 		rootChain.referer = *it;
@@ -1861,7 +1861,7 @@ void Resolver::linkTimeOptimize()
 		this->checkDylibSymbolCollisions();
 
 		// <rdar://problem/33853815> remove undefs from LTO objects that gets optimized away
-		LDSet<const ld::Atom*> mustPreserve;
+		std::unordered_set<const ld::Atom*> mustPreserve;
 		if ( _internal.classicBindingHelper != NULL )
 			mustPreserve.insert(_internal.classicBindingHelper);
 		if ( _internal.compressedFastBinderProxy != NULL )
