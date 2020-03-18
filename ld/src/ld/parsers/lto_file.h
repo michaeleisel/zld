@@ -35,6 +35,8 @@ extern unsigned int runtime_api_version();
 
 extern unsigned int static_api_version();
 
+void set_library(const char *dylib);
+
 extern bool libLTOisLoaded();
 
 extern const char* archName(const uint8_t* fileContent, uint64_t fileLength);
@@ -72,7 +74,6 @@ struct OptimizeOptions {
 	bool								verboseOptimizationHints;
 	bool								armUsesZeroCostExceptions;
 	bool								simulator;
-	bool								ignoreMismatchPlatform;
 #if SUPPORT_ARCH_arm64e
 	bool								supportsAuthenticatedPointers;
 #endif

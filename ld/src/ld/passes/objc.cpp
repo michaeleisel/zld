@@ -65,7 +65,7 @@ struct objc_image_info  {
 template <typename A>
 class ObjCImageInfoAtom : public ld::Atom {
 public:
-											ObjCImageInfoAtom(bool abi2, bool hasCategoryClassProperties, uint8_t swiftVersion);
+											ObjCImageInfoAtom(bool abi2, bool hasCategoryClassProperties, uint8_t swiftVersion, uint16_t swiftLanguageVersion);
 
 	virtual const ld::File*					file() const					{ return NULL; }
 	virtual const char*						name() const					{ return "objc image info"; }
@@ -88,7 +88,7 @@ template <typename A> ld::Section ObjCImageInfoAtom<A>::_s_sectionABI2("__DATA",
 
 
 template <typename A>
-ObjCImageInfoAtom<A>::ObjCImageInfoAtom(bool abi2, bool hasCategoryClassProperties, uint8_t swiftVersion)
+ObjCImageInfoAtom<A>::ObjCImageInfoAtom(bool abi2, bool hasCategoryClassProperties, uint8_t swiftVersion, uint16_t swiftLanguageVersion)
 	: ld::Atom(abi2 ? _s_sectionABI2 : _s_sectionABI1, ld::Atom::definitionRegular, ld::Atom::combineNever,
 							ld::Atom::scopeLinkageUnit, ld::Atom::typeUnclassified, 
 							symbolTableNotIn, false, false, false, ld::Atom::Alignment(2))
@@ -99,12 +99,47 @@ ObjCImageInfoAtom<A>::ObjCImageInfoAtom(bool abi2, bool hasCategoryClassProperti
 		value |= OBJC_IMAGE_HAS_CATEGORY_CLASS_PROPERTIES;
 	}
 
-	// provide swift language version in final binary for runtime to inspect
+	// provide swift ABI version in final binary for runtime to inspect
 	value |= (swiftVersion << 8);
+
+	// provide swift language version in final binary for runtime to inspect
+	value |= (swiftLanguageVersion << 16);
 
 	_content.version = 0;
 	A::P::E::set32(_content.flags, value);
 }
+
+
+
+//
+// This class is for a new Atom which is an ObjC category name created by merging names from categories
+//
+template <typename A>
+class CategoryNameAtom : public ld::Atom {
+public:
+											CategoryNameAtom(ld::Internal& state,
+															const std::vector<const ld::Atom*>* categories);
+
+	virtual const ld::File*					file() const					{ return _file; }
+	virtual const char*						name() const					{ return "objc merged category name"; }
+	virtual uint64_t						size() const					{ return _categoryName.size() + 1; }
+	virtual uint64_t						objectAddress() const			{ return 0; }
+	virtual void							setScope(Scope)					{ }
+	virtual void							copyRawContent(uint8_t buffer[]) const {
+		strcpy((char*)buffer, _categoryName.c_str());
+	}
+
+private:
+	typedef typename A::P::uint_t			pint_t;
+
+	const ld::File*							_file;
+	std::string								_categoryName;
+
+	static ld::Section						_s_section;
+};
+
+template <typename A>
+ld::Section CategoryNameAtom<A>::_s_section("__TEXT", "__objc_classname", ld::Section::typeCString);
 
 
 
@@ -226,46 +261,66 @@ ld::Section PropertyListAtom<A>::_s_section("__DATA", "__objc_const", ld::Sectio
 
 
 //
-// This class is used to create an Atom that replaces an atom from a .o file that holds a class_ro_t.
+// This class is used to create an Atom that replaces an atom from a .o file that holds a class_ro_t or category_t.
 // It is needed because there is no way to add Fixups to an existing atom.
 //
 template <typename A>
-class ClassROOverlayAtom : public ld::Atom {
+class ObjCOverlayAtom : public ld::Atom {
 public:
-											ClassROOverlayAtom(const ld::Atom* classROAtom);
+											ObjCOverlayAtom(const ld::Atom* classROAtom);
 
 	// overrides of ld::Atom
 	virtual const ld::File*				file() const		{ return _atom->file(); }
 	virtual const char*					name() const		{ return _atom->name(); }
 	virtual uint64_t					size() const		{ return _atom->size(); }
 	virtual uint64_t					objectAddress() const { return _atom->objectAddress(); }
-	virtual void						copyRawContent(uint8_t buffer[]) const 
+	virtual void						copyRawContent(uint8_t buffer[]) const
 															{ _atom->copyRawContent(buffer); }
-	virtual const uint8_t*				rawContentPointer() const 
+	virtual const uint8_t*				rawContentPointer() const
 															{ return _atom->rawContentPointer(); }
-	virtual unsigned long				contentHash(const class ld::IndirectBindingTable& ibt) const 
+	virtual unsigned long				contentHash(const class ld::IndirectBindingTable& ibt) const
 															{ return _atom->contentHash(ibt); }
-	virtual bool						canCoalesceWith(const ld::Atom& rhs, const class ld::IndirectBindingTable& ibt) const 
+	virtual bool						canCoalesceWith(const ld::Atom& rhs, const class ld::IndirectBindingTable& ibt) const
 															{ return _atom->canCoalesceWith(rhs,ibt); }
 
 	virtual ld::Fixup::iterator			fixupsBegin() const	{ return (ld::Fixup*)&_fixups[0]; }
 	virtual ld::Fixup::iterator			fixupsEnd()	const	{ return (ld::Fixup*)&_fixups[_fixups.size()]; }
 
-	void								addProtocolListFixup();
-	void								addPropertyListFixup();
-	void								addMethodListFixup();
-
-private:	
-	typedef typename A::P::uint_t			pint_t;
-
+protected:
 	void addFixupAtOffset(uint32_t offset);
+
+private:
+	typedef typename A::P::uint_t			pint_t;
 
 	const ld::Atom*							_atom;
 	std::vector<ld::Fixup>					_fixups;
 };
 
 template <typename A>
-ClassROOverlayAtom<A>::ClassROOverlayAtom(const ld::Atom* classROAtom)
+class ClassROOverlayAtom : public ObjCOverlayAtom<A> {
+public:
+										ClassROOverlayAtom(const ld::Atom* contentAtom) : ObjCOverlayAtom<A>(contentAtom) { }
+
+	void								addProtocolListFixup();
+	void								addPropertyListFixup();
+	void								addMethodListFixup();
+};
+
+template <typename A>
+class CategoryOverlayAtom : public ObjCOverlayAtom<A> {
+public:
+										CategoryOverlayAtom(const ld::Atom* contentAtom) : ObjCOverlayAtom<A>(contentAtom) { }
+
+	void								addNameFixup();
+	void								addInstanceMethodListFixup();
+	void								addClassMethodListFixup();
+	void								addProtocolListFixup();
+	void								addInstancePropertyListFixup();
+	void								addClassPropertyListFixup();
+};
+
+template <typename A>
+ObjCOverlayAtom<A>::ObjCOverlayAtom(const ld::Atom* classROAtom)
 	: ld::Atom(classROAtom->section(), ld::Atom::definitionRegular, ld::Atom::combineNever,
 			ld::Atom::scopeLinkageUnit, ld::Atom::typeUnclassified, 
 			classROAtom->symbolTableInclusion(), false, false, false, classROAtom->alignment()),
@@ -346,64 +401,216 @@ void ObjCData<A>::setPointerInContent(ld::Internal& state, const ld::Atom* conte
 
 
 
+#define GET_FIELD(state, classAtom, field) \
+	ObjCData<A>::getPointerInContent(state, classAtom, offsetof(Content, field))
+#define SET_FIELD(state, classAtom, field, valueAtom) \
+	ObjCData<A>::setPointerInContent(state, classAtom, offsetof(Content, field), valueAtom)
+
+#define GET_RO_FIELD(state, classAtom, field) \
+	ObjCData<A>::getPointerInContent(state, getROData(state, classAtom), offsetof(ROContent, field))
+#define SET_RO_FIELD(state, classROAtom, field, valueAtom) \
+	ObjCData<A>::setPointerInContent(state, getROData(state, classAtom), offsetof(ROContent, field), valueAtom)
+
 //
 // Helper class for reading and updating existing ObjC category atoms from .o files
 //
 template <typename A>
 class Category : public ObjCData<A> {
 public:
+	// Getters
+	static const ld::Atom*	getName(ld::Internal& state, const ld::Atom* contentAtom);
 	static const ld::Atom*	getClass(ld::Internal& state, const ld::Atom* contentAtom, bool& hasAddend);
 	static const ld::Atom*	getInstanceMethods(ld::Internal& state, const ld::Atom* contentAtom);
 	static const ld::Atom*	getClassMethods(ld::Internal& state, const ld::Atom* contentAtom);
 	static const ld::Atom*	getProtocols(ld::Internal& state, const ld::Atom* contentAtom);
 	static const ld::Atom*	getInstanceProperties(ld::Internal& state, const ld::Atom* contentAtom);
 	static const ld::Atom*	getClassProperties(ld::Internal& state, const ld::Atom* contentAtom);
+	// Setters
+	static const ld::Atom*	setName(ld::Internal& state, const ld::Atom* categoryAtom,
+									const ld::Atom* categoryNameAtom, std::set<const ld::Atom*>& deadAtoms);
+	static const ld::Atom*	setInstanceMethods(ld::Internal& state, const ld::Atom* categoryAtom,
+											   const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms);
+	static const ld::Atom*	setClassMethods(ld::Internal& state, const ld::Atom* categoryAtom,
+											const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms);
+	static const ld::Atom*	setProtocols(ld::Internal& state, const ld::Atom* categoryAtom,
+										 const ld::Atom* protocolListAtom, std::set<const ld::Atom*>& deadAtoms);
+	static const ld::Atom*	setInstanceProperties(ld::Internal& state, const ld::Atom* categoryAtom,
+												  const ld::Atom* propertyListAtom, std::set<const ld::Atom*>& deadAtoms);
+	static const ld::Atom*	setClassProperties(ld::Internal& state, const ld::Atom* categoryAtom,
+											   const ld::Atom* propertyListAtom, std::set<const ld::Atom*>& deadAtoms);
 	static uint32_t         size() { return 6*sizeof(pint_t); }
+
+	static bool				hasCategoryClassPropertiesField(const ld::Atom* categoryAtom);
+
 private:	
 	typedef typename A::P::uint_t			pint_t;
+
+	friend class CategoryOverlayAtom<A>;
+
+	struct Content {
+		pint_t name;
+		pint_t cls;
+		pint_t instanceMethods;
+		pint_t classMethods;
+		pint_t protocols;
+		pint_t instanceProperties;
+		// Fields below this point are not always present on disk.
+		pint_t classProperties;
+	};
 };
 
 
 template <typename A>
+const ld::Atom*	Category<A>::getName(ld::Internal& state, const ld::Atom* contentAtom)
+{
+	return GET_FIELD(state, contentAtom, name);
+}
+
+template <typename A>
 const ld::Atom*	Category<A>::getClass(ld::Internal& state, const ld::Atom* contentAtom, bool& hasAddend)
 {
-	return ObjCData<A>::getPointerInContent(state, contentAtom, sizeof(pint_t), &hasAddend); // category_t.cls
+	return ObjCData<A>::getPointerInContent(state, contentAtom, offsetof(Content, cls), &hasAddend); // category_t.cls
 }
 
 template <typename A>
 const ld::Atom*	Category<A>::getInstanceMethods(ld::Internal& state, const ld::Atom* contentAtom)
 {
-	return ObjCData<A>::getPointerInContent(state, contentAtom, 2*sizeof(pint_t)); // category_t.instanceMethods
+	return GET_FIELD(state, contentAtom, instanceMethods);
 }
 
 template <typename A>
 const ld::Atom*	Category<A>::getClassMethods(ld::Internal& state, const ld::Atom* contentAtom)
 {
-	return ObjCData<A>::getPointerInContent(state, contentAtom, 3*sizeof(pint_t)); // category_t.classMethods
+	return GET_FIELD(state, contentAtom, classMethods);
 }
 
 template <typename A>
 const ld::Atom*	Category<A>::getProtocols(ld::Internal& state, const ld::Atom* contentAtom)
 {
-	return ObjCData<A>::getPointerInContent(state, contentAtom, 4*sizeof(pint_t)); // category_t.protocols
+	return GET_FIELD(state, contentAtom, protocols);
 }
 
 template <typename A>
 const ld::Atom*	Category<A>::getInstanceProperties(ld::Internal& state, const ld::Atom* contentAtom)
 {
-	return ObjCData<A>::getPointerInContent(state, contentAtom, 5*sizeof(pint_t)); // category_t.instanceProperties
+	return GET_FIELD(state, contentAtom, instanceProperties);
 }
 
 template <typename A>
 const ld::Atom*	Category<A>::getClassProperties(ld::Internal& state, const ld::Atom* contentAtom)
 {
 	// Only specially-marked files have this field.
-	if ( const ld::relocatable::File* objFile = dynamic_cast<const ld::relocatable::File*>(contentAtom->file()) ) {
-		if ( objFile->objcHasCategoryClassPropertiesField() ) {
-			return ObjCData<A>::getPointerInContent(state, contentAtom, 6*sizeof(pint_t)); // category_t.classProperties
-		}
-	}
+	if ( hasCategoryClassPropertiesField(contentAtom) )
+		return GET_FIELD(state, contentAtom, classProperties);
 	return NULL;
+}
+
+template <typename A>
+bool Category<A>::hasCategoryClassPropertiesField(const ld::Atom* contentAtom)
+{
+	// Only specially-marked files have this field.
+	if ( const ld::relocatable::File* objFile = dynamic_cast<const ld::relocatable::File*>(contentAtom->file()) ) {
+		return objFile->objcHasCategoryClassPropertiesField();
+	}
+	return false;
+}
+
+
+
+template <typename A>
+const ld::Atom* Category<A>::setName(ld::Internal &state, const ld::Atom *categoryAtom,
+									 const ld::Atom *categoryNameAtom, std::set<const ld::Atom *> &deadAtoms)
+{
+	// if the base category does not already have a method list, we need to create an overlay
+	if ( getName(state, categoryAtom) == NULL ) {
+		deadAtoms.insert(categoryAtom);
+		CategoryOverlayAtom<A>* overlay = new CategoryOverlayAtom<A>(categoryAtom);
+		overlay->addNameFixup();
+		SET_FIELD(state, overlay, name, categoryNameAtom);
+		return overlay;
+	}
+	SET_FIELD(state, categoryAtom, name, categoryNameAtom);
+	return NULL; // means category atom was not replaced
+}
+
+template <typename A>
+const ld::Atom* Category<A>::setInstanceMethods(ld::Internal& state, const ld::Atom* categoryAtom,
+												const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms)
+{
+	// if the base category does not already have a method list, we need to create an overlay
+	if ( getInstanceMethods(state, categoryAtom) == NULL ) {
+		deadAtoms.insert(categoryAtom);
+		CategoryOverlayAtom<A>* overlay = new CategoryOverlayAtom<A>(categoryAtom);
+		overlay->addInstanceMethodListFixup();
+		SET_FIELD(state, overlay, instanceMethods, methodListAtom);
+		return overlay;
+	}
+	SET_FIELD(state, categoryAtom, instanceMethods, methodListAtom);
+	return NULL; // means category atom was not replaced
+}
+
+template <typename A>
+const ld::Atom* Category<A>::setClassMethods(ld::Internal& state, const ld::Atom* categoryAtom,
+											 const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms)
+{
+	// if the base category does not already have a method list, we need to create an overlay
+	if ( getClassMethods(state, categoryAtom) == NULL ) {
+		deadAtoms.insert(categoryAtom);
+		CategoryOverlayAtom<A>* overlay = new CategoryOverlayAtom<A>(categoryAtom);
+		overlay->addClassMethodListFixup();
+		SET_FIELD(state, overlay, classMethods, methodListAtom);
+		return overlay;
+	}
+	SET_FIELD(state, categoryAtom, classMethods, methodListAtom);
+	return NULL; // means category atom was not replaced
+}
+
+template <typename A>
+const ld::Atom* Category<A>::setProtocols(ld::Internal& state, const ld::Atom* categoryAtom,
+										  const ld::Atom* protocolListAtom, std::set<const ld::Atom*>& deadAtoms)
+{
+	// if the base category does not already have a protocol list, we need to create an overlay
+	if ( getProtocols(state, categoryAtom) == NULL ) {
+		deadAtoms.insert(categoryAtom);
+		CategoryOverlayAtom<A>* overlay = new CategoryOverlayAtom<A>(categoryAtom);
+		overlay->addProtocolListFixup();
+		SET_FIELD(state, overlay, protocols, protocolListAtom);
+		return overlay;
+	}
+	SET_FIELD(state, categoryAtom, protocols, protocolListAtom);
+	return NULL; // means category atom was not replaced
+}
+
+template <typename A>
+const ld::Atom* Category<A>::setInstanceProperties(ld::Internal& state, const ld::Atom* categoryAtom,
+												   const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms)
+{
+	// if the base category does not already have a property list, we need to create an overlay
+	if ( getInstanceProperties(state, categoryAtom) == NULL ) {
+		deadAtoms.insert(categoryAtom);
+		CategoryOverlayAtom<A>* overlay = new CategoryOverlayAtom<A>(categoryAtom);
+		overlay->addInstancePropertyListFixup();
+		SET_FIELD(state, overlay, instanceProperties, methodListAtom);
+		return overlay;
+	}
+	SET_FIELD(state, categoryAtom, instanceProperties, methodListAtom);
+	return NULL; // means category atom was not replaced
+}
+
+template <typename A>
+const ld::Atom* Category<A>::setClassProperties(ld::Internal& state, const ld::Atom* categoryAtom,
+												const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms)
+{
+	// if the base category does not already have a property list, we need to create an overlay
+	if ( getClassProperties(state, categoryAtom) == NULL ) {
+		deadAtoms.insert(categoryAtom);
+		CategoryOverlayAtom<A>* overlay = new CategoryOverlayAtom<A>(categoryAtom);
+		overlay->addClassPropertyListFixup();
+		SET_FIELD(state, overlay, classProperties, methodListAtom);
+		return overlay;
+	}
+	SET_FIELD(state, categoryAtom, classProperties, methodListAtom);
+	return NULL; // means category atom was not replaced
 }
 
 
@@ -500,16 +707,6 @@ private:
 		pint_t baseProperties;
 	};
 };
-
-#define GET_FIELD(state, classAtom, field) \
-	ObjCData<A>::getPointerInContent(state, classAtom, offsetof(Content, field))
-#define SET_FIELD(state, classAtom, field, valueAtom) \
-	ObjCData<A>::setPointerInContent(state, classAtom, offsetof(Content, field), valueAtom)
-
-#define GET_RO_FIELD(state, classAtom, field) \
-	ObjCData<A>::getPointerInContent(state, getROData(state, classAtom), offsetof(ROContent, field))
-#define SET_RO_FIELD(state, classROAtom, field, valueAtom) \
-	ObjCData<A>::setPointerInContent(state, getROData(state, classAtom), offsetof(ROContent, field), valueAtom)
 
 template <typename A>
 const ld::Atom*	Class<A>::getMetaClass(ld::Internal& state, const ld::Atom* classAtom)
@@ -670,7 +867,7 @@ ld::Fixup::Kind pointerFixupKind<Pointer64<LittleEndian>>() {
 }
 
 template <typename A>
-void ClassROOverlayAtom<A>::addFixupAtOffset(uint32_t offset)
+void ObjCOverlayAtom<A>::addFixupAtOffset(uint32_t offset)
 {
 	const ld::Atom* targetAtom = this; // temporary
 	_fixups.push_back(ld::Fixup(offset, ld::Fixup::k1of1, pointerFixupKind<typename A::P>(), targetAtom));
@@ -680,19 +877,55 @@ void ClassROOverlayAtom<A>::addFixupAtOffset(uint32_t offset)
 template <typename A>
 void ClassROOverlayAtom<A>::addMethodListFixup()
 {
-	addFixupAtOffset(offsetof(typename Class<A>::ROContent, baseMethods));
+	this->addFixupAtOffset(offsetof(typename Class<A>::ROContent, baseMethods));
 }
 
 template <typename A>
 void ClassROOverlayAtom<A>::addProtocolListFixup()
 {
-	addFixupAtOffset(offsetof(typename Class<A>::ROContent, baseProtocols));
+	this->addFixupAtOffset(offsetof(typename Class<A>::ROContent, baseProtocols));
 }
 
 template <typename A>
 void ClassROOverlayAtom<A>::addPropertyListFixup()
 {
-	addFixupAtOffset(offsetof(typename Class<A>::ROContent, baseProperties));
+	this->addFixupAtOffset(offsetof(typename Class<A>::ROContent, baseProperties));
+}
+
+template <typename A>
+void CategoryOverlayAtom<A>::addNameFixup()
+{
+	this->addFixupAtOffset(offsetof(typename Category<A>::Content, name));
+}
+
+template <typename A>
+void CategoryOverlayAtom<A>::addInstanceMethodListFixup()
+{
+	this->addFixupAtOffset(offsetof(typename Category<A>::Content, instanceMethods));
+}
+
+template <typename A>
+void CategoryOverlayAtom<A>::addClassMethodListFixup()
+{
+	this->addFixupAtOffset(offsetof(typename Category<A>::Content, classMethods));
+}
+
+template <typename A>
+void CategoryOverlayAtom<A>::addProtocolListFixup()
+{
+	this->addFixupAtOffset(offsetof(typename Category<A>::Content, protocols));
+}
+
+template <typename A>
+void CategoryOverlayAtom<A>::addInstancePropertyListFixup()
+{
+	this->addFixupAtOffset(offsetof(typename Category<A>::Content, instanceProperties));
+}
+
+template <typename A>
+void CategoryOverlayAtom<A>::addClassPropertyListFixup()
+{
+	this->addFixupAtOffset(offsetof(typename Category<A>::Content, classProperties));
 }
 
 
@@ -704,7 +937,8 @@ void ClassROOverlayAtom<A>::addPropertyListFixup()
 template <typename A>
 class OptimizeCategories {
 public:
-	static void				doit(const Options& opts, ld::Internal& state);
+	static void				doit(const Options& opts, ld::Internal& state, bool haveCategoriesWithoutClassPropertyStorage);
+	static bool				hasName(ld::Internal& state, const std::vector<const ld::Atom*>* categories);
 	static bool				hasInstanceMethods(ld::Internal& state, const std::vector<const ld::Atom*>* categories);
 	static bool				hasClassMethods(ld::Internal& state, const std::vector<const ld::Atom*>* categories);
 	static bool				hasProtocols(ld::Internal& state, const std::vector<const ld::Atom*>* categories);
@@ -716,6 +950,19 @@ private:
 	typedef typename A::P::uint_t			pint_t;
 
 };
+
+
+template <typename A>
+bool OptimizeCategories<A>::hasName(ld::Internal& state, const std::vector<const ld::Atom*>* categories)
+{
+	for (std::vector<const ld::Atom*>::const_iterator it=categories->begin(); it != categories->end(); ++it) {
+		const ld::Atom* categoryAtom = *it;
+		const ld::Atom* name = Category<A>::getName(state, categoryAtom);
+		if ( name != NULL )
+			return true;
+	}
+	return false;
+}
 
 
 template <typename A>
@@ -843,6 +1090,11 @@ private:
 					return strcmp(left->name(), right->name());
 				}
 			}
+			// <rdar://problem/51479025> don't crash if objc atom does not have an owning file, just sort those to end
+			if ( leftf == nullptr )
+				return false;
+			if ( rightf == nullptr )
+				return true;
 			return  (leftf->ordinal() < rightf->ordinal());
 		}
 	};
@@ -853,7 +1105,7 @@ private:
 
 
 template <typename A>
-void OptimizeCategories<A>::doit(const Options& opts, ld::Internal& state)
+void OptimizeCategories<A>::doit(const Options& opts, ld::Internal& state, bool haveCategoriesWithoutClassPropertyStorage)
 {
 	// first find all categories referenced by __objc_nlcatlist section
 	std::set<const ld::Atom*> nlcatListAtoms;
@@ -878,6 +1130,9 @@ void OptimizeCategories<A>::doit(const Options& opts, ld::Internal& state)
 	std::vector<const ld::Atom*> classOrder;
 	std::set<const ld::Atom*> deadAtoms;
 	ld::Internal::FinalSection* methodListSection = NULL;
+	typedef std::map<const ld::Atom*, std::pair<const ld::Atom*, std::vector<const ld::Atom*>*>> ExternalCatMap;
+	ExternalCatMap externalClassToCategories;
+	std::vector<const ld::Atom*> externalClassOrder;
 	for (std::vector<ld::Internal::FinalSection*>::iterator sit=state.sections.begin(); sit != state.sections.end(); ++sit) {
 		ld::Internal::FinalSection* sect = *sit;
 		if ( sect->type() == ld::Section::typeObjC2CategoryList ) {
@@ -897,15 +1152,16 @@ void OptimizeCategories<A>::doit(const Options& opts, ld::Internal& state)
 					continue;
 				const ld::Atom* categoryOnClassAtom = fixClassAliases(Category<A>::getClass(state, categoryAtom, hasAddend));
 				assert(categoryOnClassAtom != NULL);
+
+				// <rdar://problem/16107696> for now, back off optimization on new style classes
+				if ( hasAddend != 0 )
+					continue;
+				// <rdar://problem/17249777> don't apply categories to swift classes
+				if ( categoryOnClassAtom->hasFixupsOfKind(ld::Fixup::kindNoneGroupSubordinate) )
+					continue;
+
 				// only look at classes defined in this image
 				if ( categoryOnClassAtom->definition() != ld::Atom::definitionProxy ) {
-					// <rdar://problem/16107696> for now, back off optimization on new style classes
-					if ( hasAddend != 0 )
-						continue;
-					// <rdar://problem/17249777> don't apply categories to swift classes
-					if ( categoryOnClassAtom->hasFixupsOfKind(ld::Fixup::kindNoneGroupSubordinate) )
-						continue;
-
 					CatMap::iterator pos = classToCategories.find(categoryOnClassAtom);
 					if ( pos == classToCategories.end() ) {
 						classToCategories[categoryOnClassAtom] = new std::vector<const ld::Atom*>();
@@ -915,6 +1171,19 @@ void OptimizeCategories<A>::doit(const Options& opts, ld::Internal& state)
 					// mark category atom and catlist atom as dead
 					deadAtoms.insert(categoryAtom);
 					deadAtoms.insert(categoryListElementAtom);
+				} else if ( !haveCategoriesWithoutClassPropertyStorage ) {
+					// Note, we only merge duplicate categories which handle the class properties field.  Otherwise we may want to add
+					// the class properties from a .o which has it to a category which doesn't
+					ExternalCatMap::iterator pos = externalClassToCategories.find(categoryOnClassAtom);
+					if ( pos == externalClassToCategories.end() ) {
+						externalClassToCategories[categoryOnClassAtom] = { categoryListElementAtom, new std::vector<const ld::Atom*>() };
+						externalClassOrder.push_back(categoryOnClassAtom);
+					} else {
+						// mark category atom and catlist atom as dead as this is not the first category for this class
+						deadAtoms.insert(categoryAtom);
+						deadAtoms.insert(categoryListElementAtom);
+					}
+					externalClassToCategories[categoryOnClassAtom].second->push_back(categoryAtom);
 				}
 			}
 		}
@@ -923,9 +1192,12 @@ void OptimizeCategories<A>::doit(const Options& opts, ld::Internal& state)
 			methodListSection = sect;
 	}
 
-	// if found some categories
+	// Malformed binaries may not have methods lists in __objc_const.  In that case just give up
+	if ( methodListSection == NULL )
+		return;
+
+	// if found some categories on classes defined in this image
 	if ( classToCategories.size() != 0 ) {
-		assert(methodListSection != NULL);
 		sortAtomVector(classOrder);
 		// alter each class definition to have new method list which includes all category methods
 		for (std::vector<const ld::Atom*>::iterator it = classOrder.begin(); it != classOrder.end(); it++) {
@@ -1009,7 +1281,123 @@ void OptimizeCategories<A>::doit(const Options& opts, ld::Internal& state)
 				}
 			}		 
 		}
+	}
 
+	// if found some duplicate categories on classes defined in another image
+	if ( externalClassToCategories.size() != 0 ) {
+		sortAtomVector(externalClassOrder);
+		// alter each class definition to have new method list which includes all category methods
+		for (std::vector<const ld::Atom*>::iterator it = externalClassOrder.begin(); it != externalClassOrder.end(); it++) {
+			const ld::Atom* categoryListElementAtom;
+			const std::vector<const ld::Atom*>* categories;
+			std::tie(categoryListElementAtom, categories) = externalClassToCategories[*it];
+			assert(categories->size() != 0);
+			// Skip single categories.  We only optimize duplicates
+			if (categories->size() == 1)
+				continue;
+
+			const ld::Atom* categoryAtom = categories->front();
+
+			// The category name should reflect all the categories we just merged
+			// FIXME: Turn this back on once we know how to merge the category name without trashing the indirect symbol index and therefore
+			// all other users of this uniqued string
+#if 0
+			if ( OptimizeCategories<A>::hasName(state, categories) ) {
+				ld::Internal::FinalSection* categoryNameSection = state.atomToSection[Category<A>::getName(state, categoryAtom)];
+				const ld::Atom* newCategoryNameAtom = new CategoryNameAtom<A>(state, categories);
+				const ld::Atom* newCategory = Category<A>::setName(state, categoryAtom, newCategoryNameAtom, deadAtoms);
+				// add new category name to final sections
+				categoryNameSection->atoms.push_back(newCategoryNameAtom);
+				state.atomToSection[newCategoryNameAtom] = categoryNameSection;
+				if ( newCategory != NULL ) {
+					assert(strcmp(newCategory->section().sectionName(), "__objc_const") == 0);
+					categoryNameSection->atoms.push_back(newCategory);
+					state.atomToSection[newCategory] = categoryNameSection;
+					categoryAtom = newCategory;
+					ObjCData<A>::setPointerInContent(state, categoryListElementAtom, 0, newCategory);
+				}
+			}
+#endif
+
+			// if any category adds instance methods, generate new merged method list, and replace
+			if ( OptimizeCategories<A>::hasInstanceMethods(state, categories) ) {
+				const ld::Atom* newInstanceMethodListAtom = new MethodListAtom<A>(state, nullptr, false, categories, deadAtoms);
+				const ld::Atom* newCategory = Category<A>::setInstanceMethods(state, categoryAtom, newInstanceMethodListAtom, deadAtoms);
+				// add new method list to final sections
+				methodListSection->atoms.push_back(newInstanceMethodListAtom);
+				state.atomToSection[newInstanceMethodListAtom] = methodListSection;
+				if ( newCategory != NULL ) {
+					assert(strcmp(newCategory->section().sectionName(), "__objc_const") == 0);
+					methodListSection->atoms.push_back(newCategory);
+					state.atomToSection[newCategory] = methodListSection;
+					categoryAtom = newCategory;
+					ObjCData<A>::setPointerInContent(state, categoryListElementAtom, 0, newCategory);
+				}
+			}
+			// if any category adds class methods, generate new merged method list, and replace
+			if ( OptimizeCategories<A>::hasClassMethods(state, categories) ) {
+				const ld::Atom* newClassMethodListAtom = new MethodListAtom<A>(state, nullptr, true, categories, deadAtoms);
+				const ld::Atom* newCategory = Category<A>::setClassMethods(state, categoryAtom, newClassMethodListAtom, deadAtoms);
+				// add new method list to final sections
+				methodListSection->atoms.push_back(newClassMethodListAtom);
+				state.atomToSection[newClassMethodListAtom] = methodListSection;
+				if ( newCategory != NULL ) {
+					assert(strcmp(newCategory->section().sectionName(), "__objc_const") == 0);
+					methodListSection->atoms.push_back(newCategory);
+					state.atomToSection[newCategory] = methodListSection;
+					categoryAtom = newCategory;
+					ObjCData<A>::setPointerInContent(state, categoryListElementAtom, 0, newCategory);
+				}
+			}
+			// if any category adds protocols, generate new merged protocol list, and replace
+			if ( OptimizeCategories<A>::hasProtocols(state, categories) ) {
+				const ld::Atom* newProtocolListAtom = new ProtocolListAtom<A>(state, nullptr, categories, deadAtoms);
+				const ld::Atom* newCategory = Category<A>::setProtocols(state, categoryAtom, newProtocolListAtom, deadAtoms);
+				// add new protocol list to final sections
+				methodListSection->atoms.push_back(newProtocolListAtom);
+				state.atomToSection[newProtocolListAtom] = methodListSection;
+				if ( newCategory != NULL ) {
+					assert(strcmp(newCategory->section().sectionName(), "__objc_const") == 0);
+					methodListSection->atoms.push_back(newCategory);
+					state.atomToSection[newCategory] = methodListSection;
+					categoryAtom = newCategory;
+					ObjCData<A>::setPointerInContent(state, categoryListElementAtom, 0, newCategory);
+				}
+			}
+			// if any category adds instance properties, generate new merged property list, and replace
+			if ( OptimizeCategories<A>::hasInstanceProperties(state, categories) ) {
+				const ld::Atom* newPropertyListAtom = new PropertyListAtom<A>(state, nullptr, categories, deadAtoms, PropertyListAtom<A>::PropertyKind::InstanceProperties);
+				const ld::Atom* newCategory = Category<A>::setInstanceProperties(state, categoryAtom, newPropertyListAtom, deadAtoms);
+				// add new protocol list to final sections
+				methodListSection->atoms.push_back(newPropertyListAtom);
+				state.atomToSection[newPropertyListAtom] = methodListSection;
+				if ( newCategory != NULL ) {
+					assert(strcmp(newCategory->section().sectionName(), "__objc_const") == 0);
+					methodListSection->atoms.push_back(newCategory);
+					state.atomToSection[newCategory] = methodListSection;
+					categoryAtom = newCategory;
+					ObjCData<A>::setPointerInContent(state, categoryListElementAtom, 0, newCategory);
+				}
+			}
+			// if any category adds class properties, generate new merged property list, and replace
+			if ( OptimizeCategories<A>::hasClassProperties(state, categories) ) {
+				const ld::Atom* newPropertyListAtom = new PropertyListAtom<A>(state, nullptr, categories, deadAtoms, PropertyListAtom<A>::PropertyKind::ClassProperties);
+				const ld::Atom* newCategory = Category<A>::setClassProperties(state, categoryAtom, newPropertyListAtom, deadAtoms);
+				// add new protocol list to final sections
+				methodListSection->atoms.push_back(newPropertyListAtom);
+				state.atomToSection[newPropertyListAtom] = methodListSection;
+				if ( newCategory != NULL ) {
+					assert(strcmp(newCategory->section().sectionName(), "__objc_const") == 0);
+					methodListSection->atoms.push_back(newCategory);
+					state.atomToSection[newCategory] = methodListSection;
+					categoryAtom = newCategory;
+					ObjCData<A>::setPointerInContent(state, categoryListElementAtom, 0, newCategory);
+				}
+			}
+		}
+	}
+
+	if ( !classToCategories.empty() || !externalClassToCategories.empty() ) {
 		// remove dead atoms
 		for (std::vector<ld::Internal::FinalSection*>::iterator sit=state.sections.begin(); sit != state.sections.end(); ++sit) {
 			ld::Internal::FinalSection* sect = *sit;
@@ -1018,6 +1406,24 @@ void OptimizeCategories<A>::doit(const Options& opts, ld::Internal& state)
 	}
 }
 
+
+template <typename A>
+CategoryNameAtom<A>::CategoryNameAtom(ld::Internal& state, const std::vector<const ld::Atom*>* categories)
+  : ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
+			ld::Atom::scopeLinkageUnit, ld::Atom::typeUnclassified,
+			symbolTableNotIn, false, false, false, ld::Atom::Alignment(1)), _file(categories->front()->file())
+{
+	for (const ld::Atom* categoryAtom : *categories) {
+		const char* name = (const char*)Category<A>::getName(state, categoryAtom)->rawContentPointer();
+		if (!name)
+			continue;
+		if (_categoryName.empty()) {
+			_categoryName = name;
+		} else {
+			_categoryName = _categoryName + "," + name;
+		}
+	}
+}
 
 
 template <typename A> 
@@ -1281,19 +1687,19 @@ void doPass(const Options& opts, ld::Internal& state)
 	if ( !state.hasObjC ) {
 	 	return;
 	}
+
+	// Search for categories that have a non-null class properties field.
+	// Search for categories that do not have storage for the class properties field.
+	bool haveCategoriesWithoutClassPropertyStorage = scanCategories<A>(state);
 	
 	if ( opts.objcCategoryMerging() ) {
 		// optimize classes defined in this linkage unit by merging in categories also in this linkage unit
-		OptimizeCategories<A>::doit(opts, state);
+		OptimizeCategories<A>::doit(opts, state, haveCategoriesWithoutClassPropertyStorage);
 	}
-
-	// Search for surviving categories that have a non-null class properties field.
-	// Search for surviving categories that do not have storage for the class properties field.
-	 bool haveCategoriesWithoutClassPropertyStorage = scanCategories<A>(state);
 
 	// add image info atom
 	// The HasCategoryClassProperties bit is set as often as possible.
-	state.addAtom(*new ObjCImageInfoAtom<A>(isObjC2, !haveCategoriesWithoutClassPropertyStorage, state.swiftVersion));
+	state.addAtom(*new ObjCImageInfoAtom<A>(isObjC2, !haveCategoriesWithoutClassPropertyStorage, state.swiftVersion, state.swiftLanguageVersion));
 }
 
 
@@ -1322,7 +1728,7 @@ void doPass(const Options& opts, ld::Internal& state)
 #if SUPPORT_ARCH_arm64
 		case CPU_TYPE_ARM64:
 #if SUPPORT_ARCH_arm64e
-			if (opts.subArchitecture() == CPU_SUBTYPE_ARM64_E) {
+			if (opts.subArchitecture() == CPU_SUBTYPE_ARM64E) {
 				doPass<arm64e, true>(opts, state);
 				break;
 			}

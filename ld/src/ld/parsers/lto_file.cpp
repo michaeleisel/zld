@@ -33,6 +33,8 @@
 #include <errno.h>
 #include <pthread.h>
 #include <mach-o/dyld.h>
+#include <dlfcn.h>
+#include <atomic>
 #include <vector>
 #include <map>
 #include <unordered_set>
@@ -48,8 +50,8 @@
 
 #include "llvm-c/lto.h"
 
+
 namespace lto {
-	  
 
 //
 // ld64 only tracks non-internal symbols from an llvm bitcode file.  
@@ -369,8 +371,6 @@ ld::relocatable::File* Parser::parseMachOFile(const uint8_t* p, size_t len, cons
 	objOpts.neverConvertDwarf   = false;
 	objOpts.verboseOptimizationHints = options.verboseOptimizationHints;
 	objOpts.armUsesZeroCostExceptions = options.armUsesZeroCostExceptions;
-	objOpts.simulator			= options.simulator;
-	objOpts.ignoreMismatchPlatform = options.ignoreMismatchPlatform;
 #if SUPPORT_ARCH_arm64e
 	objOpts.supportsAuthenticatedPointers = options.supportsAuthenticatedPointers;
 #endif
@@ -1721,6 +1721,184 @@ bool optimize(  const std::vector<const ld::Atom*>&	allAtoms,
 
 }; // namespace lto
 
+static const char *sLTODylib = "@rpath/libLTO.dylib";
+static std::atomic<bool> sLTOIsLoaded(false);
+
+static void *getHandle() {
+  auto impl = [&]() -> void* {
+    void *handle = ::dlopen(sLTODylib, RTLD_LAZY);
+    if (handle)
+      sLTOIsLoaded.store(true);
+    return handle;
+  };
+
+  // Memoize.
+  static void *handle = impl();
+  return handle;
+}
+
+namespace lto {
+void set_library(const char *dylib) {
+  assert(!sLTOIsLoaded);
+  sLTODylib = dylib;
+}
+} // end namespace lto
+
+namespace {
+template <class T> struct LTOSymbol;
+template <class R, class... Args> struct LTOSymbol<R (Args...)> {
+  R (*call)(Args...) = nullptr;
+
+public:
+  LTOSymbol() = delete;
+  LTOSymbol(const char *name) {
+    if (void *handle = getHandle())
+      call = reinterpret_cast<R (*)(Args...)>(::dlsym(handle, name));
+
+    if (!call)
+      call = [](Args...) -> R { return R{}; };
+  }
+};
+template <class... Args> struct LTOSymbol<void (Args...)> {
+  void (*call)(Args...) = nullptr;
+
+public:
+  LTOSymbol() = delete;
+  LTOSymbol(const char *name) {
+    if (void *handle = getHandle())
+      call = reinterpret_cast<void (*)(Args...)>(::dlsym(handle, name));
+
+    if (!call)
+      call = [](Args...) -> void {};
+  }
+};
+} // end namespace
+
+extern "C" {
+
+#define WRAP_LTO_SYMBOL(RET, NAME, PARAMS, ARGS)                               \
+  RET NAME PARAMS {                                                            \
+    static LTOSymbol<RET PARAMS> x(#NAME);                                     \
+    return (x.call)ARGS;                                                       \
+  }
+
+WRAP_LTO_SYMBOL(const char *, lto_get_version, (), ())
+WRAP_LTO_SYMBOL(lto_bool_t, lto_module_has_objc_category,
+                (const void *mem, size_t length), (mem, length))
+WRAP_LTO_SYMBOL(lto_module_t, lto_module_create_from_memory_with_path,
+                (const void *mem, size_t length, const char *path),
+                (mem, length, path))
+WRAP_LTO_SYMBOL(lto_module_t, lto_module_create_in_local_context,
+                (const void *mem, size_t length, const char *path),
+                (mem, length, path))
+WRAP_LTO_SYMBOL(lto_module_t, lto_module_create_from_memory,
+                (const void *mem, size_t length), (mem, length))
+WRAP_LTO_SYMBOL(void, lto_module_dispose, (lto_module_t mod), (mod))
+WRAP_LTO_SYMBOL(unsigned int, lto_module_get_num_symbols, (lto_module_t mod),
+                (mod))
+WRAP_LTO_SYMBOL(const char *, lto_module_get_symbol_name,
+                (lto_module_t mod, unsigned int index), (mod, index))
+WRAP_LTO_SYMBOL(lto_symbol_attributes, lto_module_get_symbol_attribute,
+                (lto_module_t mod, unsigned int index), (mod, index))
+WRAP_LTO_SYMBOL(lto_bool_t, lto_codegen_add_module,
+                (lto_code_gen_t cg, lto_module_t mod), (cg, mod))
+WRAP_LTO_SYMBOL(lto_bool_t, lto_module_is_thinlto, (lto_module_t mod), (mod))
+
+WRAP_LTO_SYMBOL(void, lto_codegen_set_module,
+                (lto_code_gen_t cg, lto_module_t mod), (cg, mod))
+WRAP_LTO_SYMBOL(void, thinlto_codegen_add_module,
+                (thinlto_code_gen_t cg, const char *identifier,
+                 const char *data, int length),
+                (cg, identifier, data, length))
+
+WRAP_LTO_SYMBOL(void, thinlto_codegen_add_must_preserve_symbol,
+                (thinlto_code_gen_t cg, const char *name, int length),
+                (cg, name, length))
+WRAP_LTO_SYMBOL(void, thinlto_codegen_add_cross_referenced_symbol,
+                (thinlto_code_gen_t cg, const char *name, int length),
+                (cg, name, length))
+WRAP_LTO_SYMBOL(void, thinlto_codegen_set_cache_dir,
+                (thinlto_code_gen_t cg, const char *cache_dir), (cg, cache_dir))
+WRAP_LTO_SYMBOL(void, thinlto_codegen_set_cache_pruning_interval,
+                (thinlto_code_gen_t cg, int interval), (cg, interval))
+WRAP_LTO_SYMBOL(
+    void, thinlto_codegen_set_final_cache_size_relative_to_available_space,
+    (thinlto_code_gen_t cg, unsigned percentage), (cg, percentage))
+WRAP_LTO_SYMBOL(void, thinlto_codegen_set_cache_entry_expiration,
+                (thinlto_code_gen_t cg, unsigned expiration), (cg, expiration))
+
+WRAP_LTO_SYMBOL(void, thinlto_codegen_process, (thinlto_code_gen_t cg), (cg))
+WRAP_LTO_SYMBOL(unsigned int, thinlto_module_get_num_objects,
+                (thinlto_code_gen_t cg), (cg))
+WRAP_LTO_SYMBOL(LTOObjectBuffer, thinlto_module_get_object,
+                (thinlto_code_gen_t cg, unsigned int index), (cg, index))
+WRAP_LTO_SYMBOL(unsigned int, thinlto_module_get_num_object_files,
+                (thinlto_code_gen_t cg), (cg))
+WRAP_LTO_SYMBOL(const char *, thinlto_module_get_object_file,
+                (thinlto_code_gen_t cg, unsigned int index), (cg, index))
+WRAP_LTO_SYMBOL(lto_bool_t, thinlto_codegen_set_pic_model,
+                (thinlto_code_gen_t cg, lto_codegen_model m), (cg, m))
+WRAP_LTO_SYMBOL(void, thinlto_codegen_set_savetemps_dir,
+                (thinlto_code_gen_t cg, const char *save_temps_dir),
+                (cg, save_temps_dir))
+WRAP_LTO_SYMBOL(void, thinlto_set_generated_objects_dir,
+                (thinlto_code_gen_t cg, const char *save_temps_dir),
+                (cg, save_temps_dir))
+WRAP_LTO_SYMBOL(void, thinlto_codegen_set_cpu,
+                (thinlto_code_gen_t cg, const char *cpu), (cg, cpu))
+WRAP_LTO_SYMBOL(void, thinlto_codegen_disable_codegen,
+                (thinlto_code_gen_t cg, lto_bool_t disable), (cg, disable))
+WRAP_LTO_SYMBOL(void, thinlto_codegen_set_codegen_only,
+                (thinlto_code_gen_t cg, lto_bool_t codegen_only),
+                (cg, codegen_only))
+WRAP_LTO_SYMBOL(void, thinlto_debug_options,
+                (const char *const *options, int number), (options, number))
+
+WRAP_LTO_SYMBOL(lto_code_gen_t, lto_codegen_create_in_local_context, (void), ())
+WRAP_LTO_SYMBOL(void, lto_codegen_set_diagnostic_handler,
+                (lto_code_gen_t cg, lto_diagnostic_handler_t handler,
+                 void *context),
+                (cg, handler, context))
+WRAP_LTO_SYMBOL(lto_code_gen_t, lto_codegen_create, (void), ())
+WRAP_LTO_SYMBOL(void, lto_codegen_debug_options,
+                (lto_code_gen_t cg, const char *options), (cg, options))
+WRAP_LTO_SYMBOL(void, lto_codegen_dispose, (lto_code_gen_t cg), (cg))
+WRAP_LTO_SYMBOL(void, lto_codegen_set_assembler_path,
+                (lto_code_gen_t cg, const char *path), (cg, path))
+WRAP_LTO_SYMBOL(thinlto_code_gen_t, thinlto_create_codegen, (void), ())
+WRAP_LTO_SYMBOL(unsigned int, lto_api_version, (void), ())
+WRAP_LTO_SYMBOL(const void *, lto_codegen_compile_optimized,
+                (lto_code_gen_t cg, size_t *length), (cg, length))
+WRAP_LTO_SYMBOL(lto_bool_t, lto_module_is_object_file_in_memory_for_target,
+                (const void *mem, size_t length,
+                 const char *target_triple_prefix),
+                (mem, length, target_triple_prefix))
+WRAP_LTO_SYMBOL(void, lto_codegen_set_should_embed_uselists,
+                (lto_code_gen_t cg, lto_bool_t ShouldEmbedUselists),
+                (cg, ShouldEmbedUselists))
+WRAP_LTO_SYMBOL(const void *, lto_codegen_compile,
+                (lto_code_gen_t cg, size_t *length), (cg, length))
+WRAP_LTO_SYMBOL(const char *, lto_get_error_message, (void), ())
+WRAP_LTO_SYMBOL(lto_module_t, lto_module_create_in_codegen_context,
+                (const void *mem, size_t length, const char *path,
+                 lto_code_gen_t cg),
+                (mem, length, path, cg))
+WRAP_LTO_SYMBOL(lto_bool_t, lto_codegen_optimize, (lto_code_gen_t cg), (cg))
+WRAP_LTO_SYMBOL(lto_bool_t, lto_codegen_write_merged_modules,
+                (lto_code_gen_t cg, const char *path), (cg, path))
+WRAP_LTO_SYMBOL(void, lto_codegen_set_should_internalize,
+                (lto_code_gen_t cg, lto_bool_t ShouldInternalize),
+                (cg, ShouldInternalize))
+WRAP_LTO_SYMBOL(void, lto_codegen_set_cpu, (lto_code_gen_t cg, const char *cpu),
+                (cg, cpu))
+WRAP_LTO_SYMBOL(lto_bool_t, lto_codegen_set_pic_model,
+                (lto_code_gen_t cg, lto_codegen_model model), (cg, model))
+WRAP_LTO_SYMBOL(void, lto_codegen_add_must_preserve_symbol,
+                (lto_code_gen_t cg, const char *symbol), (cg, symbol))
+
+#undef WRAP_LTO_SYMBOL
+
+} // end extern "C"
 
 #endif
 

@@ -42,17 +42,18 @@ class File; // forward reference
 
 class TLVEntryAtom : public ld::Atom {
 public:
-											TLVEntryAtom(ld::Internal& internal, const ld::Atom* target, bool weakImport)
+											TLVEntryAtom(ld::Internal& internal, const ld::Atom* target, bool weakImport, unsigned ptrSize)
 				: ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
 							ld::Atom::scopeLinkageUnit, ld::Atom::typeNonLazyPointer, 
 							symbolTableNotIn, false, false, false, ld::Atom::Alignment(3)), 
-				_fixup(0, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressLittleEndian64, target),
-				_target(target)
+				_fixup(0, ld::Fixup::k1of1, (ptrSize ==8) ? ld::Fixup::kindStoreTargetAddressLittleEndian64 : ld::Fixup::kindStoreTargetAddressLittleEndian32, target),
+				_target(target),
+				_size(ptrSize)
 					{	_fixup.weakImport = weakImport; internal.addAtom(*this); }
 
 	virtual const ld::File*					file() const					{ return NULL; }
 	virtual const char*						name() const					{ return _target->name(); }
-	virtual uint64_t						size() const					{ return 8; }
+	virtual uint64_t						size() const					{ return _size; }
 	virtual uint64_t						objectAddress() const			{ return 0; }
 	virtual void							copyRawContent(uint8_t buffer[]) const { }
 	virtual void							setScope(Scope)					{ }
@@ -62,7 +63,8 @@ public:
 private:
 	mutable ld::Fixup						_fixup;
 	const ld::Atom*							_target;
-	
+	unsigned 								_size;
+
 	static ld::Section						_s_section;
 };
 
@@ -111,6 +113,8 @@ void doPass(const Options& opts, ld::Internal& internal)
 	// only make tlv section in final linked images
 	if ( opts.outputKind() == Options::kObjectFile )
 		return;
+
+	const unsigned ptrSize = (opts.architecture() == CPU_TYPE_ARM64_32) ? 4 : 8;
 
 	// walk all atoms and fixups looking for TLV references and add them to list
 	std::vector<TlVReferenceCluster>	references;
@@ -201,7 +205,7 @@ void doPass(const Options& opts, ld::Internal& internal)
 			if (log) fprintf(stderr, "make TLV pointer for %s\n", it->first->name());
 			if ( it->first->contentType() != ld::Atom::typeTLV )
 				throwf("illegal thread local variable reference to regular symbol %s", it->first->name());
-			TLVEntryAtom* tlvp = new TLVEntryAtom(internal, it->first, it->second);
+			TLVEntryAtom* tlvp = new TLVEntryAtom(internal, it->first, it->second, ptrSize);
 			variableToPointerMap[it->first] = tlvp;
 		}
 	}

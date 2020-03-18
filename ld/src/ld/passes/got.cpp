@@ -389,14 +389,15 @@ void doPass(const Options& opts, ld::Internal& internal)
 	// make GOT entries
 	for (auto& entry : gotMap) {
 		if ( entry.second == NULL ) {
+			bool weakDef = opts.useDataConstSegment() && opts.sharedRegionEligible() && weakDefMap[entry.first.atom];
 #if SUPPORT_ARCH_arm64e
 			if ( entry.first.isPersonalityFn && (opts.supportsAuthenticatedPointers()) ) {
-				entry.second = new GOTAuthEntryAtom(internal, entry.first.atom, weakImportMap[entry.first.atom], opts.useDataConstSegment() && weakDefMap[entry.first.atom]);
+				entry.second = new GOTAuthEntryAtom(internal, entry.first.atom, weakImportMap[entry.first.atom], weakDef);
 				if (log) fprintf(stderr, "making new GOT slot for %s, gotMap[%p] = %p\n", entry.first.atom->name(), entry.first.atom, entry.second);
 				continue;
 			}
 #endif
-			entry.second = new GOTEntryAtom(internal, entry.first.atom, weakImportMap[entry.first.atom], opts.useDataConstSegment() && weakDefMap[entry.first.atom], is64);
+			entry.second = new GOTEntryAtom(internal, entry.first.atom, weakImportMap[entry.first.atom], weakDef, is64);
 			if (log) fprintf(stderr, "making new GOT slot for %s, gotMap[%p] = %p\n", entry.first.atom->name(), entry.first.atom, entry.second);
 		}
 	}

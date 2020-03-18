@@ -31,9 +31,7 @@ object file is a "thin" file, the native 32-bit architecture for the host is use
 .Pp
 Usually,
 .Nm ld
-is not used directly.  Instead the
-.Xr gcc(1)
-compiler driver invokes
+is not used directly.  Instead the compiler driver invokes
 .Nm ld.
 The compiler driver can be passed multiple -arch options and it will create a
 universal final linked image by invoking
@@ -145,14 +143,6 @@ clients linking to the library being created.  This was previously done with a s
 This is the same as listing a file name path to a library on the link line and it specifies that the
 all symbols in library path should be available to clients linking to the library being created.
 This was previously done with a separate -sub_library option.
-.It Fl lazy-l Ns Ar x
-This is the same as the -lx but it is only for shared libraries and the linker
-will construct glue code so that the shared library is not loaded until
-the first function in it is called.
-.It Fl lazy_library Ar path_to_library
-This is the same as listing a file name path to a shared library on the link line
-except that the linker will construct glue code so that the shared library is not
-loaded until the first function in it is called.
 .It Fl upward-l Ns Ar x
 This is the same as the -lx but specifies that the dylib is an upward dependency.
 .It Fl upward_library Ar path_to_library
@@ -192,11 +182,6 @@ references to it to be marked as weak imports.
 This is the same as the -framework name[,suffix] but also specifies that the
 all symbols in that framework should be available to clients linking to the library being created.
 This was previously done with a separate -sub_umbrella option.
-.It Fl lazy_framework Ar name[,suffix]
-This is the same as the -framework name[,suffix] except that the linker will
-construct glue code so that the framework is not
-loaded until the first function in it is called.  You cannot directly access
-data or Objective-C classes in a framework linked this way.
 .It Fl upward_framework Ar name[,suffix]
 This is the same as the -framework name[,suffix] but also specifies that the
 framework is an upward dependency.
@@ -263,11 +248,34 @@ to the end. Use this option to disable the automatic rearrangement of initialize
 By default the linker reorders global data in the __DATA segment so that all global variables that
 dyld will need to adjust at launch time will early in the __DATA segment.  This reduces the number
 of dirty pages at launch time.  This option disables that optimization.
-.It Fl macosx_version_min Ar version
-This is set to indicate the oldest Mac OS X version that that the output is to be used on.  Specifying
+.It Fl platform_version Ar platform Ar min_version Ar sdk_version
+This is set to indicate the platform, oldest supported version of that platform that output is to be
+used on, and the SDK that the output was built against.
+.Ar platform
+is a numeric value as defined in <mach-o/loader.h>, or it may be one of the following strings:
+.Bl -tag -compact
+.It \(bu macos
+.It \(bu ios
+.It \(bu tvos
+.It \(bu watchos
+.It \(bu bridgeos
+.It \(bu mac-catalyst
+.It \(bu ios-sim
+.It \(bu tvos-sim
+.It \(bu watchos-sim
+.It \(bu driverkit
+.El
+Specifying a newer min or SDK version enables the linker to assume features of that OS or SDK in the
+output file. The format of
+.Ar min_version
+and
+.Ar sdk_version
+is a version number such as 10.13 or 10.14
+.It Fl macos_version_min Ar version
+This is set to indicate the oldest macOS version that that the output is to be used on.  Specifying
 a later version enables the linker to assumes features of that OS in the output file.  The format of
 .Ar version
-is a Mac OS X version number such as 10.4 or 10.5
+is a macOS version number such as 10.9 or 10.14
 .It Fl ios_version_min Ar version
 This is set to indicate the oldest iOS version that that the output is to be used on.  Specifying
 a later version enables the linker to assumes features of that OS in the output file.  The format of
@@ -351,11 +359,7 @@ will cause a bus error if a NULL pointer is dereferenced.  The argument
 is a hexadecimal number with an optional leading 0x.  If
 .Ar size
 is zero, the linker will not generate a page zero segment.  By default on 32-bit architectures the page zero size
-is 4KB.  On 64-bit architectures, the default size is 4GB.  The ppc64 architecture has some special cases. Since Mac
-OS X 10.4 did not support 4GB page zero programs, the default page zero size for ppc64 will be 4KB unless
--macosx_version_min is 10.5 or later.  Also, the -mdynamic-no-pic codegen model for ppc64 will only work if the
-code is placed in the lower 2GB of the address space, so the if the linker detects any such code, the page zero
-size is set to 4KB and then a new unreadable trailing segment is created after the code, filling up the lower 4GB.
+is 4KB.  On 64-bit architectures, the default size is 4GB. 
 .It Fl stack_size Ar size
 Specifies the maximum stack size for the main thread in a program.  Without this option a program has a 8MB stack.
 The argument
@@ -519,6 +523,10 @@ The specified
 contains a list of non-global symbol names that should be remain in the output file's symbol table.  All other
 symbol names will be removed from the output file's symbol table. See -exported_symbols_list for syntax and use
 of wildcards.
+.It Fl oso_prefix Ar prefix-path
+When generating the debug map, the linker will remove the specified
+.Ar prefix-path
+from the path in OSO symbols. This can be used so to help build servers generate identical binaries.
 .El
 .Ss Options for Bitcode build flow
 .Bl -tag
@@ -556,6 +564,9 @@ Error if the output contains any static initializers
 Do not warn if the output contains any static initializers
 .It Fl debug_variant
 Do not warn about issues that are only problems for binaries shipping to customers.
+.It Fl unaligned_pointers Ar treatment
+Specifies how unaligned pointers in __DATA segments should be handled. Options are: 'warning', 'error', or 'suppress'.
+The default for arm64e is 'error' and for all other architectures it is 'suppress'.
 .It Fl dirty_data_list Ar filename
 Specifies a file containing the names of data symbols likely to be dirtied.
 If the linker is creating a __DATA_DIRTY segment, those symbols will be moved
@@ -734,10 +745,10 @@ the glue code need to set up and call main().
 .It Fl w
 Suppress all warning messages
 .It Fl final_output Ar name
-Specifies the install name of a dylib if -install_name is not used.  This option is used by gcc driver when it is invoked
+Specifies the install name of a dylib if -install_name is not used.  This option is used by compiler driver when it is invoked
 with multiple -arch arguments.
 .It Fl arch_multiple
-Specifes that the linker should augment error and warning messages with the architecture name.  This option is used by gcc
+Specifes that the linker should augment error and warning messages with the architecture name.  This option is used by compiler
 driver when it is invoked with multiple -arch arguments.
 .It Fl twolevel_namespace_hints
 Specifies that hints should be added to the resulting binary that can help speed up runtime binding by dyld as long as the
@@ -893,6 +904,20 @@ Replaced by more general -order_file option.
 .It Fl sectorder_detail
 Produced extra logging about which entries from a sectorder entries were used.  Replaced by -order_file_statistics.
 This option is obsolete.
+.It Fl lazy_framework Ar name[,suffix]
+This is the same as the -framework name[,suffix] except that the linker will
+construct glue code so that the framework is not
+loaded until the first function in it is called.  You cannot directly access
+data or Objective-C classes in a framework linked this way. This option
+is deprecated.
+.It Fl lazy-l Ns Ar x
+This is the same as the -lx but it is only for shared libraries and the linker
+will construct glue code so that the shared library is not loaded until
+the first function in it is called. This option is deprecated.
+.It Fl lazy_library Ar path_to_library
+This is the same as listing a file name path to a shared library on the link line
+except that the linker will construct glue code so that the shared library is not
+loaded until the first function in it is called. This option is deprecated.
 .El
 .Sh SEE ALSO
 as(1), ar(1), cc(1), nm(1), otool(1) lipo(1),

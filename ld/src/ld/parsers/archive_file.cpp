@@ -96,6 +96,8 @@ public:
 	virtual bool										justInTimeDataOnlyforEachAtom(const char* name, ld::File::AtomHandler& handler) const;
 
 private:
+	friend bool isArchiveFile(const uint8_t* fileContent, uint64_t fileLength, ld::Platform* platform, const char** archiveArchName);
+
 	static bool										validMachOFile(const uint8_t* fileContent, uint64_t fileLength, 
 																	const mach_o::relocatable::ParserOptions& opts);
 	static bool										validLTOFile(const uint8_t* fileContent, uint64_t fileLength, 
@@ -151,6 +153,7 @@ private:
 	const bool										_objc2ABI;
 	const bool										_verboseLoad;
 	const bool										_logAllFiles;
+	mutable bool									_alreadyLoadedAll;
 	const mach_o::relocatable::ParserOptions		_objOpts;
 };
 
@@ -297,12 +300,11 @@ File<A>::File(const uint8_t fileContent[], uint64_t fileLength, const char* pth,
 	_tableOfContentCount(0), _tableOfContentStrings(NULL),
 	_forceLoadAll(opts.forceLoadAll), _forceLoadObjC(opts.forceLoadObjC), 
 	_forceLoadThis(opts.forceLoadThisArchive), _objc2ABI(opts.objcABI2), _verboseLoad(opts.verboseLoad), 
-	_logAllFiles(opts.logAllFiles), _objOpts(opts.objOpts)
+	_logAllFiles(opts.logAllFiles), _alreadyLoadedAll(false), _objOpts(opts.objOpts)
 {
 	if ( strncmp((const char*)fileContent, "!<arch>\n", 8) != 0 )
 		throw "not an archive";
 
-	if ( !_forceLoadAll ) {
 		const Entry* const firstMember = (Entry*)&_archiveFileContent[8];
 		char memberName[256];
 		firstMember->getName(memberName, sizeof(memberName));
@@ -333,7 +335,6 @@ File<A>::File(const uint8_t fileContent[], uint64_t fileLength, const char* pth,
 		else
 			throw "archive has no table of contents";
 	}
-}
 
 template <>
 bool File<x86>::memberHasObjCCategories(const Entry* member) const
@@ -483,6 +484,7 @@ bool File<A>::forEachAtom(ld::File::AtomHandler& handler) const
 			MemberState& state = this->makeObjectFileForMember(p);
 			didSome |= loadMember(state, handler, "%s forced load of %s(%s)\n", _forceLoadThis ? "-force_load" : "-all_load", this->path(), memberName);
 		}
+		_alreadyLoadedAll = true;
 	}
 	else if ( _forceLoadObjC ) {
 		// call handler on all .o files in this archive containing objc classes
@@ -575,7 +577,7 @@ template <typename A>
 bool File<A>::justInTimeforEachAtom(const char* name, ld::File::AtomHandler& handler) const
 {
 	// in force load case, all members already loaded
-	if ( _forceLoadAll || _forceLoadThis ) 
+	if ( _alreadyLoadedAll )
 		return false;
 	
 	// do a hash search of table of contents looking for requested symbol
@@ -614,7 +616,7 @@ template <typename A>
 bool File<A>::justInTimeDataOnlyforEachAtom(const char* name, ld::File::AtomHandler& handler) const
 {
 	// in force load case, all members already loaded
-	if ( _forceLoadAll || _forceLoadThis ) 
+	if ( _alreadyLoadedAll )
 		return false;
 	
 	// do a hash search of table of contents looking for requested symbol
@@ -723,6 +725,38 @@ ld::archive::File* parse(const uint8_t* fileContent, uint64_t fileLength,
 #endif
 	}
 	return NULL;
+}
+
+
+bool isArchiveFile(const uint8_t* fileContent, uint64_t fileLength, ld::Platform* platform, const char** archiveArchName)
+{
+	if ( strncmp((const char*)fileContent, "!<arch>\n", 8) != 0 )
+		return false;
+
+	// peak at first recognizable .o file and extract its platform and archName
+	// note: the template type does not matter here
+	const File<x86_64>::Entry* const start = (File<x86_64>::Entry*)&fileContent[8];
+	const File<x86_64>::Entry* const end = (File<x86_64>::Entry*)&fileContent[fileLength];
+	for (const File<x86_64>::Entry* p=start; p < end; p = p->next()) {
+		char memberName[256];
+		p->getName(memberName, sizeof(memberName));
+		// skip optional table-of-content member
+		if ( (p==start) && ((strcmp(memberName, SYMDEF_SORTED) == 0) || (strcmp(memberName, SYMDEF) == 0)) )
+			continue;
+#ifdef SYMDEF_64
+		if ( (p==start) && ((strcmp(memberName, SYMDEF_64_SORTED) == 0) || (strcmp(memberName, SYMDEF_64) == 0)) )
+			continue;
+#endif
+		*archiveArchName = mach_o::relocatable::archName(p->content());
+		if ( *archiveArchName != NULL ) {
+			cpu_type_t    type;
+			cpu_subtype_t subtype;
+			uint32_t      ignore;
+			if ( mach_o::relocatable::isObjectFile(p->content(), p->contentSize(), &type, &subtype, platform, &ignore) )
+				return true;
+		}
+	}
+	return false;
 }
 
 
