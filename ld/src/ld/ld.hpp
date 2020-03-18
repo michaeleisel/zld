@@ -63,8 +63,6 @@ enum Platform {
 
 const ld::Platform basePlatform(const ld::Platform& platform);
 
-const ld::Platform platformFromString(const char* platformString);
-
 typedef LDOrderedSet<Platform> PlatformSet;
 
 //

@@ -104,28 +104,6 @@ const ld::Platform ld::basePlatform(const ld::Platform& platform)  {
 	}
 }
 
-const ld::Platform ld::platformFromString(const char* platformString) {
-	static const char* platforms[] = {
-		"",						// unknown
-		"macos",
-		"ios",
-		"tvos",
-		"watchos",
-		"",						// bridgeOS not supported
-		"",						// Catalyst not supported
-		"ios-simulator",
-		"tvos-simulator",
-		"watchos-simulator"
-	};
-
-	for (int i = ld::kPlatform_macOS; i <= ld::kPlatform_watchOSSimulator; i++) {
-		if ( strcmp(platformString, platforms[i]) == 0 ) {
-			return ld::Platform(i);
-		}
-	}
-	return ld::kPlatform_unknown;
-}
-
 const ld::VersionSet ld::File::_platforms;
 
 struct PerformanceStatistics {
