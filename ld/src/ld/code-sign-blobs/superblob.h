@@ -146,7 +146,7 @@ public:
 	_BlobType *operator () () const { return make(); }
 
 private:
-	typedef std::map<Type, BlobCore *> BlobMap;
+	typedef LDOrderedMap<Type, BlobCore *> BlobMap;
 	BlobMap mPieces;
 };
 
