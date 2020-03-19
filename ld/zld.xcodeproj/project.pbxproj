@@ -58,6 +58,7 @@
 		F3176404241011E300D68E7F /* libtbb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F3176402241011E300D68E7F /* libtbb.a */; };
 		F338085E2422DA520086B7E8 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
 		F33808602422DA6D0086B7E8 /* inits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085F2422DA6D0086B7E8 /* inits.cpp */; };
+		F34634572423BD3700F08C44 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
 		F9023C4E06D5A272001BBF46 /* ld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9023C3F06D5A254001BBF46 /* ld.cpp */; };
 		F933E3D9092E855B0083EAC8 /* ObjectDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F971EED706D5AD240041D381 /* ObjectDump.cpp */; };
 		F93CB248116E69EB003233B8 /* tlvp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F93CB246116E69EB003233B8 /* tlvp.cpp */; };
@@ -884,7 +885,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/csh;
-			shellScript = "# Let tests set MACOSX_DEPLOYMENT_TARGET as they need\nunsetenv MACOSX_DEPLOYMENT_TARGET\n\n# make linker relative libLTO.dylib\n#mkdir -p ${BUILD_DIR}/lib\n#ln -sf /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib ${BUILD_DIR}/lib/libLTO.dylib\n\n# always use new linker\nsetenv LD_NO_CLASSIC_LINKER\nsetenv LD_NO_CLASSIC_LINKER_STATIC\n\n#setenv IOS_SDK `xcode-select -p`/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk\n#setenv OSX_SDK `xcode-select -p`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk\n\n# run full test suite\nrm /tmp/results-ld\n\"$SRCROOT\"/unit-tests/run-all-unit-tests > /tmp/results-ld\n\n\"$SRCROOT\"/unit-tests/test_analyzer.rb /tmp/results-ld\n\n#exit 0\n";
+			shellScript = "# Let tests set MACOSX_DEPLOYMENT_TARGET as they need\nunsetenv MACOSX_DEPLOYMENT_TARGET\n\n# make linker relative libLTO.dylib\n#mkdir -p ${BUILD_DIR}/lib\n#ln -sf /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib ${BUILD_DIR}/lib/libLTO.dylib\n\n# always use new linker\nsetenv LD_NO_CLASSIC_LINKER\nsetenv LD_NO_CLASSIC_LINKER_STATIC\n\n#setenv IOS_SDK `xcode-select -p`/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk\n#setenv OSX_SDK `xcode-select -p`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk\n\n# run full test suite\nrm /tmp/results-ld\n\"$SRCROOT\"/unit-tests/run-all-unit-tests # > /tmp/results-ld\n\n#\"$SRCROOT\"/unit-tests/test_analyzer.rb /tmp/results-ld\n\n#exit 0\n";
 		};
 		F9CCF765144CE244007CB524 /* make configure.h */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1040,6 +1041,7 @@
 				F9AE23291109015E0007ED5D /* lto_file.cpp in Sources */,
 				F933E3D9092E855B0083EAC8 /* ObjectDump.cpp in Sources */,
 				4C8D9C9B240597220040CE7C /* Tweaks.cpp in Sources */,
+				F34634572423BD3700F08C44 /* PlatformSupport.cpp in Sources */,
 				F9EA75BC09788857008B4F1D /* debugline.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
