@@ -1299,6 +1299,13 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 		throw _exception;
 	}
 
+	preParseLibraries();
+	for (auto &file : _inputFiles) {
+		if (file->type() == ld::File::Archive) {
+			file->forEachAtom(handler);
+		}
+	}
+
 	markExplicitlyLinkedDylibs();
 	addLinkerOptionLibraries(state, handler);
 	createIndirectDylibs();
@@ -1312,12 +1319,6 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 		fileIndex++;
 	}
 
-	preParseLibraries();
-	for (auto &file : _inputFiles) {
-		if (file->type() == ld::File::Archive) {
-			file->forEachAtom(handler);
-		}
-	}
     
     switch ( _options.outputKind() ) {
         case Options::kStaticExecutable:
