@@ -885,7 +885,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/csh;
-			shellScript = "# Let tests set MACOSX_DEPLOYMENT_TARGET as they need\nunsetenv MACOSX_DEPLOYMENT_TARGET\n\n# make linker relative libLTO.dylib\n#mkdir -p ${BUILD_DIR}/lib\n#ln -sf /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib ${BUILD_DIR}/lib/libLTO.dylib\n\n# always use new linker\nsetenv LD_NO_CLASSIC_LINKER\nsetenv LD_NO_CLASSIC_LINKER_STATIC\n\n#setenv IOS_SDK `xcode-select -p`/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk\n#setenv OSX_SDK `xcode-select -p`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk\n\n# run full test suite\nrm /tmp/results-ld\n\"$SRCROOT\"/unit-tests/run-all-unit-tests # > /tmp/results-ld\n\n#\"$SRCROOT\"/unit-tests/test_analyzer.rb /tmp/results-ld\n\n#exit 0\n";
+			shellScript = "# Let tests set MACOSX_DEPLOYMENT_TARGET as they need\nunsetenv MACOSX_DEPLOYMENT_TARGET\n\n# make linker relative libLTO.dylib\n#mkdir -p ${BUILD_DIR}/lib\n#ln -sf /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib ${BUILD_DIR}/lib/libLTO.dylib\n\n# always use new linker\nsetenv LD_NO_CLASSIC_LINKER\nsetenv LD_NO_CLASSIC_LINKER_STATIC\n\n#setenv IOS_SDK `xcode-select -p`/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk\n#setenv OSX_SDK `xcode-select -p`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk\n\n# run full test suite\nrm /tmp/results-ld\n\"$SRCROOT\"/unit-tests/run-all-unit-tests > /tmp/results-ld\n\n\"$SRCROOT\"/unit-tests/test_analyzer.rb /tmp/results-ld\n\n#exit 0\n";
 		};
 		F9CCF765144CE244007CB524 /* make configure.h */ = {
 			isa = PBXShellScriptBuildPhase;

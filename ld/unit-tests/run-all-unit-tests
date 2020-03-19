@@ -10,8 +10,8 @@ cd `echo "$0" | sed 's/run-all-unit-tests/test-cases/'`
 
 [ "$PROCTORRUN" ] && exec ../proctor-run
 
-all_archs="x86_64  i386"
-valid_archs="x86_64 i386"
+all_archs="x86_64"
+valid_archs="x86_64"
 ios_sdk_directory="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs"
 # only test arm code if iOS platform tools installed
 min_available_ios_sdk_version()
@@ -27,12 +27,7 @@ version_ge()
 }
 if [ -d $ios_sdk_directory ]
 then
-	arm_arch="armv7"
-	# Newer SDKs don't support older architectures.
-	if version_ge "$(min_available_ios_sdk_version)" "11.0"
-	then
-		arm_arch="arm64"
-	fi
+       arm_arch="arm64"
     all_archs="${all_archs}  ${arm_arch}"
     valid_archs="${valid_archs} ${arm_arch}"
 fi

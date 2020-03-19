@@ -106,16 +106,15 @@ sub process_entry
     }
 
     #if there was any output to stderr, mark this as a failure
-    foreach $line (@{$$tbl{stderr}})
-    {
-	printf "%-40s FAIL spurious stderr failure: %s\n", $test_name, $line;
-	$total_count++;
-	return;
-    }
+    #foreach $line (@{$$tbl{stderr}})
+    #{
+    #printf "%-40s FAIL spurious stderr failure: %s\n", $test_name, $line;
+    #$total_count++;
+    #return;
+    #}
 
     # scan all stdout looking for lines that start with PASS or FAIL
     my $seen_result = 0;
-    my $fail = 0;
     foreach $line (@{$$tbl{stdout}})
     {
 	if($line =~ m/^(PASS|XPASS|FAIL|XFAIL).+/)
@@ -127,27 +126,11 @@ sub process_entry
 	    }
 	    else
 	    {
-                $fail = 1;
 		# only print failure lines
-                #  printf "%-40s %s\n", $test_name, $line;
+		printf "%-40s %s\n", $test_name, $line;
 	    }
 	    $seen_result = 1;
 	}
-    }
-    # printf $fail;
-    if ($fail == 1) {
-        printf "%-40s failed", $test_name;
-        printf "stdout\n";
-        # my $line1;
-        foreach $line (@{$$tbl{stdout}})
-        {
-            printf "stdout: %s\n", $line;
-        }
-        printf "stderr\n";
-        foreach $line (@{$$tbl{stderr}})
-        {
-            printf "stderr: %s\n", $line;
-        }
     }
     if(!$seen_result)
     {
