@@ -39,6 +39,8 @@ extern ld::dylib::File* parse(const uint8_t* fileContent, uint64_t fileLength, c
 extern ld::dylib::File *parse(const char *path, tapi::LinkerInterfaceFile* file, time_t modTime,
                               ld::File::Ordinal ordinal, const Options& opts, bool indirectDylib);
 
+extern bool isTextStubFile(const uint8_t* fileContent, uint64_t fileLength, const char* path);
+
 } // namespace dylib
 } // namespace textstub
 

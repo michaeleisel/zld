@@ -49,7 +49,7 @@ public:
 										DeDupAliasAtom(const ld::Atom* dupOf, const ld::Atom* replacement) :
 											ld::Atom(dupOf->section(), ld::Atom::definitionRegular, ld::Atom::combineNever,
 													dupOf->scope(), dupOf->contentType(), ld::Atom::symbolTableIn,
-													false, false, true, dupOf->alignment()),
+													false, false, true, replacement->alignment()),
 											_dedupOf(dupOf),
 											_fixup(0, ld::Fixup::k1of1, ld::Fixup::kindNoneFollowOn, ld::Fixup::bindingDirectlyBound, replacement) {
                                                 if ( dupOf->autoHide() )

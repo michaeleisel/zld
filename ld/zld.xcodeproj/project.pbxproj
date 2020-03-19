@@ -56,6 +56,9 @@
 		F307EBD4241AB309009AC4F3 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F307EBD2241AB2F3009AC4F3 /* CoreFoundation.framework */; };
 		F307EBD5241AB347009AC4F3 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F307EBD2241AB2F3009AC4F3 /* CoreFoundation.framework */; };
 		F3176404241011E300D68E7F /* libtbb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F3176402241011E300D68E7F /* libtbb.a */; };
+		F338085E2422DA520086B7E8 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
+		F33808602422DA6D0086B7E8 /* inits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085F2422DA6D0086B7E8 /* inits.cpp */; };
+		F34634572423BD3700F08C44 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
 		F9023C4E06D5A272001BBF46 /* ld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9023C3F06D5A254001BBF46 /* ld.cpp */; };
 		F933E3D9092E855B0083EAC8 /* ObjectDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F971EED706D5AD240041D381 /* ObjectDump.cpp */; };
 		F93CB248116E69EB003233B8 /* tlvp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F93CB246116E69EB003233B8 /* tlvp.cpp */; };
@@ -285,6 +288,12 @@
 		C1E27B591F6B1B70003B8FA6 /* thread_starts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = thread_starts.h; sourceTree = "<group>"; };
 		F307EBD2241AB2F3009AC4F3 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		F3176402241011E300D68E7F /* libtbb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libtbb.a; sourceTree = "<group>"; };
+		F338085D2422DA520086B7E8 /* PlatformSupport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PlatformSupport.cpp; path = src/ld/PlatformSupport.cpp; sourceTree = "<group>"; };
+		F338085F2422DA6D0086B7E8 /* inits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = inits.cpp; sourceTree = "<group>"; };
+		F33808612422DA830086B7E8 /* inits.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = inits.h; sourceTree = "<group>"; };
+		F33808622422DA8B0086B7E8 /* PlatformSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PlatformSupport.h; path = src/ld/PlatformSupport.h; sourceTree = "<group>"; };
+		F33808632422DAB40086B7E8 /* stub_arm64_32.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = stub_arm64_32.hpp; sourceTree = "<group>"; };
+		F33808642422DAB40086B7E8 /* stub_arm64e.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = stub_arm64e.hpp; sourceTree = "<group>"; };
 		F9023C3906D5A23E001BBF46 /* zld */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = zld; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9023C3F06D5A254001BBF46 /* ld.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ld.cpp; path = src/ld/ld.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F91B7B0318987D5F0099486F /* AddressSpace.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AddressSpace.hpp; sourceTree = "<group>"; };
@@ -498,6 +507,8 @@
 		F9AA650B1051BD2B003E3539 /* passes */ = {
 			isa = PBXGroup;
 			children = (
+				F338085F2422DA6D0086B7E8 /* inits.cpp */,
+				F33808612422DA830086B7E8 /* inits.h */,
 				F9FC51081BC8915A00FEC3F8 /* code_dedup.cpp */,
 				F9FC51091BC8915A00FEC3F8 /* code_dedup.h */,
 				B028FCF11A9E7C3F00E3584B /* bitcode_bundle.cpp */,
@@ -534,6 +545,8 @@
 			isa = PBXGroup;
 			children = (
 				F9AA650D1051BD2B003E3539 /* make_stubs.h */,
+				F33808632422DAB40086B7E8 /* stub_arm64_32.hpp */,
+				F33808642422DAB40086B7E8 /* stub_arm64e.hpp */,
 				F9AA65101051BD2B003E3539 /* stubs.cpp */,
 				F9AA650F1051BD2B003E3539 /* stub_arm.hpp */,
 				F984A13B10B614CF009E9878 /* stub_arm_classic.hpp */,
@@ -601,6 +614,8 @@
 				F9AA69B410583C0C003E3539 /* SymbolTable.cpp */,
 				F9AA69B510583C0C003E3539 /* SymbolTable.h */,
 				4C5E360823FB61DC0073E2F5 /* compile_stubs.h */,
+				F338085D2422DA520086B7E8 /* PlatformSupport.cpp */,
+				F33808622422DA8B0086B7E8 /* PlatformSupport.h */,
 				F9AA687A10572E27003E3539 /* InputFiles.cpp */,
 				4C5E360723FB61D50073E2F5 /* configure.h */,
 				F9AA687B10572E27003E3539 /* InputFiles.h */,
@@ -984,8 +999,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				F9FC510A1BC893C400FEC3F8 /* code_dedup.cpp in Sources */,
+				F33808602422DA6D0086B7E8 /* inits.cpp in Sources */,
 				C1E27B581F6B1B68003B8FA6 /* thread_starts.cpp in Sources */,
 				FA95D6141AB25CF400395811 /* textstub_dylib_file.cpp in Sources */,
+				F338085E2422DA520086B7E8 /* PlatformSupport.cpp in Sources */,
 				F9C0D4BD06DD28D2001C7193 /* Options.cpp in Sources */,
 				F9023C4E06D5A272001BBF46 /* ld.cpp in Sources */,
 				F9AA65891051E750003E3539 /* macho_relocatable_file.cpp in Sources */,
@@ -1024,6 +1041,7 @@
 				F9AE23291109015E0007ED5D /* lto_file.cpp in Sources */,
 				F933E3D9092E855B0083EAC8 /* ObjectDump.cpp in Sources */,
 				4C8D9C9B240597220040CE7C /* Tweaks.cpp in Sources */,
+				F34634572423BD3700F08C44 /* PlatformSupport.cpp in Sources */,
 				F9EA75BC09788857008B4F1D /* debugline.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

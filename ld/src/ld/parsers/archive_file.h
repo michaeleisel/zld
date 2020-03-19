@@ -43,6 +43,9 @@ struct ParserOptions {
 extern ld::archive::File* parse(const uint8_t* fileContent, uint64_t fileLength, 
 						const char* path, time_t modTime, ld::File::Ordinal ordinal, const ParserOptions& opts);
 
+extern bool isArchiveFile(const uint8_t* fileContent, uint64_t fileLength, ld::Platform* platform, const char** archiveArchName);
+
+
 } // namespace archive
 
 

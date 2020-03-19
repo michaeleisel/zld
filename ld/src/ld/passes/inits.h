@@ -1,6 +1,6 @@
 /* -*- mode: C++; c-basic-offset: 4; tab-width: 4 -*-
  *
- * Copyright (c) 2009-2011 Apple Inc. All rights reserved.
+ * Copyright (c) 2009 Apple Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
  *
@@ -22,27 +22,24 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-#ifndef __MACHO_DYLIB_FILE_H__
-#define __MACHO_DYLIB_FILE_H__
 
-#include "ld.hpp"
+#ifndef __INITS_H__
+#define __INITS_H__
+
 #include "Options.h"
-
-namespace mach_o {
-namespace dylib {
+#include "ld.hpp"
 
 
-extern bool isDylibFile(const uint8_t* fileContent, uint64_t fileLength, cpu_type_t* result, cpu_subtype_t* subResult, ld::Platform* platform, uint32_t* minOsVers);					
+namespace ld {
+namespace passes {
+namespace inits {
 
-extern const char* archName(const uint8_t* fileContent);
-
-
-extern ld::dylib::File* parse(const uint8_t* fileContent, uint64_t fileLength, const char* path,
-							  time_t modTime, const Options& opts, ld::File::Ordinal ordinal,
-							  bool bundleLoader, bool indirectDylib);
-
-} // namespace dylib
-} // namespace mach_o
+// called by linker to transform __mod_init_funs to __init_offsets
+extern void doPass(Options& opts, ld::Internal& internal);
 
 
-#endif // __MACHO_DYLIB_FILE_H__
+} // namespace huge
+} // namespace passes 
+} // namespace ld 
+
+#endif // __INITS_H__

@@ -1,6 +1,6 @@
 /* -*- mode: C++; c-basic-offset: 4; tab-width: 4 -*-
  *
- * Copyright (c) 2009-2012 Apple Inc. All rights reserved.
+ * Copyright (c) 2010-2013 Apple Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
  *
@@ -24,7 +24,11 @@
 
 
 // already in ld::passes::stubs namespace
-namespace x86_64 {
+
+#if SUPPORT_ARCH_arm64e
+
+// already in ld::passes::stubs namespace
+namespace arm64e {
 
 
 
@@ -59,28 +63,23 @@ ld::Section FastBindingPointerAtom::_s_section("__DATA", "__got", ld::Section::t
 class ImageCachePointerAtom : public ld::Atom {
 public:
 											ImageCachePointerAtom(ld::passes::stubs::Pass& pass)
-				: ld::Atom( (pass.usingDataConstSegment ? _s_section : _s_sectionOld),
-					        ld::Atom::definitionRegular, ld::Atom::combineNever,
-							(pass.usingDataConstSegment ? ld::Atom::scopeTranslationUnit : ld::Atom::scopeLinkageUnit),
-							(pass.usingDataConstSegment ? ld::Atom::typeUnclassified : ld::Atom::typeNonLazyPointer),
-							(pass.usingDataConstSegment ? symbolTableIn : symbolTableNotIn),
-							false, false, false, ld::Atom::Alignment(3)) { pass.addAtom(*this); }
+				: ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
+							ld::Atom::scopeTranslationUnit, ld::Atom::typeUnclassified,
+							symbolTableIn, false, false, false, ld::Atom::Alignment(3)) { pass.addAtom(*this); }
 
 	virtual const ld::File*					file() const					{ return NULL; }
-	virtual const char*						name() const					{ return "__dyld_private"; }
+    virtual const char*                     name() const                    { return "__dyld_private"; }
 	virtual uint64_t						size() const					{ return 8; }
 	virtual uint64_t						objectAddress() const			{ return 0; }
 	virtual void							copyRawContent(uint8_t buffer[]) const { }
 	virtual void							setScope(Scope)					{ }
 
 private:
-
+	
 	static ld::Section						_s_section;
-	static ld::Section						_s_sectionOld;
 };
 
-ld::Section ImageCachePointerAtom::_s_section(   "__DATA", "__data",          ld::Section::typeUnclassified);
-ld::Section ImageCachePointerAtom::_s_sectionOld("__DATA", "__nl_symbol_ptr", ld::Section::typeNonLazyPointer);
+ld::Section ImageCachePointerAtom::_s_section("__DATA", "__data", ld::Section::typeUnclassified);
 
 
 
@@ -97,35 +96,29 @@ public:
 				: ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
 							ld::Atom::scopeLinkageUnit, ld::Atom::typeStubHelper, 
 							symbolTableNotIn, false, false, false, ld::Atom::Alignment(2)), 
-				_fixup1(3,  ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressX86PCRel32, compressedImageCache(pass)),
-				_fixup2(11, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressX86PCRel32, compressedFastBinder(pass)) 
+				_fixup1(0,  ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressARM64Page21,    compressedImageCache(pass)),
+				_fixup2(4,  ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressARM64PageOff12, compressedImageCache(pass)), 
+				_fixup3(12, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressARM64Page21,    compressedFastBinder(pass)), 
+				_fixup4(16, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressARM64PageOff12, compressedFastBinder(pass)), 
+				_fixup5(ld::Fixup::kindLinkerOptimizationHint, LOH_ARM64_ADRP_ADD, 0, 4), 
+				_fixup6(ld::Fixup::kindLinkerOptimizationHint, LOH_ARM64_ADRP_LDR, 12, 16) 
 					{ pass.addAtom(*this); }
 
 	virtual ld::File*						file() const					{ return NULL; }
 	virtual const char*						name() const					{ return "helper helper"; }
-	virtual uint64_t						size() const					{ return 16; }
+	virtual uint64_t						size() const					{ return 24; }
 	virtual uint64_t						objectAddress() const			{ return 0; }
 	virtual void							copyRawContent(uint8_t buffer[]) const {
-		buffer[0]  = 0x4C;		// leaq dyld_mageLoaderCache(%rip),%r11
-		buffer[1]  = 0x8D;
-		buffer[2]  = 0x1D;
-		buffer[3]  = 0x00;
-		buffer[4]  = 0x00;
-		buffer[5]  = 0x00;
-		buffer[6]  = 0x00;
-		buffer[7]  = 0x41;		// pushq %r11
-		buffer[8]  = 0x53;
-		buffer[9]  = 0xFF;		// jmp *_fast_lazy_bind(%rip)
-		buffer[10] = 0x25;
-		buffer[11] = 0x00;
-		buffer[12] = 0x00;
-		buffer[13] = 0x00;
-		buffer[14] = 0x00;
-		buffer[15] = 0x90;		// nop
+		OSWriteLittleInt32(&buffer[ 0], 0, 0x90000011); //     ADRP  X17, dyld_mageLoaderCache@page
+		OSWriteLittleInt32(&buffer[ 4], 0, 0x91000231); //     ADD	 X17, X17, dyld_mageLoaderCache@pageoff
+		OSWriteLittleInt32(&buffer[ 8], 0, 0xA9BF47F0); //     STP   X16/X17, [SP, #-16]!
+		OSWriteLittleInt32(&buffer[12], 0, 0x90000010); //     ADRP  X16, _fast_lazy_bind@page
+		OSWriteLittleInt32(&buffer[16], 0, 0xF9400210); //     LDR	 X16, [X16,_fast_lazy_bind@pageoff]
+		OSWriteLittleInt32(&buffer[20], 0, 0xD61F0200); //     BR    X16
 	}
 	virtual void							setScope(Scope)					{ }
 	virtual ld::Fixup::iterator				fixupsBegin() const				{ return &_fixup1; }
-	virtual ld::Fixup::iterator				fixupsEnd()	const				{ return &((ld::Fixup*)&_fixup2)[1]; }
+	virtual ld::Fixup::iterator				fixupsEnd()	const				{ return &((ld::Fixup*)&_fixup6)[1]; }
 
 private:
 	static ld::Atom* compressedImageCache(ld::passes::stubs::Pass& pass) {
@@ -141,6 +134,10 @@ private:
 	
 	mutable ld::Fixup						_fixup1;
 	ld::Fixup								_fixup2;
+	ld::Fixup								_fixup3;
+	ld::Fixup								_fixup4;
+	ld::Fixup								_fixup5;
+	ld::Fixup								_fixup6;
 	
 	static ld::Section						_s_section;
 };
@@ -152,40 +149,33 @@ ld::Section StubHelperHelperAtom::_s_section("__TEXT", "__stub_helper", ld::Sect
 class StubHelperAtom : public ld::Atom {
 public:
 											StubHelperAtom(ld::passes::stubs::Pass& pass, const ld::Atom* lazyPointer,
-															const ld::Atom& stubTo, bool stubToResolver)
+                                                           const ld::Atom& stubTo, bool stubToResolver)
 				: ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
 							ld::Atom::scopeLinkageUnit, ld::Atom::typeStubHelper, 
-							symbolTableNotIn, false, false, false, ld::Atom::Alignment(1)), 
+							symbolTableNotIn, false, false, false, ld::Atom::Alignment(2)),
 				_stubTo(stubTo),
-				_fixup1(1, ld::Fixup::k1of2, ld::Fixup::kindSetLazyOffset, lazyPointer),
-				_fixup2(1, ld::Fixup::k2of2, ld::Fixup::kindStoreLittleEndian32),
-				_fixup3(6, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressX86BranchPCRel32, helperHelper(pass, *this, stubToResolver)) { }
+				_fixup1(4, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressARM64Branch26, helperHelper(pass, *this, stubToResolver)),
+				_fixup2(8, ld::Fixup::k1of2, ld::Fixup::kindSetLazyOffset, lazyPointer),
+				_fixup3(8, ld::Fixup::k2of2, ld::Fixup::kindStoreLittleEndian32)  { }
 				
 	virtual const ld::File*					file() const					{ return _stubTo.file(); }
 	virtual const char*						name() const					{ return _stubTo.name(); }
-	virtual uint64_t						size() const					{ return 10; }
+	virtual uint64_t						size() const					{ return 12; }
 	virtual uint64_t						objectAddress() const			{ return 0; }
 	virtual void							copyRawContent(uint8_t buffer[]) const {
-			buffer[0]  = 0x68;		// pushq $lazy-info-offset
-			buffer[1]  = 0x00;
-			buffer[2]  = 0x00;
-			buffer[3]  = 0x00;
-			buffer[4]  = 0x00;
-			buffer[5]  = 0xE9;		// jmp helperhelper
-			buffer[6]  = 0x00;
-			buffer[7]  = 0x00;
-			buffer[8]  = 0x00;
-			buffer[9]  = 0x00;
+		OSWriteLittleInt32(&buffer[0], 0, 0x18000050); //     LDR   W16, L0
+		OSWriteLittleInt32(&buffer[4], 0, 0x14000000); //     B     helperhelper
+		OSWriteLittleInt32(&buffer[8], 0, 0x00000000); // L0: .long 0
 	}
 	virtual void							setScope(Scope)					{ }
 	virtual ld::Fixup::iterator				fixupsBegin() const				{ return &_fixup1; }
 	virtual ld::Fixup::iterator				fixupsEnd() const				{ return &((ld::Fixup*)&_fixup3)[1]; }
 
 private:
-	static ld::Atom* helperHelper(ld::passes::stubs::Pass& pass, StubHelperAtom& stub, bool stubToResolver) {
-		// hack for resolvers in chained fixups.  StubHelper is not used by needs to be constructed, so use dummy values
-		if ( stubToResolver )
-			return &stub;
+    static ld::Atom* helperHelper(ld::passes::stubs::Pass& pass, StubHelperAtom& stub, bool stubToResolver) {
+        // hack for resolvers in chained fixups.  StubHelper is not used by needs to be constructed, so use dummy values
+        if ( stubToResolver )
+            return &stub;
 		if ( pass.compressedHelperHelper == NULL )
 			pass.compressedHelperHelper = new StubHelperHelperAtom(pass);
 		return pass.compressedHelperHelper;
@@ -208,54 +198,36 @@ public:
 																							const ld::Atom& stubTo)
 				: ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
 							ld::Atom::scopeLinkageUnit, ld::Atom::typeStubHelper, 
-							symbolTableNotIn, false, false, false, ld::Atom::Alignment(1)), 
+							symbolTableNotIn, false, false, false, ld::Atom::Alignment(2)),
 				_stubTo(stubTo),
-				_fixup1(10, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressX86BranchPCRel32, &stubTo),
-				_fixup2(17, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressX86PCRel32, lazyPointer),
-				_fixup3(32, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressX86PCRel32, lazyPointer) { }
+				_fixup1(24, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressARM64Branch26, &stubTo),
+				_fixup2(28, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressARM64Page21, lazyPointer),
+				_fixup3(32, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressARM64PageOff12, lazyPointer) { }
 				
 	virtual const ld::File*					file() const					{ return _stubTo.file(); }
 	virtual const char*						name() const					{ return _stubTo.name(); }
-	virtual uint64_t						size() const					{ return 36; }
+	virtual uint64_t						size() const					{ return 68; }
 	virtual uint64_t						objectAddress() const			{ return 0; }
 	virtual void							copyRawContent(uint8_t buffer[]) const {
-			buffer[ 0]  = 0x50;		// push %rax
-			buffer[ 1]  = 0x57;		// push %rdi
-			buffer[ 2]  = 0x56;		// push %rsi
-			buffer[ 3]  = 0x52;		// push %rdx
-			buffer[ 4]  = 0x51;		// push %rcx
-			buffer[ 5]  = 0x41;		// push %r8
-			buffer[ 6]  = 0x50;
-			buffer[ 7]  = 0x41;		// push %r9
-			buffer[ 8]  = 0x51;
-			buffer[ 9]  = 0xE8;		// call foo
-			buffer[10]  = 0x00;
-			buffer[11]  = 0x00;
-			buffer[12]  = 0x00;		
-			buffer[13]  = 0x00;
-			buffer[14]  = 0x48;		// movq %rax,foo$lazy_pointer(%rip)
-			buffer[15]  = 0x89;
-			buffer[16]  = 0x05;
-			buffer[17]  = 0x00;
-			buffer[18]  = 0x00;
-			buffer[19]  = 0x00;
-			buffer[20]  = 0x00;
-			buffer[21]  = 0x41;		// pop %r9
-			buffer[22]  = 0x59;	
-			buffer[23]  = 0x41;		// pop %r8
-			buffer[24]  = 0x58;
-			buffer[25]  = 0x59;		// pop %rcx
-			buffer[26]  = 0x5A;		// pop %rdx
-			buffer[27]  = 0x5E;		// pop %rsi
-			buffer[28]  = 0x5F;		// pop %rdi
-			buffer[29]  = 0x58;		// pop %rax
-			buffer[30]  = 0xFF;		// jmp *foo$lazy_ptr(%rip)
-			buffer[31]  = 0x25;
-			buffer[32]  = 0x00;
-			buffer[33]  = 0x00;
-			buffer[34]  = 0x00;
-			buffer[35]  = 0x00;
+		OSWriteLittleInt32(&buffer[ 0], 0, 0xa9bf7bfd); // stp	fp, lr, [sp, #-16]!
+		OSWriteLittleInt32(&buffer[ 4], 0, 0x910003fd); // mov	fp, sp
+		OSWriteLittleInt32(&buffer[ 8], 0, 0xa9bf03e1); // stp	x1, x0, [sp, #-16]!
+		OSWriteLittleInt32(&buffer[12], 0, 0xa9bf0be3); // stp	x3, x2, [sp, #-16]!
+		OSWriteLittleInt32(&buffer[16], 0, 0xa9bf13e5); // stp	x5, x4, [sp, #-16]!
+		OSWriteLittleInt32(&buffer[20], 0, 0xa9bf1be7); // stp	x7, x6, [sp, #-16]!
+		OSWriteLittleInt32(&buffer[24], 0, 0x94000000); // bl	_foo
+		OSWriteLittleInt32(&buffer[28], 0, 0x90000010); // adrp	x16, lazy_pointer@PAGE
+		OSWriteLittleInt32(&buffer[32], 0, 0x91000210); // add	x16, x16, lazy_pointer@PAGEOFF
+		OSWriteLittleInt32(&buffer[36], 0, 0xf9000200); // str	x0, [x16]
+		OSWriteLittleInt32(&buffer[40], 0, 0xaa0003f0); // mov	x16, x0
+		OSWriteLittleInt32(&buffer[44], 0, 0xa8c11be7); // ldp	x7, x6, [sp], #16
+		OSWriteLittleInt32(&buffer[48], 0, 0xa8c113e5); // ldp	x5, x4, [sp], #16
+		OSWriteLittleInt32(&buffer[52], 0, 0xa8c10be3); // ldp	x3, x2, [sp], #16
+		OSWriteLittleInt32(&buffer[56], 0, 0xa8c103e1); // ldp	x1, x0, [sp], #16
+		OSWriteLittleInt32(&buffer[60], 0, 0xa8c17bfd); // ldp	fp, lr, [sp], #16
+		OSWriteLittleInt32(&buffer[64], 0, 0xD61F0A1F); // braaz x16
 	}
+
 	virtual void							setScope(Scope)					{ }
 	virtual ld::Fixup::iterator				fixupsBegin() const				{ return &_fixup1; }
 	virtual ld::Fixup::iterator				fixupsEnd() const				{ return &((ld::Fixup*)&_fixup3)[1]; }
@@ -277,17 +249,18 @@ ld::Section						ResolverHelperAtom::_s_section("__TEXT", "__stub_helper", ld::S
 class LazyPointerAtom : public ld::Atom {
 public:
 											LazyPointerAtom(ld::passes::stubs::Pass& pass, const ld::Atom& stubTo,
-															bool stubToGlobalWeakDef, bool stubToResolver, bool weakImport)
-				: ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
+															bool stubToGlobalWeakDef, bool stubToResolver, bool weakImport, bool dataConstUsed)
+				: ld::Atom(selectSection(stubToGlobalWeakDef, stubToResolver, dataConstUsed),
+							ld::Atom::definitionRegular, ld::Atom::combineNever,
 							ld::Atom::scopeTranslationUnit, ld::Atom::typeLazyPointer, 
 							symbolTableNotIn, false, false, false, ld::Atom::Alignment(3)), 
 				_stubTo(stubTo),
 				_helper(pass, this, stubTo, stubToResolver),
 				_resolverHelper(pass, this, stubTo),
-				_fixup1(0, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressLittleEndian64, 
-													stubToResolver ? &_resolverHelper : 
-														(stubToGlobalWeakDef ?  &stubTo : &_helper)),
-				_fixup2(0, ld::Fixup::k1of1, ld::Fixup::kindLazyTarget, &stubTo) { 
+				_fixup1(0, ld::Fixup::k1of2, ld::Fixup::kindSetAuthData, (ld::Fixup::AuthData){ 0, false, ld::Fixup::AuthData::ptrauth_key_asia }),
+				_fixup2(0, ld::Fixup::k2of2, ld::Fixup::kindStoreTargetAddressLittleEndianAuth64,
+													stubToResolver ? &_resolverHelper : (stubToGlobalWeakDef ?  &stubTo : &_helper)),
+				_fixup3(0, ld::Fixup::k1of1, ld::Fixup::kindLazyTarget, &stubTo) {
 						_fixup2.weakImport = weakImport; pass.addAtom(*this); 
 						if ( stubToResolver )
 							pass.addAtom(_resolverHelper);
@@ -302,58 +275,73 @@ public:
 	virtual void							copyRawContent(uint8_t buffer[]) const { }
 	virtual void							setScope(Scope)					{ }
 	virtual ld::Fixup::iterator				fixupsBegin() const				{ return &_fixup1; }
-	virtual ld::Fixup::iterator				fixupsEnd()	const 				{ return &((ld::Fixup*)&_fixup2)[1]; }
+	virtual ld::Fixup::iterator				fixupsEnd()	const 				{ return &((ld::Fixup*)&_fixup3)[1]; }
 
 private:
+	static ld::Section& selectSection(bool stubToGlobalWeakDef, bool stubToResolver, bool dataConstUsed) {
+		if ( stubToGlobalWeakDef && dataConstUsed )
+			return _s_sectionWeak;
+		else if ( stubToResolver && dataConstUsed )
+			return _s_sectionResolver;
+		else
+			return _s_section;
+	}
+
 	const ld::Atom&							_stubTo;
 	StubHelperAtom							_helper;
 	ResolverHelperAtom						_resolverHelper;
 	mutable ld::Fixup						_fixup1;
 	ld::Fixup								_fixup2;
-	
+	ld::Fixup								_fixup3;
+
 	static ld::Section						_s_section;
+	static ld::Section						_s_sectionResolver;
+	static ld::Section						_s_sectionWeak;
 };
 
 ld::Section LazyPointerAtom::_s_section("__DATA", "__la_symbol_ptr", ld::Section::typeLazyPointer);
+ld::Section LazyPointerAtom::_s_sectionResolver("__DATA_DIRTY", "__la_resolver", ld::Section::typeLazyPointer);
+ld::Section LazyPointerAtom::_s_sectionWeak("__DATA", "__la_weak_ptr", ld::Section::typeLazyPointer);
 
 
 class StubAtom : public ld::Atom {
 public:
 											StubAtom(ld::passes::stubs::Pass& pass, const ld::Atom& stubTo,
-													bool stubToGlobalWeakDef, bool stubToResolver, bool weakImport)
+													bool stubToGlobalWeakDef, bool stubToResolver, bool weakImport, bool dataConstUsed)
 				: ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
 							ld::Atom::scopeLinkageUnit, ld::Atom::typeStub, 
-							symbolTableNotIn, false, false, false, ld::Atom::Alignment(1)), 
+							symbolTableNotIn, false, false, false, ld::Atom::Alignment(2)),
 				_stubTo(stubTo), 
-				_lazyPointer(pass, stubTo, stubToGlobalWeakDef, stubToResolver, weakImport),
-				_fixup(2, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressX86PCRel32, &_lazyPointer) { pass.addAtom(*this); }
+				_lazyPointer(pass, stubTo, stubToGlobalWeakDef, stubToResolver, weakImport, dataConstUsed),
+				_fixup1(0, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressARM64Page21, &_lazyPointer),
+				_fixup2(4, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressARM64PageOff12, &_lazyPointer),
+				_fixup3(ld::Fixup::kindLinkerOptimizationHint, LOH_ARM64_ADRP_LDR, 0, 4) 
+					{ pass.addAtom(*this); 	}
 
 	virtual const ld::File*					file() const					{ return _stubTo.file(); }
 	virtual const char*						name() const					{ return _stubTo.name(); }
-	virtual uint64_t						size() const					{ return 6; }
+	virtual uint64_t						size() const					{ return 12; }
 	virtual uint64_t						objectAddress() const			{ return 0; }
 	virtual void							copyRawContent(uint8_t buffer[]) const {
-			buffer[0] = 0xFF;		// jmp *foo$lazy_pointer(%rip)
-			buffer[1] = 0x25;
-			buffer[2] = 0x00;
-			buffer[3] = 0x00;
-			buffer[4] = 0x00;
-			buffer[5] = 0x00;
+		OSWriteLittleInt32(&buffer[0], 0, 0x90000010); // ADRP  X16, lazy_pointer@page
+		OSWriteLittleInt32(&buffer[4], 0, 0xF9400210); // LDR   X16, [X16, lazy_pointer@pageoff]
+		OSWriteLittleInt32(&buffer[8], 0, 0xD61F0A1F); // BRAAZ X16
 	}
 	virtual void							setScope(Scope)					{ }
-	virtual ld::Fixup::iterator				fixupsBegin() const				{ return &_fixup; }
-	virtual ld::Fixup::iterator				fixupsEnd()	const 				{ return &((ld::Fixup*)&_fixup)[1]; }
+	virtual ld::Fixup::iterator				fixupsBegin() const				{ return &_fixup1; }
+	virtual ld::Fixup::iterator				fixupsEnd()	const 				{ return &((ld::Fixup*)&_fixup3)[1]; }
 
 private:
 	const ld::Atom&							_stubTo;
 	LazyPointerAtom							_lazyPointer;
-	mutable ld::Fixup						_fixup;
+	mutable ld::Fixup						_fixup1;
+	mutable ld::Fixup						_fixup2;
+	mutable ld::Fixup						_fixup3;
 	
 	static ld::Section						_s_section;
 };
 
 ld::Section StubAtom::_s_section("__TEXT", "__stubs", ld::Section::typeStub);
-
 
 
 
@@ -365,8 +353,9 @@ public:
 							ld::Atom::combineNever, ld::Atom::scopeLinkageUnit, ld::Atom::typeNonLazyPointer, 
 							symbolTableNotIn, false, false, false, ld::Atom::Alignment(3)), 
 				_stubTo(stubTo),
-				_fixup1(0, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressLittleEndian64, &stubTo) {
-					_fixup1.weakImport = weakImport;
+	_fixup1(0, ld::Fixup::k1of2, ld::Fixup::kindSetAuthData, (ld::Fixup::AuthData){ 0, true, ld::Fixup::AuthData::ptrauth_key_asia }),
+	_fixup2(0, ld::Fixup::k2of2, ld::Fixup::kindStoreTargetAddressLittleEndianAuth64, &stubTo) {
+					_fixup2.weakImport = weakImport;
 					pass.addAtom(*this);
 				}
 
@@ -377,56 +366,60 @@ public:
 	virtual void							copyRawContent(uint8_t buffer[]) const { }
 	virtual void							setScope(Scope)					{ }
 	virtual ld::Fixup::iterator				fixupsBegin() const				{ return (ld::Fixup*)&_fixup1; }
-	virtual ld::Fixup::iterator				fixupsEnd()	const 				{ return &((ld::Fixup*)&_fixup1)[1]; }
+	virtual ld::Fixup::iterator				fixupsEnd()	const 				{ return &((ld::Fixup*)&_fixup2)[1]; }
 
 private:
 	const ld::Atom&							_stubTo;
 	ld::Fixup								_fixup1;
+	ld::Fixup								_fixup2;
 	
 	static ld::Section						_s_section;
 };
 
-ld::Section NonLazyPointerAtom::_s_section("__DATA", "__got", ld::Section::typeNonLazyPointer);
-
+ld::Section NonLazyPointerAtom::_s_section("__DATA", "__auth_got", ld::Section::typeNonLazyPointer);
 
 
 class NonLazyStubAtom : public ld::Atom {
 public:
-	NonLazyStubAtom(ld::passes::stubs::Pass& pass, const ld::Atom& stubTo,
-					bool weakImport)
+				NonLazyStubAtom(ld::passes::stubs::Pass& pass, const ld::Atom& stubTo,
+								bool weakImport)
 				: ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
 							ld::Atom::scopeLinkageUnit, ld::Atom::typeStub, 
-							symbolTableNotIn, false, false, false, ld::Atom::Alignment(1)), 
+							symbolTableNotIn, false, false, false, ld::Atom::Alignment(2)),
 				_stubTo(stubTo), 
 				_nonLazyPointer(pass, stubTo, weakImport),
-				_fixup(2, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressX86PCRel32, &_nonLazyPointer) { pass.addAtom(*this); }
+				_fixup1(0, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressARM64Page21, &_nonLazyPointer),
+				_fixup2(4, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressARM64PageOff12, &_nonLazyPointer) { 
+					asprintf((char**)&_name, "%s.stub", _stubTo.name());
+					pass.addAtom(*this);
+				}
 
 	virtual const ld::File*					file() const					{ return _stubTo.file(); }
-	virtual const char*						name() const					{ return _stubTo.name(); }
-	virtual uint64_t						size() const					{ return 6; }
+	virtual const char*						name() const					{ return _name; }
+	virtual uint64_t						size() const					{ return 16; }
 	virtual uint64_t						objectAddress() const			{ return 0; }
 	virtual void							copyRawContent(uint8_t buffer[]) const {
-			buffer[0] = 0xFF;		// jmp *foo$non_lazy_pointer(%rip)
-			buffer[1] = 0x25;
-			buffer[2] = 0x00;
-			buffer[3] = 0x00;
-			buffer[4] = 0x00;
-			buffer[5] = 0x00;
+		OSWriteLittleInt32(&buffer[ 0], 0, 0x90000011); // ADRP  X17, dyld_mageLoaderCache@page
+		OSWriteLittleInt32(&buffer[ 4], 0, 0x91000231); // ADD	 X17, X17, dyld_mageLoaderCache@pageoff
+		OSWriteLittleInt32(&buffer[ 8], 0, 0xF9400230); // LDR   X16, [X17]
+		OSWriteLittleInt32(&buffer[12], 0, 0xD71F0A11); // BRAA  X16, X17
 	}
 	virtual void							setScope(Scope)					{ }
-	virtual ld::Fixup::iterator				fixupsBegin() const				{ return &_fixup; }
-	virtual ld::Fixup::iterator				fixupsEnd()	const 				{ return &((ld::Fixup*)&_fixup)[1]; }
+	virtual ld::Fixup::iterator				fixupsBegin() const				{ return &_fixup1; }
+	virtual ld::Fixup::iterator				fixupsEnd()	const 				{ return &((ld::Fixup*)&_fixup2)[1]; }
 
 private:
 	const ld::Atom&							_stubTo;
+	const char*								_name;
 	NonLazyPointerAtom						_nonLazyPointer;
-	mutable ld::Fixup						_fixup;
+	mutable ld::Fixup						_fixup1;
+	mutable ld::Fixup						_fixup2;
 	
 	static ld::Section						_s_section;
 };
 
-ld::Section NonLazyStubAtom::_s_section("__TEXT", "__stubs", ld::Section::typeStub);
+ld::Section NonLazyStubAtom::_s_section("__TEXT", "__auth_stubs", ld::Section::typeStub);
 
 
-} // namespace x86_64 
-
+} // namespace arm64e
+#endif

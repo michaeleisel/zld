@@ -312,8 +312,9 @@ void Snapshot::writeCommandLine(bool rawArgs)
         int argsFile = open(path, O_WRONLY|O_CREAT|O_TRUNC, mode);
         FILE *argsStream = fdopen(argsFile, "w");
         
-        if (rawArgs)
-            fprintf(argsStream, "cd %s\n", getcwd(path, sizeof(path)));
+        const char* cwdPath = getcwd(path, sizeof(path));
+        if (rawArgs && cwdPath)
+            fprintf(argsStream, "cd %s\n", cwdPath);
 
         // iterate to write args, quoting as needed
         unsigned idx;

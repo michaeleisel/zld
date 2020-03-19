@@ -4,6 +4,9 @@ dwarf-debug-notes-lto
 efi-basic
 dwarf-debug-notes-r
 lto-symbol-section-move
+lazy-dylib-objc
+missing-option-args
+lazy-dylib
 lto-llvm-options
 custom-segment-layout
 init-order

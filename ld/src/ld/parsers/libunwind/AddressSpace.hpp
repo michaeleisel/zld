@@ -36,7 +36,6 @@
 #include <mach-o/loader.h>
 #include <mach-o/getsect.h>
 #include <mach-o/dyld_priv.h>
-#include <mach/i386/thread_status.h>
 #include <Availability.h>
 
 #include "FileAbstraction.hpp"

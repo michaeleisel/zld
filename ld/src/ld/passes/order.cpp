@@ -245,6 +245,12 @@ bool Layout::Comparer::operator()(const ld::Atom* left, const ld::Atom* right)
 	}
 #endif
 	
+	// sort cold functions to end
+	bool leftCold  = left->cold();
+	bool rightCold = right->cold();
+	if ( leftCold != rightCold )
+		return rightCold;
+	
 	// sort by .o order
 	const ld::File* leftFile = left->file();
 	const ld::File* rightFile = right->file();

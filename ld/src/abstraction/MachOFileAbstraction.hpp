@@ -40,103 +40,11 @@
 
 #include "configure.h"
 
-// stuff that will eventually go away once newer cctools headers are widespread
-#ifndef LC_LOAD_UPWARD_DYLIB
-	#define	LC_LOAD_UPWARD_DYLIB (0x23|LC_REQ_DYLD)	/* load of dylib whose initializers run later */
-#endif
 
-#ifndef CPU_SUBTYPE_ARM_V5TEJ
-	#define CPU_SUBTYPE_ARM_V5TEJ		((cpu_subtype_t) 7)
-#endif
-#ifndef CPU_SUBTYPE_ARM_XSCALE
-	#define CPU_SUBTYPE_ARM_XSCALE		((cpu_subtype_t) 8)
-#endif
-#ifndef CPU_SUBTYPE_ARM_V7
-	#define CPU_SUBTYPE_ARM_V7			((cpu_subtype_t) 9)
-#endif
 
-#ifndef N_ARM_THUMB_DEF
-	#define N_ARM_THUMB_DEF	0x0008 
-#endif
-#ifndef MH_DEAD_STRIPPABLE_DYLIB
-	#define MH_DEAD_STRIPPABLE_DYLIB 0x400000
-#endif
-#ifndef MH_KEXT_BUNDLE
-	#define MH_KEXT_BUNDLE 11
-#endif
-#ifndef MH_SIM_SUPPORT
-	#define MH_SIM_SUPPORT 0x08000000
-#endif
-#ifndef LC_DYLD_INFO
-	#define	LC_DYLD_INFO 	0x22	/* compressed dyld information */
-	#define	LC_DYLD_INFO_ONLY (0x22|LC_REQ_DYLD)	/* compressed dyld information only */
-
-	struct dyld_info_command {
-	   uint32_t   cmd;		/* LC_DYLD_INFO or LC_DYLD_INFO_ONLY */
-	   uint32_t   cmdsize;		/* sizeof(struct dyld_info_command) */
-		uint32_t   rebase_off;	/* file offset to rebase info  */
-		uint32_t   rebase_size;	/* size of rebase info   */
-		uint32_t   bind_off;	/* file offset to binding info   */
-		uint32_t   bind_size;	/* size of binding info  */
-		uint32_t   weak_bind_off;	/* file offset to weak binding info   */
-		uint32_t   weak_bind_size;  /* size of weak binding info  */
-		uint32_t   lazy_bind_off;	/* file offset to lazy binding info */
-		uint32_t   lazy_bind_size;  /* size of lazy binding infs */
-		uint32_t   export_off;	/* file offset to lazy binding info */
-		uint32_t   export_size;	/* size of lazy binding infs */
-	};
-
-	#define REBASE_TYPE_POINTER					1
-	#define REBASE_TYPE_TEXT_ABSOLUTE32				2
-	#define REBASE_TYPE_TEXT_PCREL32				3
-
-	#define REBASE_OPCODE_MASK					0xF0
-	#define REBASE_IMMEDIATE_MASK					0x0F
-	#define REBASE_OPCODE_DONE					0x00
-	#define REBASE_OPCODE_SET_TYPE_IMM				0x10
-	#define REBASE_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB		0x20
-	#define REBASE_OPCODE_ADD_ADDR_ULEB				0x30
-	#define REBASE_OPCODE_ADD_ADDR_IMM_SCALED			0x40
-	#define REBASE_OPCODE_DO_REBASE_IMM_TIMES			0x50
-	#define REBASE_OPCODE_DO_REBASE_ULEB_TIMES			0x60
-	#define REBASE_OPCODE_DO_REBASE_ADD_ADDR_ULEB			0x70
-	#define REBASE_OPCODE_DO_REBASE_ULEB_TIMES_SKIPPING_ULEB	0x80
-
-	#define BIND_TYPE_POINTER					1
-	#define BIND_TYPE_TEXT_ABSOLUTE32				2
-	#define BIND_TYPE_TEXT_PCREL32					3
-
-	#define BIND_SPECIAL_DYLIB_SELF					 0
-	#define BIND_SPECIAL_DYLIB_MAIN_EXECUTABLE			-1
-	#define BIND_SPECIAL_DYLIB_FLAT_LOOKUP				-2
-
-	#define BIND_SYMBOL_FLAGS_WEAK_IMPORT				0x1
-	#define BIND_SYMBOL_FLAGS_NON_WEAK_DEFINITION			0x8
-
-	#define BIND_OPCODE_MASK					0xF0
-	#define BIND_IMMEDIATE_MASK					0x0F
-	#define BIND_OPCODE_DONE					0x00
-	#define BIND_OPCODE_SET_DYLIB_ORDINAL_IMM			0x10
-	#define BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB			0x20
-	#define BIND_OPCODE_SET_DYLIB_SPECIAL_IMM			0x30
-	#define BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM		0x40
-	#define BIND_OPCODE_SET_TYPE_IMM				0x50
-	#define BIND_OPCODE_SET_ADDEND_SLEB				0x60
-	#define BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB			0x70
-	#define BIND_OPCODE_ADD_ADDR_ULEB				0x80
-	#define BIND_OPCODE_DO_BIND					0x90
-	#define BIND_OPCODE_DO_BIND_ADD_ADDR_ULEB			0xA0
-	#define BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED			0xB0
-	#define BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB		0xC0
-
-	#define EXPORT_SYMBOL_FLAGS_KIND_MASK				0x03
-	#define EXPORT_SYMBOL_FLAGS_KIND_REGULAR			0x00
-	#define EXPORT_SYMBOL_FLAGS_KIND_THREAD_LOCAL			0x01
-	#define EXPORT_SYMBOL_FLAGS_WEAK_DEFINITION			0x04
-	#define EXPORT_SYMBOL_FLAGS_INDIRECT_DEFINITION			0x08
-	#define EXPORT_SYMBOL_FLAGS_HAS_SPECIALIZATIONS			0x10
-
-#endif
+//#if SUPPORT_ARCH_arm64 || SUPPORT_ARCH_arm64e || SUPPORT_ARCH_arm64_32
+  #include <mach-o/arm64/reloc.h>
+///#endif
 
 #ifndef BIND_SPECIAL_DYLIB_WEAK_LOOKUP
 #define BIND_SPECIAL_DYLIB_WEAK_LOOKUP				-3
@@ -154,161 +62,248 @@
 #define BIND_SUBOPCODE_THREADED_APPLY								0x01
 #endif
 
-#if SUPPORT_ARCH_arm64e
-
-// clang encodes the combination of the key bits as these values.
-typedef enum {
-	ptrauth_key_asia = 0,
-	ptrauth_key_asib = 1,
-	ptrauth_key_asda = 2,
-	ptrauth_key_asdb = 3,
-} ptrauth_key;
-
+#ifndef EXPORT_SYMBOL_FLAGS_KIND_ABSOLUTE
+	#define EXPORT_SYMBOL_FLAGS_KIND_ABSOLUTE			0x02
+#endif
+#ifndef MH_SIM_SUPPORT
+	#define MH_SIM_SUPPORT 0x08000000
+#endif
+#ifndef PLATFORM_IOSMAC
+	#define PLATFORM_IOSMAC 6
+#endif
+#ifndef SG_READ_ONLY
+	#define SG_READ_ONLY    0x10
 #endif
 
-#ifndef S_THREAD_LOCAL_REGULAR
-	#define S_THREAD_LOCAL_REGULAR                   0x11
+#ifndef N_COLD_FUNC
+	#define N_COLD_FUNC 0x0400
 #endif
 
-#ifndef S_THREAD_LOCAL_ZEROFILL
-	#define S_THREAD_LOCAL_ZEROFILL                  0x12
-#endif
+#if __has_include(<mach-o/fixup-chains2.h>)
+  #include <mach-o/fixup-chains.h>
+#else
+	// header of the LC_DYLD_CHAINED_FIXUPS payload
+	struct dyld_chained_fixups_header
+	{
+		uint32_t    fixups_version;    // 0
+		uint32_t    starts_offset;     // offset of dyld_chained_starts_in_image in chain_data
+		uint32_t    imports_offset;    // offset of imports table in chain_data
+		uint32_t    symbols_offset;    // offset of symbol strings in chain_data
+		uint32_t    imports_count;     // number of imported symbol names
+		uint32_t    imports_format;    // DYLD_CHAINED_IMPORT*
+		uint32_t    symbols_format;    // 0 => uncompressed, 1 => zlib compressed
+	};
 
-#ifndef S_THREAD_LOCAL_VARIABLES
-	#define S_THREAD_LOCAL_VARIABLES                 0x13
-#endif
+	// This struct is embedded in LC_DYLD_CHAINED_FIXUPS payload
+	struct dyld_chained_starts_in_image
+	{
+		uint32_t    seg_count;
+		uint32_t    seg_info_offset[1];  // each entry is offset into this struct for that segment
+		// followed by pool of dyld_chain_starts_in_segment data
+	};
 
-#ifndef S_THREAD_LOCAL_VARIABLE_POINTERS
-	#define S_THREAD_LOCAL_VARIABLE_POINTERS         0x14
-#endif
+	// This struct is embedded in dyld_chain_starts_in_image
+	// and passed down to the kernel for page-in linking
+	struct dyld_chained_starts_in_segment
+	{
+		uint32_t    size;               // size of this (amount kernel needs to copy)
+		uint16_t    page_size;          // 0x1000 or 0x4000
+		uint16_t    pointer_format;     // DYLD_CHAINED_PTR_*
+		uint64_t    segment_offset;     // offset in memory to start of segment
+		uint32_t    max_valid_pointer;  // for 32-bit OS, any value beyond this is not a pointer
+		uint16_t    page_count;         // how many pages are in array
+		uint16_t    page_start[1];      // each entry is offset in each page of first element in chain
+										// or DYLD_CHAINED_PTR_START_NONE if no fixups on page
+	 // uint16_t    chain_starts[1];    // some 32-bit formats may require multiple starts per page.
+										// for those, if high bit is set in page_starts[], then it
+										// is index into chain_starts[] which is a list of starts
+										// the last of which has the high bit set
+	};
 
-#ifndef S_THREAD_LOCAL_INIT_FUNCTION_POINTERS
-	#define S_THREAD_LOCAL_INIT_FUNCTION_POINTERS    0x15
-#endif
+	enum {
+		DYLD_CHAINED_PTR_START_NONE   = 0xFFFF, // used in page_start[] to denote a page with no fixups
+		DYLD_CHAINED_PTR_START_MULTI  = 0x8000, // used in page_start[] to denote a page which has multiple starts
+		DYLD_CHAINED_PTR_START_LAST   = 0x8000, // used in chain_starts[] to denote last start in list for page
+	};
 
-#ifndef MH_HAS_TLV_DESCRIPTORS
-	#define MH_HAS_TLV_DESCRIPTORS 0x800000
-#endif
 
-#ifndef X86_64_RELOC_TLV
-	#define X86_64_RELOC_TLV    9
-#endif
+	// This struct is embedded in __TEXT,__chain_starts section in firmware
+	struct dyld_chained_starts_offsets
+	{
+		uint32_t    pointer_format;     // DYLD_CHAINED_PTR_32_FIRMWARE
+		uint32_t    starts_count;       // number of starts in array
+		uint32_t    chain_starts[1];    // array chain start offsets
+	};
+
+
+	// values for dyld_chained_starts_in_segment.pointer_format
+	enum {
+		DYLD_CHAINED_PTR_ARM64E      = 1,
+		DYLD_CHAINED_PTR_64          = 2,
+		DYLD_CHAINED_PTR_32          = 3,
+		DYLD_CHAINED_PTR_32_CACHE    = 4,
+		DYLD_CHAINED_PTR_32_FIRMWARE = 5,
+	};
+
+	// DYLD_CHAINED_PTR_ARM64E
+	struct dyld_chained_ptr_arm64e_rebase
+	{
+		uint64_t    target   : 43,
+					high8    :  8,
+					next     : 11,    // 8-byte stide
+					bind     :  1,    // == 0
+					auth     :  1;    // == 0
+	};
+
+	// DYLD_CHAINED_PTR_ARM64E
+	struct dyld_chained_ptr_arm64e_bind
+	{
+		uint64_t    ordinal   : 16,
+					zero      : 16,
+					addend    : 19,
+					next      : 11,    // 8-byte stide
+					bind      :  1,    // == 1
+					auth      :  1;    // == 0
+	};
+
+	// DYLD_CHAINED_PTR_ARM64E
+	struct dyld_chained_ptr_arm64e_auth_rebase
+	{
+		uint64_t    target    : 32,
+					diversity : 16,
+					addrDiv   :  1,
+					key       :  2,
+					next      : 11,    // 8-byte stide
+					bind      :  1,    // == 0
+					auth      :  1;    // == 1
+	};
+
+	// DYLD_CHAINED_PTR_ARM64E
+	struct dyld_chained_ptr_arm64e_auth_bind
+	{
+		uint64_t    ordinal   : 16,
+					zero      : 16,
+					diversity : 16,
+					addrDiv   :  1,
+					key       :  2,
+					next      : 11,    // 8-byte stide
+					bind      :  1,    // == 1
+					auth      :  1;    // == 1
+	};
+
+	// DYLD_CHAINED_PTR_64
+	struct dyld_chained_ptr_64_rebase
+	{
+		uint64_t    target    : 36,    // 64GB max image size
+					high8     :  8,    // top 8 bits set to this after slide added
+					reserved  :  7,    // all zeros
+					next      : 12,    // 4-byte stride
+					bind      :  1;    // == 0
+	};
+
+	// DYLD_CHAINED_PTR_64
+	struct dyld_chained_ptr_64_bind
+	{
+		uint64_t    ordinal   : 24,
+					addend    :  8,   // 0 thru 255
+					reserved  : 19,   // all zeros
+					next      : 12,   // 4-byte stride
+					bind      :  1;   // == 1
+	};
+
+	// DYLD_CHAINED_PTR_32
+	struct dyld_chained_ptr_32_rebase
+	{
+		uint32_t    target    : 26,   // 64MB max image size
+					next      :  5,   // 4-byte stride
+					bind      :  1;   // == 0
+	};
+
+	// DYLD_CHAINED_PTR_32
+	struct dyld_chained_ptr_32_bind
+	{
+		uint32_t    ordinal   : 20,
+					addend    :  6,   // 0 thru 63
+					next      :  5,   // 4-byte stride
+					bind      :  1;   // == 1
+	};
+
+	// DYLD_CHAINED_PTR_32_CACHE
+	struct dyld_chained_ptr_32_cache_rebase
+	{
+		uint32_t    target    : 30,   // 1GB max dyld cache TEXT and DATA
+					next      :  2;   // 4-byte stride
+	};
+
+
+	// DYLD_CHAINED_PTR_32_FIRMWARE
+	struct dyld_chained_ptr_32_firmware_rebase
+	{
+		uint32_t    target   : 26,   // 64MB max firmware TEXT and DATA
+					next     :  6;   // 4-byte stride
+	};
+
+
+
+	// values for dyld_chained_fixups_header.imports_format
+	enum {
+		DYLD_CHAINED_IMPORT          = 1,
+		DYLD_CHAINED_IMPORT_ADDEND   = 2,
+		DYLD_CHAINED_IMPORT_ADDEND64 = 3,
+	};
+
+	// DYLD_CHAINED_IMPORT
+	struct dyld_chained_import
+	{
+		uint32_t    lib_ordinal :  8,
+					weak_import :  1,
+					name_offset : 23;
+	};
+
+	// DYLD_CHAINED_IMPORT_ADDEND
+	struct dyld_chained_import_addend
+	{
+		uint32_t    lib_ordinal :  8,
+					weak_import :  1,
+					name_offset : 23;
+		int32_t     addend;
+	};
+
+	// DYLD_CHAINED_IMPORT_ADDEND64
+	struct dyld_chained_import_addend64
+	{
+		uint64_t    lib_ordinal : 16,
+					weak_import :  1,
+					reserved    : 15,
+					name_offset : 32;
+		uint64_t    addend;
+	};
+
+#endif  // __has_include(<mach-o/fixup-chains.h>)
+
+
+#define LC_DYLD_EXPORTS_TRIE     (0x33 | LC_REQ_DYLD)
+#define LC_DYLD_CHAINED_FIXUPS   (0x34 | LC_REQ_DYLD)
+
 
 #define GENERIC_RLEOC_TLV  5
-
-#ifndef EXPORT_SYMBOL_FLAGS_STUB_AND_RESOLVER
-	#define EXPORT_SYMBOL_FLAGS_STUB_AND_RESOLVER 0x10
-#endif
-
-#ifndef EXPORT_SYMBOL_FLAGS_REEXPORT
-	#define EXPORT_SYMBOL_FLAGS_REEXPORT 0x08
-#endif
 
 // type internal to linker
 #define BIND_TYPE_OVERRIDE_OF_WEAKDEF_IN_DYLIB 0
 
-#ifndef LC_VERSION_MIN_MACOSX
-	#define	LC_VERSION_MIN_MACOSX 	0x24
-	#define	LC_VERSION_MIN_IPHONEOS 	0x25
 
-	struct version_min_command {
-		uint32_t	cmd;		/* LC_VERSION_MIN_MACOSX or LC_VERSION_MIN_IPHONEOS  */
-		uint32_t	cmdsize;	/* sizeof(struct min_version_command) */
-		uint32_t	version;	/* X.Y.Z is encoded in nibbles xxxx.yy.zz */
-		uint32_t	reserved;	/* zero */
-	};
+#ifndef CPU_TYPE_ARM64_32
+	#ifndef CPU_ARCH_ABI64_32
+		#define CPU_ARCH_ABI64_32			0x02000000
+	#endif
+	#define CPU_TYPE_ARM64_32			(CPU_TYPE_ARM | CPU_ARCH_ABI64_32)
 #endif
-
-#ifndef N_SYMBOL_RESOLVER
-	#define N_SYMBOL_RESOLVER 0x100
+#ifndef CPU_SUBTYPE_ARM64_32_V8
+	#define CPU_SUBTYPE_ARM64_32_V8    1
 #endif
-
-#ifndef N_AST
-	#define N_AST 0x32
-#endif
-
-#ifndef LC_FUNCTION_STARTS
-	#define	LC_FUNCTION_STARTS 	0x26
-#endif
-
-#ifndef MH_NO_HEAP_EXECUTION
-	#define MH_NO_HEAP_EXECUTION 0x1000000
-#endif
-
-#ifndef LC_DYLD_ENVIRONMENT
-	#define	LC_DYLD_ENVIRONMENT 	0x27
-#endif
-
-#ifndef LC_DATA_IN_CODE
-	#define LC_DATA_IN_CODE 0x29 /* table of non-instructions in __text */
- 	struct data_in_code_entry {
-		uint32_t	offset;
-		uint16_t	length;
-		uint16_t	kind;
-	};
-#endif
-
-#ifndef LC_DYLIB_CODE_SIGN_DRS
-	#define LC_DYLIB_CODE_SIGN_DRS 0x2B
-#endif
-
-#ifndef LC_ENCRYPTION_INFO_64
-	#define LC_ENCRYPTION_INFO_64 0x2C
-  struct encryption_info_command_64 {
-     uint32_t	cmd;		
-     uint32_t	cmdsize;
-     uint32_t	cryptoff;
-     uint32_t	cryptsize;
-     uint32_t	cryptid;
-     uint32_t	pad;
-  };
-#endif
-
-#ifndef MH_APP_EXTENSION_SAFE
-	#define MH_APP_EXTENSION_SAFE 0x02000000
-#endif
-
-#ifndef N_ALT_ENTRY
-	#define N_ALT_ENTRY 0x0200
-#endif
-
-#ifndef CPU_SUBTYPE_ARM_V7F
-  #define CPU_SUBTYPE_ARM_V7F    ((cpu_subtype_t) 10)
-#endif
-#ifndef CPU_SUBTYPE_ARM_V7K
-  #define CPU_SUBTYPE_ARM_V7K    ((cpu_subtype_t) 12)
-#endif
-#ifndef CPU_SUBTYPE_ARM_V7S
-  #define CPU_SUBTYPE_ARM_V7S    ((cpu_subtype_t) 11)
-#endif
-
-
-
-// hack until arm64 headers are worked out
-#ifndef CPU_TYPE_ARM64
-	#define CPU_TYPE_ARM64			(CPU_TYPE_ARM | CPU_ARCH_ABI64)
-#endif
-#ifndef CPU_SUBTYPE_ARM64_ALL
-	#define CPU_SUBTYPE_ARM64_ALL	0
-#endif
-#ifndef CPU_SUBTYPE_ARM64_V8
-	#define CPU_SUBTYPE_ARM64_V8    1
-#endif
-
-#define ARM64_RELOC_UNSIGNED            0 // for pointers
-#define ARM64_RELOC_SUBTRACTOR          1 // must be followed by a ARM64_RELOC_UNSIGNED
-#define ARM64_RELOC_BRANCH26            2 // a B/BL instruction with 26-bit displacement
-#define ARM64_RELOC_PAGE21              3 // pc-rel distance to page of target
-#define ARM64_RELOC_PAGEOFF12           4 // offset within page, scaled by r_length
-#define ARM64_RELOC_GOT_LOAD_PAGE21     5 // pc-rel distance to page of GOT slot
-#define ARM64_RELOC_GOT_LOAD_PAGEOFF12  6 // offset within page of GOT slot, scaled by r_length
-#define ARM64_RELOC_POINTER_TO_GOT      7 // for pointers to GOT slots
-#define ARM64_RELOC_TLVP_LOAD_PAGE21    8 // pc-rel distance to page of TLVP slot
-#define ARM64_RELOC_TLVP_LOAD_PAGEOFF12 9 // offset within page of TLVP slot, scaled by r_length
-#define ARM64_RELOC_ADDEND				10 // r_symbolnum is addend for next reloc
-
-#if SUPPORT_ARCH_arm64e
-	#define ARM64_RELOC_AUTHENTICATED_POINTER				11 // An authenticated pointer.
+#ifndef CPU_SUBTYPE_ARM64E
+	#define CPU_SUBTYPE_ARM64E    2
+	#define ARM64_RELOC_AUTHENTICATED_POINTER 11
 #endif
 
 
@@ -412,84 +407,17 @@ typedef enum {
 
 #define UNW_ARM_D31 287
 
-
-#ifndef LC_SOURCE_VERSION
-	#define LC_SOURCE_VERSION 0x2A
-	struct source_version_command {
-		uint32_t  cmd;	/* LC_SOURCE_VERSION */
-		uint32_t  cmdsize;	/* 16 */
-		uint64_t  version;	/* A.B.C.D.E packed as a24.b10.c10.d10.e10 */
-	};
+#ifndef LC_LINKER_OPTIMIZATION_HINTS
+       #define LC_LINKER_OPTIMIZATION_HINTS   0x2E
+       #define LOH_ARM64_ADRP_ADRP                             1
+       #define LOH_ARM64_ADRP_LDR                              2
+       #define LOH_ARM64_ADRP_ADD_LDR                  3
+       #define LOH_ARM64_ADRP_LDR_GOT_LDR              4
+       #define LOH_ARM64_ADRP_ADD_STR                  5
+       #define LOH_ARM64_ADRP_LDR_GOT_STR              6
+       #define LOH_ARM64_ADRP_ADD                              7
+       #define LOH_ARM64_ADRP_LDR_GOT                  8
 #endif
-
-#ifndef LC_MAIN
-	#define LC_MAIN (0x28|LC_REQ_DYLD) /* replacement for LC_UNIXTHREAD */
-	struct entry_point_command {
-		uint32_t  cmd;	/* LC_MAIN only used in MH_EXECUTE filetypes */
-		uint32_t  cmdsize;	/* 24 */
-		uint64_t  entryoff;	/* file (__TEXT) offset of main() */
-		uint64_t  stacksize;/* if not zero, initial stack size */
-	};
-#endif
-
-#ifndef LC_DYLIB_CODE_SIGN_DRS
-	#define LC_DYLIB_CODE_SIGN_DRS 0x2B 
-#endif	
-
-#ifndef LC_LINKER_OPTION 
-	#define LC_LINKER_OPTION   0x2D
-
-	struct linker_option_command {
-		uint32_t	cmd;	  /*LC_LINKER_OPTION only used in MH_OBJECT filetypes */
-		uint32_t	cmdsize;
-		uint32_t	count;	  /* number of strings */
-		/* concatenation of zero terminated UTF8 strings.  Zero filled at end to align */
-	};
-#endif
-
-#ifndef LC_LINKER_OPTIMIZATION_HINTS 
-	#define LC_LINKER_OPTIMIZATION_HINTS   0x2E
-	#define LOH_ARM64_ADRP_ADRP				1
-	#define LOH_ARM64_ADRP_LDR				2
-	#define LOH_ARM64_ADRP_ADD_LDR			3
-	#define LOH_ARM64_ADRP_LDR_GOT_LDR		4
-	#define LOH_ARM64_ADRP_ADD_STR			5
-	#define LOH_ARM64_ADRP_LDR_GOT_STR		6
-	#define LOH_ARM64_ADRP_ADD				7
-	#define LOH_ARM64_ADRP_LDR_GOT			8
-#endif
-
-#ifndef LC_VERSION_MIN_TVOS
-	#define LC_VERSION_MIN_TVOS			0x2F
-#endif
-
-#ifndef LC_VERSION_MIN_WATCHOS
-	#define LC_VERSION_MIN_WATCHOS		0x30
-#endif
-
-#ifndef EXPORT_SYMBOL_FLAGS_KIND_ABSOLUTE
-	#define EXPORT_SYMBOL_FLAGS_KIND_ABSOLUTE			0x02
-#endif
-
-#ifndef CPU_SUBTYPE_ARM_V8
-	#define CPU_SUBTYPE_ARM_V8		((cpu_subtype_t) 13) 
-#endif
-
-#ifndef CPU_SUBTYPE_ARM_V6M
-	#define CPU_SUBTYPE_ARM_V6M		((cpu_subtype_t) 14) 
-#endif	
-
-#ifndef CPU_SUBTYPE_ARM_V7M
-	#define CPU_SUBTYPE_ARM_V7M		((cpu_subtype_t) 15) 
-#endif	
-
-#ifndef CPU_SUBTYPE_ARM_V7EM
-	#define CPU_SUBTYPE_ARM_V7EM	((cpu_subtype_t) 16) 
-#endif	
-
-#ifndef CPU_SUBTYPE_X86_64_H
-	#define CPU_SUBTYPE_X86_64_H	((cpu_subtype_t) 8) 
-#endif	
 
 #define UNWIND_ARM_MODE_MASK                          0x0F000000
 #define UNWIND_ARM_MODE_FRAME                         0x01000000
@@ -541,57 +469,11 @@ typedef enum {
 #define DYLD_CACHE_ADJ_V2_IMAGE_OFF_32			0x0C
 #define DYLD_CACHE_ADJ_V2_THREADED_POINTER_64			0x0D
 
-
-#ifndef LC_BUILD_VERSION
-	#define LC_BUILD_VERSION 0x32 /* build for platform min OS version */
-
-	/*
-	 * The build_version_command contains the min OS version on which this 
-	 * binary was built to run for its platform.  The list of known platforms and
-	 * tool values following it.
-	 */
-	struct build_version_command {
-		uint32_t	cmd;		/* LC_BUILD_VERSION */
-		uint32_t	cmdsize;	/* sizeof(struct build_version_command) plus */
-								/* ntools * sizeof(struct build_tool_version) */
-		uint32_t	platform;	/* platform */
-		uint32_t	minos;		/* X.Y.Z is encoded in nibbles xxxx.yy.zz */
-		uint32_t	sdk;		/* X.Y.Z is encoded in nibbles xxxx.yy.zz */
-		uint32_t	ntools;		/* number of tool entries following this */
-	};
-
-	struct build_tool_version {
-		uint32_t	tool;		/* enum for the tool */
-		uint32_t	version;	/* version number of the tool */
-	};
-
-	/* Known values for the platform field above. */
-	#define PLATFORM_MACOS		1
-	#define PLATFORM_IOS		2
-	#define PLATFORM_TVOS		3
-	#define PLATFORM_WATCHOS	4
-	#define PLATFORM_BRIDGEOS	5
-
-	/* Known values for the tool field above. */
-	#define TOOL_CLANG	1
-	#define TOOL_SWIFT	2
-	#define TOOL_LD		3
+#ifndef S_INIT_FUNC_OFFSETS
+	#define S_INIT_FUNC_OFFSETS                 0x16
 #endif
 
-#ifndef LC_NOTE
-	#define LC_NOTE 0x31
-	struct note_command {
-		uint32_t    cmd;        /* LC_NOTE */
-		uint32_t    cmdsize;    /* sizeof(struct note_command) */
-		char        data_owner[16];    /* owner name for this LC_NOTE */
-		uint64_t    offset;        /* file offset of this data */
-		uint64_t    size;        /* length of data region */
-	};
-#endif
 
-#ifndef PLATFORM_IOSMAC
-	#define PLATFORM_IOSMAC 6
-#endif
 
 // kind target-address fixup-addr [adj] 
 
@@ -670,7 +552,8 @@ static const ArchInfo archInfoArray[] = {
 	{ NULL, 0, 0, NULL, NULL, false, false }
 };
 
- 
+
+
 // weird, but this include must wait until after SUPPORT_ARCH_arm_any is set up
 #if SUPPORT_ARCH_arm_any
 #include <mach-o/arm/reloc.h>
@@ -1733,13 +1616,8 @@ public:
 	uint32_t		version() const							INLINE { return fields.version; }
 	void			set_version(uint32_t value)				INLINE { E::set32(fields.version, value); }
 
-#ifdef DICE_KIND_DATA
 	uint32_t		sdk() const								INLINE { return fields.sdk; }
 	void			set_sdk(uint32_t value)					INLINE { E::set32(fields.sdk, value); }
-#else
-	uint32_t		sdk() const								INLINE { return fields.reserved; }
-	void			set_sdk(uint32_t value)					INLINE { E::set32(fields.reserved, value); }
-#endif
 
 	typedef typename P::E		E;
 private:
@@ -1899,14 +1777,6 @@ private:
 	data_in_code_entry	fields;
 };
 
-#ifndef DICE_KIND_DATA
-  #define DICE_KIND_DATA              0x0001 
-  #define DICE_KIND_JUMP_TABLE8       0x0002 
-  #define DICE_KIND_JUMP_TABLE16      0x0003 
-  #define DICE_KIND_JUMP_TABLE32      0x0004 
-  #define DICE_KIND_ABS_JUMP_TABLE32  0x0005 
-#endif
-
 template <typename P>
 class macho_linker_option_command {
 public:
@@ -1926,8 +1796,6 @@ public:
 private:
 	linker_option_command	fields;
 };
-
-
 
 
 

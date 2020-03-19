@@ -57,22 +57,22 @@ class ImageCachePointerAtom : public ld::Atom {
 public:
 											ImageCachePointerAtom(ld::passes::stubs::Pass& pass)
 				: ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
-							ld::Atom::scopeLinkageUnit, ld::Atom::typeNonLazyPointer, 
-							symbolTableNotIn, false, false, false, ld::Atom::Alignment(2)) { pass.addAtom(*this); }
+							ld::Atom::scopeTranslationUnit, ld::Atom::typeUnclassified,
+							symbolTableIn, false, false, false, ld::Atom::Alignment(2)) { pass.addAtom(*this); }
 
 	virtual const ld::File*					file() const					{ return NULL; }
-	virtual const char*						name() const					{ return "non-lazy pointer"; }
+	virtual const char*						name() const					{ return "__dyld_private"; }
 	virtual uint64_t						size() const					{ return 4; }
 	virtual uint64_t						objectAddress() const			{ return 0; }
 	virtual void							copyRawContent(uint8_t buffer[]) const { }
 	virtual void							setScope(Scope)					{ }
 
 private:
-	
+
 	static ld::Section						_s_section;
 };
 
-ld::Section ImageCachePointerAtom::_s_section("__DATA", "__nl_symbol_ptr", ld::Section::typeNonLazyPointer);
+ld::Section ImageCachePointerAtom::_s_section("__DATA", "__data", ld::Section::typeUnclassified);
 
 
 
@@ -144,12 +144,12 @@ ld::Section StubHelperHelperAtom::_s_section("__TEXT", "__stub_helper", ld::Sect
 class StubHelperAtom : public ld::Atom {
 public:
 											StubHelperAtom(ld::passes::stubs::Pass& pass, const ld::Atom& stubTo, 
-																					const ld::Atom* lazyPointer)
+														   const ld::Atom* lazyPointer, bool stubToResolver)
 				: ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
 							ld::Atom::scopeLinkageUnit, ld::Atom::typeStubHelper, 
 							symbolTableNotIn, false, false, false, ld::Atom::Alignment(2)), 
 				_stubTo(stubTo),  
-				_fixup1(4, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressARMBranch24, helperHelper(pass)),
+				_fixup1(4, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressARMBranch24, helperHelper(pass, *this, stubToResolver)),
 				_fixup2(8, ld::Fixup::k1of2, ld::Fixup::kindSetLazyOffset, lazyPointer),
 				_fixup3(8, ld::Fixup::k2of2, ld::Fixup::kindStoreLittleEndian32) { }
 	
@@ -167,8 +167,11 @@ public:
 	virtual ld::Fixup::iterator				fixupsEnd() const				{ return &((ld::Fixup*)&_fixup3)[1]; }
 
 private:
-	static ld::Atom* helperHelper(ld::passes::stubs::Pass& pass) {
-		if ( pass.compressedHelperHelper == NULL ) 
+	static ld::Atom* helperHelper(ld::passes::stubs::Pass& pass, StubHelperAtom& stub, bool stubToResolver) {
+		// hack for resolvers in chained fixups.  StubHelper is not used by needs to be constructed, so use dummy values
+		if ( stubToResolver )
+			return &stub;
+		if ( pass.compressedHelperHelper == NULL )
 			pass.compressedHelperHelper = new StubHelperHelperAtom(pass);
 		return pass.compressedHelperHelper;
 	}
@@ -240,7 +243,7 @@ public:
 							ld::Atom::combineNever, ld::Atom::scopeLinkageUnit, ld::Atom::typeLazyPointer, 
 							symbolTableNotIn, false, false, false, ld::Atom::Alignment(2)), 
 				_stubTo(stubTo),
-				_helper(pass, stubTo, this),
+				_helper(pass, stubTo, this, stubToResolver),
 				_resolverHelper(pass, stubTo, this),
 				_fixup1(0, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressLittleEndian32, 
 								stubToResolver ? &_resolverHelper : (stubToGlobalWeakDef ?  &stubTo : &_helper)),
@@ -296,7 +299,7 @@ public:
 	NonLazyPointerAtom(ld::passes::stubs::Pass& pass, const ld::Atom& stubTo,
 					   bool weakImport)
 				: ld::Atom(_s_section, ld::Atom::definitionRegular, 
-							ld::Atom::combineNever, ld::Atom::scopeLinkageUnit, ld::Atom::typeLazyPointer, 
+							ld::Atom::combineNever, ld::Atom::scopeLinkageUnit, ld::Atom::typeNonLazyPointer,
 							symbolTableNotIn, false, false, false, ld::Atom::Alignment(2)), 
 				_stubTo(stubTo),
 				_fixup1(0, ld::Fixup::k1of1, ld::Fixup::kindStoreTargetAddressLittleEndian32, &stubTo) {
@@ -495,6 +498,48 @@ private:
 
 ld::Section StubCloseAtom::_s_section("__TEXT", "__symbolstub1", ld::Section::typeStubClose);
 
+
+class NonLazyStubPICAtom : public ld::Atom {
+public:
+											NonLazyStubPICAtom(ld::passes::stubs::Pass& pass, const ld::Atom& stubTo,
+														bool stubToGlobalWeakDef, bool stubToResolver, bool weakImport, bool usingDataConst)
+				: ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
+							ld::Atom::scopeLinkageUnit, ld::Atom::typeStub,
+							symbolTableNotIn, false, false, false, ld::Atom::Alignment(2)),
+				_stubTo(stubTo),
+				_nonlazyPointer(pass, stubTo, weakImport),
+				_fixup1(12, ld::Fixup::k1of4, ld::Fixup::kindSetTargetAddress, &_nonlazyPointer),
+				_fixup2(12, ld::Fixup::k2of4, ld::Fixup::kindSubtractTargetAddress, this),
+				_fixup3(12, ld::Fixup::k3of4, ld::Fixup::kindSubtractAddend, 12),
+				_fixup4(12, ld::Fixup::k4of4, ld::Fixup::kindStoreLittleEndian32)
+				{ pass.addAtom(*this); }
+
+	virtual const ld::File*					file() const					{ return _stubTo.file(); }
+	virtual const char*						name() const					{ return _stubTo.name(); }
+	virtual uint64_t						size() const					{ return 16; }
+	virtual uint64_t						objectAddress() const			{ return 0; }
+	virtual void							copyRawContent(uint8_t buffer[]) const {
+			OSWriteLittleInt32(&buffer[ 0], 0, 0xe59fc004);	// 	ldr ip, pc + 12
+			OSWriteLittleInt32(&buffer[ 4], 0, 0xe08fc00c);	// 	add ip, pc, ip
+			OSWriteLittleInt32(&buffer[ 8], 0, 0xe59cf000);	// 	ldr pc, [ip]
+			OSWriteLittleInt32(&buffer[12], 0, 0x00000000);	// 	.long L_foo$nonlazy_ptr - (L1$scv + 8)
+	}
+	virtual void							setScope(Scope)					{ }
+	virtual ld::Fixup::iterator				fixupsBegin() const				{ return (ld::Fixup*)&_fixup1; }
+	virtual ld::Fixup::iterator				fixupsEnd()	const 				{ return &((ld::Fixup*)&_fixup4)[1]; }
+
+private:
+	const ld::Atom&							_stubTo;
+	NonLazyPointerAtom						_nonlazyPointer;
+	ld::Fixup								_fixup1;
+	ld::Fixup								_fixup2;
+	ld::Fixup								_fixup3;
+	ld::Fixup								_fixup4;
+
+	static ld::Section						_s_section;
+};
+
+ld::Section NonLazyStubPICAtom::_s_section("__TEXT", "__picsymbolstub5", ld::Section::typeStub);
 
 
 

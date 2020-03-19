@@ -118,7 +118,8 @@ private:
 	const uint8_t*								printSharedRegionV2ToSectionOffset(const uint8_t* p, const uint8_t* end);
 	const uint8_t*								printSharedRegionV2Kind(const uint8_t* p, const uint8_t* end);
 
-	pint_t										relocBase();
+	pint_t										localRelocBase();
+	pint_t										externalRelocBase();
 	const char*									relocTypeName(uint8_t r_type);
 	uint8_t										segmentIndexForAddress(pint_t addr);
 	void										processExportGraphNode(const uint8_t* const start, const uint8_t* const end,  
@@ -761,7 +762,7 @@ void DyldInfoPrinter<A>::printRebaseInfo()
 #if SUPPORT_ARCH_arm64e
 									uint16_t diversity = (uint16_t)(value >> 32);
 									bool hasAddressDiversity = (value & (1ULL << 48)) != 0;
-									ptrauth_key key = (ptrauth_key)((value >> 49) & 0x3);
+									uint8_t key = (uint8_t)((value >> 49) & 0x3);
 									bool isAuthenticated = (value & (1ULL << 63)) != 0;
 #endif
 									bool isRebase = (value & (1ULL << 62)) == 0;
@@ -1226,7 +1227,7 @@ void DyldInfoPrinter<A>::printBindingInfo()
 #if SUPPORT_ARCH_arm64e
 								uint16_t diversity = (uint16_t)(value >> 32);
 								bool hasAddressDiversity = (value & (1ULL << 48)) != 0;
-								ptrauth_key key = (ptrauth_key)((value >> 49) & 0x3);
+								uint8_t key = (uint8_t)((value >> 49) & 0x3);
 								bool isAuthenticated = (value & (1ULL << 63)) != 0;
 #endif
 								bool isRebase = (value & (1ULL << 62)) == 0;
@@ -2156,56 +2157,39 @@ void DyldInfoPrinter<A>::printDataInCode()
 
 
 template <>
-ppc::P::uint_t DyldInfoPrinter<ppc>::relocBase()
+x86_64::P::uint_t DyldInfoPrinter<x86_64>::localRelocBase()
 {
-	if ( fHeader->flags() & MH_SPLIT_SEGS )
-		return fFirstWritableSegment->vmaddr();
-	else
+	if (fHeader->filetype() == MH_KEXT_BUNDLE) {
+		// for kext bundles the reloc base address starts at __TEXT segment
 		return fFirstSegment->vmaddr();
-}
-
-template <>
-ppc64::P::uint_t DyldInfoPrinter<ppc64>::relocBase()
-{
-	if ( fWriteableSegmentWithAddrOver4G ) 
-		return fFirstWritableSegment->vmaddr();
-	else
-		return fFirstSegment->vmaddr();
-}
-
-template <>
-x86::P::uint_t DyldInfoPrinter<x86>::relocBase()
-{
-	if ( fHeader->flags() & MH_SPLIT_SEGS )
-		return fFirstWritableSegment->vmaddr();
-	else
-		return fFirstSegment->vmaddr();
-}
-
-template <>
-x86_64::P::uint_t DyldInfoPrinter<x86_64>::relocBase()
-{
+	}
+	// for all other kinds, the x86_64 reloc base address starts at first writable segment (usually __DATA)
 	return fFirstWritableSegment->vmaddr();
 }
 
-#if SUPPORT_ARCH_arm_any
-template <>
-arm::P::uint_t DyldInfoPrinter<arm>::relocBase()
+template <typename A>
+typename A::P::uint_t DyldInfoPrinter<A>::localRelocBase()
 {
-	if ( fHeader->flags() & MH_SPLIT_SEGS )
-		return fFirstWritableSegment->vmaddr();
-	else
-		return fFirstSegment->vmaddr();
+	return fFirstSegment->vmaddr();
 }
-#endif
 
-#if SUPPORT_ARCH_arm64
+
 template <>
-arm64::P::uint_t DyldInfoPrinter<arm64>::relocBase()
+x86_64::P::uint_t DyldInfoPrinter<x86_64>::externalRelocBase()
 {
+	if (fHeader->filetype() == MH_KEXT_BUNDLE) {
+		// for kext bundles the reloc base address starts at __TEXT segment
+		return fFirstSegment->vmaddr();;
+	}
 	return fFirstWritableSegment->vmaddr();
 }
-#endif
+
+template <typename A>
+typename A::P::uint_t DyldInfoPrinter<A>::externalRelocBase()
+{
+	return 0;
+}
+
 
 
 template <>
@@ -2242,6 +2226,8 @@ const char*	DyldInfoPrinter<x86_64>::relocTypeName(uint8_t r_type)
 {
 	if ( r_type == X86_64_RELOC_UNSIGNED )
 		return "pointer";
+	else if ( r_type == X86_64_RELOC_BRANCH )
+		return "branch";
 	else
 		return "??";
 }
@@ -2289,7 +2275,7 @@ void DyldInfoPrinter<A>::printRelocRebaseInfo()
 #if SUPPORT_ARCH_arm64e
 				uint16_t diversity = (uint16_t)(value >> 32);
 				bool hasAddressDiversity = (value & (1ULL << 48)) != 0;
-				ptrauth_key key = (ptrauth_key)((value >> 49) & 0x3);
+				uint8_t key = (uint8_t)((value >> 49) & 0x3);
 				bool isAuthenticated = (value & (1ULL << 63)) != 0;
 #endif
 				bool isRebase = (value & (1ULL << 62)) == 0;
@@ -2306,8 +2292,8 @@ void DyldInfoPrinter<A>::printRelocRebaseInfo()
 						// Add in the offset from the mach_header
 						newValue += baseAddress;
 						// We have bits to merge in to the discriminator
-						printf("%-7s %-16s 0x%08llX  %s  0x%08llX (JOP: diversity %d, address %s, %s)\n",
-							   segName, sectName, (uint64_t)vmAddress, "pointer", newValue,
+						printf("%-7s %-16s 0x%08llX  %s  0x%08llX with value 0x%016llX (JOP: diversity %d, address %s, %s)\n",
+							   segName, sectName, (uint64_t)vmAddress, "pointer", newValue, value,
 							   diversity, hasAddressDiversity ? "true" : "false", keyNames[key]);
 					} else
 #endif
@@ -2318,7 +2304,7 @@ void DyldInfoPrinter<A>::printRelocRebaseInfo()
 						uint64_t top8Bits = value & 0x0007F80000000000ULL;
 						uint64_t bottom43Bits = value & 0x000007FFFFFFFFFFULL;
 						uint64_t targetValue = ( top8Bits << 13 ) | (((intptr_t)(bottom43Bits << 21) >> 21) & 0x00FFFFFFFFFFFFFF);
-						printf("%-7s %-16s 0x%08llX  %s  0x%08llX\n", segName, sectName, (uint64_t)vmAddress, "pointer", targetValue);
+						printf("%-7s %-16s 0x%08llX  %s  0x%08llX with value 0x%016llX\n", segName, sectName, (uint64_t)vmAddress, "pointer", targetValue, value);
 					}
 				}
 
@@ -2365,9 +2351,9 @@ void DyldInfoPrinter<A>::printRelocRebaseInfo()
 	}
 	else {
 		printf("rebase information (from local relocation records and indirect symbol table):\n");
-		printf("segment  section          address     type\n");
+		printf("segment      section          address     type\n");
 		// walk all local relocations
-		pint_t rbase = relocBase();
+		pint_t rbase = localRelocBase();
 		const macho_relocation_info<P>* const relocsStart = (macho_relocation_info<P>*)(((uint8_t*)fHeader) + fDynamicSymbolTable->locreloff());
 		const macho_relocation_info<P>* const relocsEnd = &relocsStart[fDynamicSymbolTable->nlocrel()];
 		for (const macho_relocation_info<P>* reloc=relocsStart; reloc < relocsEnd; ++reloc) {
@@ -2377,7 +2363,7 @@ void DyldInfoPrinter<A>::printRelocRebaseInfo()
 				const char* typeName = relocTypeName(reloc->r_type());
 				const char* segName  = segmentName(segIndex);
 				const char* sectName = sectionName(segIndex, addr);
-				printf("%-8s %-16s 0x%08llX  %s\n", segName, sectName, (uint64_t)addr, typeName);
+				printf("%-12s %-16s 0x%08llX  %s\n", segName, sectName, (uint64_t)addr, typeName);
 			} 
 			else {
 				const macho_scattered_relocation_info<P>* sreloc = (macho_scattered_relocation_info<P>*)reloc;
@@ -2386,7 +2372,7 @@ void DyldInfoPrinter<A>::printRelocRebaseInfo()
 				const char* typeName = relocTypeName(sreloc->r_type());
 				const char* segName  = segmentName(segIndex);
 				const char* sectName = sectionName(segIndex, addr);
-				printf("%-8s %-16s 0x%08llX  %s\n", segName, sectName, (uint64_t)addr, typeName);
+				printf("%-12s %-16s 0x%08llX  %s\n", segName, sectName, (uint64_t)addr, typeName);
 			}
 		}
 		// look for local non-lazy-pointers
@@ -2408,7 +2394,7 @@ void DyldInfoPrinter<A>::printRelocRebaseInfo()
 							const char* typeName = "pointer";
 							const char* segName  = segmentName(segIndex);
 							const char* sectName = sectionName(segIndex, addr);
-							printf("%-8s %-16s 0x%08llX  %s\n", segName, sectName, (uint64_t)addr, typeName);
+							printf("%-12s %-16s 0x%08llX  %s\n", segName, sectName, (uint64_t)addr, typeName);
 						}
 					}
 				}
@@ -2506,10 +2492,10 @@ void DyldInfoPrinter<A>::printClassicBindingInfo()
 		printf("no classic dynamic symbol table");
 	}
 	else {
-		printf("binding information (from relocations and indirect symbol table):\n");
-		printf("segment  section          address        type   weak  addend dylib            symbol\n");
+		printf("binding information (from external relocations and indirect symbol table):\n");
+		printf("segment      section          address        type   weak  addend dylib            symbol\n");
 		// walk all external relocations
-		pint_t rbase = relocBase();
+		pint_t rbase = externalRelocBase();
 		const macho_relocation_info<P>* const relocsStart = (macho_relocation_info<P>*)(((uint8_t*)fHeader) + fDynamicSymbolTable->extreloff());
 		const macho_relocation_info<P>* const relocsEnd = &relocsStart[fDynamicSymbolTable->nextrel()];
 		for (const macho_relocation_info<P>* reloc=relocsStart; reloc < relocsEnd; ++reloc) {
@@ -2524,13 +2510,15 @@ void DyldInfoPrinter<A>::printClassicBindingInfo()
 			const char* segName  = segmentName(segIndex);
 			const char* sectName = sectionName(segIndex, addr);
 			const pint_t* addressMapped = mappedAddressForVMAddress(addr);
-			int64_t addend = P::getP(*addressMapped); 
+			int64_t addend = P::getP(*addressMapped);
+			if ( strcmp(typeName, "pointer") != 0 )
+				addend = 0;
 			if ( fHeader->flags() & MH_PREBOUND ) {
 				// In prebound binaries the content is already pointing to the target.
 				// To get the addend requires subtracting out the base address it was prebound to.
 				addend -= sym->n_value();
 			}
-			printf("%-8s %-16s 0x%08llX %10s %4s  %5lld %-16s %s\n", segName, sectName, (uint64_t)addr, 
+			printf("%-12s %-16s 0x%08llX %10s %4s  %5lld %-16s %s\n", segName, sectName, (uint64_t)addr,
 									typeName, weak_import, addend, fromDylib, symbolName);
 		}
 		// look for non-lazy pointers
@@ -2557,7 +2545,7 @@ void DyldInfoPrinter<A>::printClassicBindingInfo()
 							const char* segName  = segmentName(segIndex);
 							const char* sectName = sectionName(segIndex, addr);
 							int64_t addend = 0;
-							printf("%-8s %-16s 0x%08llX %10s %4s  %5lld %-16s %s\n", segName, sectName, (uint64_t)addr, 
+							printf("%-12s %-16s 0x%08llX %10s %4s  %5lld %-16s %s\n", segName, sectName, (uint64_t)addr,
 																	typeName, weak_import, addend, fromDylib, symbolName);
 						}
 					}
