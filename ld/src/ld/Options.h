@@ -640,6 +640,7 @@ private:
 	const char*							fDylibInstallName;
 	const char*							fFinalName;
 	const char*							fEntryName;
+	const char*							fZldRetryMessage;
 	uint64_t							fBaseAddress;
 	uint64_t							fMaxAddress;
 	uint64_t							fBaseWritableAddress;

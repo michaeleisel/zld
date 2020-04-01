@@ -1316,11 +1316,20 @@ static void getVMInfo(vm_statistics_data_t& info)
 }
 
 
+void retryWithStockLd() {
+}
 
 
 int main(int argc, const char* argv[])
 {
 	tbb::global_control c(tbb::global_control::thread_stack_size, 8 * 1024 * 1024);
+	const char *retryMessage = NULL;
+	for (int i = 0; i < argc; i++) {
+		if (strcmp(argv[i], "-zld_retry_message") == 0) {
+			retryMessage = argv[i + 1];
+			assert(retryMessage != NULL);
+		}
+	}
 	const char* archName = NULL;
 	bool showArch = false;
 	try {
@@ -1427,6 +1436,12 @@ int main(int argc, const char* argv[])
 			fprintf(stderr, "ld: %s for architecture %s\n", msg, archName);
 		else
 			fprintf(stderr, "ld: %s\n", msg);
+		if (retryMessage != NULL) {
+			fprintf(stderr, "zld invocation failed, falling back to ld...");
+			char *notifCmd = NULL;
+			asprintf("osascript -e 'display notification \"Linker issue\" with title \"%s\"'", retryMessage);
+			system(notifCmd);
+		}
 		return 1;
 	}
 
