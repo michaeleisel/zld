@@ -40,3 +40,7 @@ tapi-b920569:
 tbb:
 	curl -# -L https://github.com/intel/tbb/releases/download/v2020.1/tbb-2020.1-mac.tgz | tar xz
 
+install: build
+	mkdir -p "/usr/local/bin"
+	cp -f "build/Build/Products/Release/zld" "/usr/local/bin/zld"
+
