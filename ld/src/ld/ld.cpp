@@ -123,7 +123,7 @@ public:
 
 	virtual									~InternalState() {}
 private:
-	bool									inMoveRWChain(const ld::Atom& atom, const char* filePath, const char*& dstSeg, bool& wildCardMatch);
+	bool									inMoveRWChain(const ld::Atom& atom, const char* filePath, bool followedBackBranch, const char*& dstSeg, bool& wildCardMatch);
 	bool									inMoveROChain(const ld::Atom& atom, const char* filePath, const char*& dstSeg, bool& wildCardMatch);
 
 	class FinalSection : public ld::Internal::FinalSection 
@@ -582,7 +582,14 @@ bool InternalState::hasReferenceToWeakExternal(const ld::Atom& atom)
 	return false;
 }
 
-bool InternalState::inMoveRWChain(const ld::Atom& atom, const char* filePath, const char*& dstSeg, bool& wildCardMatch)
+
+// .o files without .subsections_via_symbols have all atoms in a section chained together with kindNoneFollowOn
+// If any symbol in section is moved to another segment/section, all the atoms in that section need to be moved too.
+// But we don't have a good way to find the start atom, so we just move all atoms started with the choosen one.
+//
+// For Swift classes, there are two alt_entry symbols in the class structure. If the main symbol or either alt_entry
+// is moved, then all the atoms in that chain need to move. We find the start atom via the kindNoneGroupSubordinate.
+bool InternalState::inMoveRWChain(const ld::Atom& atom, const char* filePath, bool followedBackBranch, const char*& dstSeg, bool& wildCardMatch)
 {
 	if ( !_options.hasDataSymbolMoves() )
 		return false;
@@ -592,17 +599,20 @@ bool InternalState::inMoveRWChain(const ld::Atom& atom, const char* filePath, co
 		dstSeg = pos->second;
 		return true;
 	}
-
+	
 	bool result = false;
 	if ( _options.moveRwSymbol(atom.name(), filePath, dstSeg, wildCardMatch) )
 		result = true;
 
 	for (ld::Fixup::iterator fit=atom.fixupsBegin(); fit != atom.fixupsEnd(); ++fit) {
-		if ( fit->kind == ld::Fixup::kindNoneFollowOn ) {
-			if ( fit->binding == ld::Fixup::bindingDirectlyBound ) {
-				if ( inMoveRWChain(*(fit->u.target), filePath, dstSeg, wildCardMatch) )
-					result = true;
-			}
+		if ( (fit->kind == ld::Fixup::kindNoneFollowOn) && (fit->binding == ld::Fixup::bindingDirectlyBound) ) {
+			if ( inMoveRWChain(*(fit->u.target), filePath, followedBackBranch, dstSeg, wildCardMatch) )
+				result = true;
+		}
+		else if ( !followedBackBranch && (fit->kind == ld::Fixup::kindNoneGroupSubordinate) && (fit->binding == ld::Fixup::bindingDirectlyBound) ) {
+			// don't recurse forever.  Only recurse if we have not already followed a backbranch (kindNoneGroupSubordinate)
+			if ( inMoveRWChain(*(fit->u.target), filePath, true, dstSeg, wildCardMatch) )
+				result = true;
 		}
 	}
 
@@ -681,7 +691,7 @@ ld::Internal::FinalSection* InternalState::addAtom(const ld::Atom& atom)
 	if ( atom.symbolTableInclusion() == ld::Atom::symbolTableIn ) {
 		const char* dstSeg;
 		bool wildCardMatch;
-		if ( inMoveRWChain(atom, path, dstSeg, wildCardMatch) ) {
+		if ( inMoveRWChain(atom, path, false, dstSeg, wildCardMatch) ) {
 			if ( (sectType != ld::Section::typeZeroFill) 
 			  && (sectType != ld::Section::typeUnclassified) 
 			  && (sectType != ld::Section::typeTentativeDefs)
@@ -1427,10 +1437,12 @@ int main(int argc, const char* argv[])
 			fprintf(stderr, "ld: %s for architecture %s\n", msg, archName);
 		else
 			fprintf(stderr, "ld: %s\n", msg);
-		return 1;
+		// <rdar://50510752> exit but don't run termination routines
+		_exit(1);
 	}
 
-	return 0;
+	// <rdar://problem/55031993> don't run terminators until all we can guarantee all threads are stopped
+	_exit(0);
 }
 
 
@@ -1464,7 +1476,7 @@ void __assert_rtn(const char* func, const char* file, int line, const char* fail
 	}
     fprintf(stderr, "A linker snapshot was created at:\n\t%s\n", snapshot->rootDir());
 	fprintf(stderr, "ld: Assertion failed: (%s), function %s, file %s, line %d.\n", failedexpr, func, file, line);
-	exit(1);
+	_exit(1);
 }
 #endif
 
