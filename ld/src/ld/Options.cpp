@@ -5075,6 +5075,10 @@ void Options::reconfigureDefaults()
 	if ( (fArchitecture == CPU_TYPE_X86_64) && (fOutputKind == kDynamicExecutable) && (platforms().minOS(ld::mac10_6) || platforms().contains(ld::Platform::iOSMac)) )
 		fPositionIndependentExecutable = true;
 
+	// <rdar://problem/55348074> dext processes should be PIE
+	if ( (fOutputKind == kDynamicExecutable) && platforms().contains(ld::Platform::driverKit) )
+		fPositionIndependentExecutable = true;
+
 	// Simulator defaults to PIE
 	if ( targetIOSSimulator() && (fOutputKind == kDynamicExecutable) )
 		fPositionIndependentExecutable = true;

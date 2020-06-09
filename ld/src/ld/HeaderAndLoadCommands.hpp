@@ -217,7 +217,7 @@ HeaderAndLoadCommandsAtom<A>::HeaderAndLoadCommandsAtom(const Options& opts, ld:
 				_hasUUIDLoadCommand = false;
 			_hasDynamicSymbolTableLoadCommand = false;
 			for (std::vector<ld::Internal::FinalSection*>::iterator it = _state.sections.begin(); it != _state.sections.end(); ++it) {
-				if ( (*it)->type() == ld::Section::typeNonLazyPointer ) {
+				if ( ((*it)->type() == ld::Section::typeNonLazyPointer) || ((*it)->type() == ld::Section::typeTLVPointers) ) {
 					_hasDynamicSymbolTableLoadCommand = true;
 					break;
 				}

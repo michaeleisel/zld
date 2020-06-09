@@ -250,24 +250,32 @@ ld::Section SymbolTableAtom<A>::_s_section("__LINKEDIT", "__symbol_table", ld::S
 template <typename A>
 int	 SymbolTableAtom<A>::_s_anonNameIndex = 1;
 
+static bool chainLeadsTo(const ld::Atom* startAtom, const ld::Atom* targetAtom)
+{
+	if ( startAtom == targetAtom )
+		return true;
+
+	for (ld::Fixup::iterator fit = startAtom->fixupsBegin(); fit != startAtom->fixupsEnd(); ++fit) {
+		if ( (fit->kind == ld::Fixup::kindNoneFollowOn) && (fit->binding == Fixup::bindingDirectlyBound) ) {
+			const Atom* nextAtom = fit->u.target;
+			assert(nextAtom != NULL);
+			if ( chainLeadsTo(nextAtom, targetAtom) )
+				return true;
+		}
+	}
+	return false;
+}
 
 template <typename A>
 bool SymbolTableAtom<A>::isAltEntry(const ld::Atom* atom) 
 {
 	// alt entries have a group subordinate reference to the previous atom
 	for (ld::Fixup::iterator fit = atom->fixupsBegin(); fit != atom->fixupsEnd(); ++fit) {
-		if ( fit->kind == ld::Fixup::kindNoneGroupSubordinate ) {
-			if ( fit->binding == Fixup::bindingDirectlyBound ) {
-				const Atom* prevAtom = fit->u.target;
-				assert(prevAtom != NULL);
-				for (ld::Fixup::iterator fit2 = prevAtom->fixupsBegin(); fit2 != prevAtom->fixupsEnd(); ++fit2) {
-					if ( fit2->kind == ld::Fixup::kindNoneFollowOn ) {
-						if ( fit2->binding == Fixup::bindingDirectlyBound ) {
-							if ( fit2->u.target == atom )
-								return true;
-						}
-					}
-				}
+		if ( (fit->kind == ld::Fixup::kindNoneGroupSubordinate) && (fit->binding == Fixup::bindingDirectlyBound) ) {
+			const Atom* chainStart = fit->u.target;
+			assert(chainStart != NULL);
+			if ( chainLeadsTo(chainStart, atom) ) {
+				return true;
 			}
 		}
 	}
@@ -704,10 +712,14 @@ void SymbolTableAtom<A>::encode()
 
 	// go back to start and make nlist entries for all local symbols
 	std::vector<const ld::Atom*>& localAtoms = this->_writer._localAtoms;
-	_locals.reserve(localsCount);
-	symbolIndex = 0;
 	this->_writer._localSymbolsStartIndex = 0;
-	_stabsIndexStart = 0;
+	symbolIndex = 0;
+	_locals.reserve(localsCount);
+	for (const ld::Atom* atom : localAtoms) {
+		if ( this->addLocal(atom, this->_writer._stringPoolAtom) )
+			this->_writer._atomToSymbolIndex[atom] = symbolIndex++;
+	}
+	_stabsIndexStart = symbolIndex;
 	_stabsStringsOffsetStart = this->_writer._stringPoolAtom->currentOffset();
 	for (const ld::relocatable::File::Stab& stab : _state.stabs) {
 		macho_nlist<P> entry;
@@ -721,10 +733,6 @@ void SymbolTableAtom<A>::encode()
 	}
 	_stabsIndexEnd = symbolIndex;
 	_stabsStringsOffsetEnd = this->_writer._stringPoolAtom->currentOffset();
-	for (const ld::Atom* atom : localAtoms) {
-		if ( this->addLocal(atom, this->_writer._stringPoolAtom) )
-			this->_writer._atomToSymbolIndex[atom] = symbolIndex++;
-	}
 	this->_writer._localSymbolsCount = symbolIndex;
 }
 
