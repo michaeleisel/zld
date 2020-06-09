@@ -16,3 +16,4 @@ linker-optimization-hints
 lto-weak-native-override
 llvm-integration
 objc-category-class-property-mismatch
+objc-category-optimize

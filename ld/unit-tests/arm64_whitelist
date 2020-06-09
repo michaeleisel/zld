@@ -63,6 +63,7 @@ no-object-symbols
 non-lazy-r
 non-lazy-sections-r
 objc-category-class-property-mismatch
+objc-category-optimize
 operator-new
 prebound-split-seg
 re-export-cases
