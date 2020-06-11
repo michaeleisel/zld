@@ -644,14 +644,7 @@ void Layout::doPass()
 				break;
 			default:
 				if ( log ) fprintf(stderr, "sorting section %s\n", sect->sectionName());
-				// riskier
-				if (Tweaks::reproEnabled()) {
     				std::sort(sect->atoms.begin(), sect->atoms.end(), _comparer);
-				} else {
-    				std::sort(std::execution::par, sect->atoms.begin(), sect->atoms.end(), _comparer);
-				}
-				// note that is_sorted fails here, probably because of some shenanigans around aliases in _comparer.
-				// but it doesn't seem to be a regression
 				break;
 		}
 	}
