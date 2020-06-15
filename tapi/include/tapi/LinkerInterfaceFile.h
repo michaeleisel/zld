@@ -64,6 +64,9 @@ enum class Platform : unsigned {
   /// \since 1.2
   bridgeOS = 5,
 
+  // Hopefully these last ones are correct. They seem to be in practice, but who knows
+  iOSMac = 6,
+  zippered = UINT_MAX,
 };
 
 ///

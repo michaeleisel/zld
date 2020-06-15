@@ -17,7 +17,7 @@
 
 #include <string>
 #include <tapi/Defines.h>
-#include <tapi/Version.inc>
+#include <tapi/Version.inc.h>
 
 ///
 /// \defgroup TAPI_VERSION Version methods
