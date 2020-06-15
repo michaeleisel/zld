@@ -128,7 +128,7 @@ static ld::VersionSet mapPlatform(tapi::Platform platform, bool useSimulatorVari
 		platforms.insert(ld::Platform::iOSMac);
 		break;
 	#endif
-	#if ((TAPI_API_VERSION_MAJOR == 1 &&  TAPI_API_VERSION_MINOR >= 5) || (TAPI_API_VERSION_MAJOR > 1))
+	#if 0 // ((TAPI_API_VERSION_MAJOR == 1 &&  TAPI_API_VERSION_MINOR >= 5) || (TAPI_API_VERSION_MAJOR > 1))
 	case tapi::Platform::DriverKit:
 		platforms.insert(ld::Platform::driverKit);
 		break;
@@ -250,7 +250,7 @@ void File<A>::init(tapi::LinkerInterfaceFile* file, const Options *opts, bool bu
 		this->_allowableClients.emplace_back(strdup(client.c_str()));
 
 	ld::VersionSet lcPlatforms;
-#if ((TAPI_API_VERSION_MAJOR == 1 &&  TAPI_API_VERSION_MINOR >= 6) || (TAPI_API_VERSION_MAJOR > 1))
+#if 0 //((TAPI_API_VERSION_MAJOR == 1 &&  TAPI_API_VERSION_MINOR >= 6) || (TAPI_API_VERSION_MAJOR > 1))
 	if (tapi::APIVersion::isAtLeast(1, 6)) {
 		for (const auto &platform : file->getPlatformSet())
 			lcPlatforms.insert((ld::Platform)platform);

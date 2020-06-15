@@ -147,7 +147,7 @@ void VersionSet::checkDylibCrosslink(const VersionSet& dylibPlatforms, const std
             // with the exception of zippered binaries linking to macOS only libraries in the OS.
             // To handle that case we exit early when the commandline platform is iOSMac, if
             // the platforms also contain macOS.
-            if (cmdLinePlatform == ld::Platform::iOSMac && contains(ld::Platform::macOS))
+            if (cmdLinePlatform == ld::Platform::iOSMac && (contains(ld::Platform::macOS) || contains(ld::Platform::iOSMac)))
                 return;
             // <rdar://problem/48416765> spurious warnings when iOSMac binary is built links with zippered dylib that links with macOS dylib
             // <rdar://problem/50517845> iOSMac app links simulator frameworks without warning/error

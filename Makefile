@@ -32,11 +32,6 @@ package:
 	tar -C build/Build/Products/Release -cvJf build/Build/Products/Release/zld.$(HASH).tar.xz zld
 	tar -C build/Build/Products/Release -cvJf build/Build/Products/Release/zld.dSYM.$(HASH).tar.xz zld.dSYM
 
-tapi-b920569:
-	mkdir -p $@
-	curl -# -L https://github.com/ributzka/tapi/tarball/b920569 | tar xz -C $@ --strip-components=1
-	patch -p1 -d $@ < patches/tapi.patch
-
 tbb:
 	curl -# -L https://github.com/intel/tbb/releases/download/v2020.1/tbb-2020.1-mac.tgz | tar xz
 
