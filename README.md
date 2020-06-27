@@ -57,7 +57,7 @@ Apple's approach is a very reasonable one, using C++ with STL data structures. H
 
 Whether you use this project or not, there are a number of things that can speed linking up (again, this is only for debug builds):
 
-- The linker flag `-Wl,-no_uuid`, which disables UUID creation
+- The linker flag `-Wl,-random_uuid`, which disables content hashing based UUID creation and instead uses a random UUID (using `-no_uuid` can decrease performance when lldb is attaching to the binary)
 - Turning off dead stripping (referred to as "Dead Code Stripping" in Xcode build settings)
 - For executables and xctest bundles, disable dyld exports trie creation with `-Wl,-exported_symbols_list,/dev/null` (cannot be used by test host apps that provide symbols to xctests)
 - `-Wl,-no_deduplicate`, which disables the deduplication pass. In Xcode, this flag is added by default for Debug builds.
