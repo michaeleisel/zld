@@ -29,7 +29,6 @@ extern "C" double log2 ( double );
 
 
 #include <stdlib.h>
-#include <regex>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
