@@ -1354,7 +1354,7 @@ int main(int argc, const char* argv[])
 		}
 
 		if (isArm64_32 && !forceZld) {
-            fallBackToSystemLd(argv, "WatchOS");
+			fallBackToSystemLd(argv, "WatchOS");
 		}
 
 		// We assume that the alternative would've been to use the default system linker,
@@ -1515,5 +1515,4 @@ void __assert_rtn(const char* func, const char* file, int line, const char* fail
 	_exit(1);
 }
 #endif
-
 
