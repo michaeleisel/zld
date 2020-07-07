@@ -29,6 +29,7 @@ extern "C" double log2 ( double );
 
 
 #include <stdlib.h>
+#include <regex>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
@@ -1338,7 +1339,37 @@ int main(int argc, const char* argv[])
 		statistics.startTool = mach_absolute_time();
 		
 		// create object to track command line arguments
+		const char *defaultLinker = "/usr/bin/ld";
+		std::string tmpPathTemplate("ld_version-XXXXXXXXX.json");
+		const char *tmpPath = mktemp((char *)tmpPathTemplate.c_str());
+		char *cmd = NULL;
+		asprintf(&cmd, "/usr/bin/ld -version_details > %s", tmpPath);
+		system(cmd);
+		FILE *output = fopen(tmpPath, "r");
+		fseek(output, 0, SEEK_END);
+		size_t length = ftell(output);
+		fseek(output, 0, SEEK_SET);
+		char *buffer = (char *)malloc(length + 1);
+		size_t bytesRead = fread(buffer, length, 1, output);
+		buffer[length] = '\0';
+		fclose(output);
+		std::string versionInfo = buffer;
+		const std::regex regex("\"version\"\\s*:\\s*\"(.*?)\"");
+		std::smatch matches;
+		std::regex_match(versionInfo, matches, regex);
+		printf("%s\n", matches[1].str().c_str());
+		//std::cout << matches[1] << " zzz\n";
 		Options options(argc, argv);
+		bool supportsCatalyst = options.platforms().contains(ld::Platform::iOSMac);
+
+		if (bytesRead < length) {
+			// error
+		}
+		if (supportsCatalyst) {
+			argv[0] = defaultLinker; // todo: edit argv necessary?
+			return 0;
+			//execv(defaultLinker, argv);
+		}
 		InternalState state(options);
 		
 		// allow libLTO to be overridden by command line -lto_library
