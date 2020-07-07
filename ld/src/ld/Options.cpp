@@ -3987,6 +3987,9 @@ void Options::parse(int argc, const char* argv[])
 			else if (strcmp(arg, "-debug_variant") == 0) {
 			    fDebugVariant = true;
             }
+			else if (strcmp(arg, "-force_zld") == 0) {
+				// Ignore and let logic in ld.cpp handle this
+			}
 			else if (strcmp(arg, "-no_new_main") == 0) {
 				// HACK until 39514191 is fixed
 			}

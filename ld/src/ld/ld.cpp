@@ -1326,8 +1326,13 @@ static void getVMInfo(vm_statistics_data_t& info)
 	}
 }
 
-
-
+void fallBackToSystemLd(const char* argv[], const char *reason);
+void fallBackToSystemLd(const char* argv[], const char *reason) {
+	fprintf(stderr, "note: zld does not fully support this invocation and will instead fall back to ld. Support will be added in the future. Reason: %s\n", reason);
+	const char *linkerPath = "/usr/bin/ld";
+	argv[0] = linkerPath;
+	execv(linkerPath, (char * const *)argv);
+}
 
 int main(int argc, const char* argv[])
 {
@@ -1337,39 +1342,39 @@ int main(int argc, const char* argv[])
 	try {
 		PerformanceStatistics statistics;
 		statistics.startTool = mach_absolute_time();
-		
-		// create object to track command line arguments
-		const char *defaultLinker = "/usr/bin/ld";
-		std::string tmpPathTemplate("ld_version-XXXXXXXXX.json");
-		const char *tmpPath = mktemp((char *)tmpPathTemplate.c_str());
-		char *cmd = NULL;
-		asprintf(&cmd, "/usr/bin/ld -version_details > %s", tmpPath);
-		system(cmd);
-		FILE *output = fopen(tmpPath, "r");
-		fseek(output, 0, SEEK_END);
-		size_t length = ftell(output);
-		fseek(output, 0, SEEK_SET);
-		char *buffer = (char *)malloc(length + 1);
-		size_t bytesRead = fread(buffer, length, 1, output);
-		buffer[length] = '\0';
-		fclose(output);
-		std::string versionInfo = buffer;
-		const std::regex regex("\"version\"\\s*:\\s*\"(.*?)\"");
-		std::smatch matches;
-		std::regex_match(versionInfo, matches, regex);
-		printf("%s\n", matches[1].str().c_str());
-		//std::cout << matches[1] << " zzz\n";
-		Options options(argc, argv);
-		bool supportsCatalyst = options.platforms().contains(ld::Platform::iOSMac);
 
-		if (bytesRead < length) {
-			// error
+		bool forceZld = false;
+		bool isArm64_32 = false;
+		for (int i = 0; i < argc; i++) {
+			if (strcmp(argv[i], "-force_zld") == 0) {
+				forceZld = true;
+			} else if (strcmp(argv[i], "-arch") == 0 && i < argc - 1 && strcmp(argv[i + 1], "arm64_32") == 0) {
+				isArm64_32 = true;
+			}
 		}
-		if (supportsCatalyst) {
-			argv[0] = defaultLinker; // todo: edit argv necessary?
-			return 0;
-			//execv(defaultLinker, argv);
+
+		if (isArm64_32 && !forceZld) {
+            fallBackToSystemLd(argv, "WatchOS");
 		}
+
+		// We assume that the alternative would've been to use the default system linker,
+		// i.e. `which ld`
+		// python 2 and python 3 both work with this invocation
+		FILE *file = popen("ld -version_details | python -c \"import sys, json; print(json.load(sys.stdin)['version'])\"", "r");
+		int majorVersion = 0;
+		fscanf(file, "%d", &majorVersion);
+		if (majorVersion > 556 && !forceZld) {
+			fallBackToSystemLd(argv, "Xcode 12");
+		}
+
+		// create object to track command line arguments
+		Options options(argc, argv);
+
+		bool supportsCatalyst = options.platforms().contains(ld::Platform::iOSMac);
+		if (supportsCatalyst && !forceZld) {
+			fallBackToSystemLd(argv, "Catalyst");
+		}
+
 		InternalState state(options);
 		
 		// allow libLTO to be overridden by command line -lto_library
