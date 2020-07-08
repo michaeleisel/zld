@@ -1325,8 +1325,12 @@ static void getVMInfo(vm_statistics_data_t& info)
 	}
 }
 
-
-
+void useFallbackLd(const char *fallbackPath, const char* argv[], const char *reason);
+void useFallbackLd(const char *fallbackPath, const char* argv[], const char *reason) {
+	fprintf(stderr, "note: zld does not fully support this invocation and will instead fall back to ld. Support will be added in the future. Reason: %s\n", reason);
+	argv[0] = fallbackPath;
+	execv(fallbackPath, (char * const *)argv);
+}
 
 int main(int argc, const char* argv[])
 {
@@ -1336,9 +1340,52 @@ int main(int argc, const char* argv[])
 	try {
 		PerformanceStatistics statistics;
 		statistics.startTool = mach_absolute_time();
-		
+
+		bool forceZld = false;
+		bool isArm64_32 = false;
+		const char *fallbackPath = NULL;
+		for (int i = 0; i < argc; i++) {
+			if (strcmp(argv[i], "-zld_force") == 0) {
+				forceZld = true;
+			} else if (strcmp(argv[i], "-arch") == 0 && i < argc - 1 && strcmp(argv[i + 1], "arm64_32") == 0) {
+				isArm64_32 = true;
+			} else if (strcmp(argv[i], "-zld_original_ld_path") == 0 && i < argc - 1) {
+				const char *path = argv[i + 1];
+				assert(path[0] != '-');
+				fallbackPath = path;
+			}
+		}
+
+		// If a fallback path was not supplied, always use zld. While we could assume that /usr/bin/ld is the correct
+		// fallback and be right *most* of the time, this is not always the case, especially with people using Xcode beta
+		if (!fallbackPath) {
+			forceZld = true;
+		}
+
+		if (!forceZld) {
+			if (isArm64_32) {
+				useFallbackLd(fallbackPath, argv, "WatchOS");
+			}
+
+			// python 2 and python 3 both work with this invocation
+			char *cmd = NULL;
+			asprintf(&cmd, "%s -version_details | python -c \"import sys, json; print(json.load(sys.stdin)['version'])\"", fallbackPath);
+			FILE *file = popen(cmd, "r");
+			int majorVersion = 0;
+			fscanf(file, "%d", &majorVersion);
+			if (majorVersion > 556 && !forceZld) {
+				useFallbackLd(fallbackPath, argv, "Xcode 12");
+			}
+		}
+
 		// create object to track command line arguments
 		Options options(argc, argv);
+
+		bool supportsCatalyst = options.platforms().contains(ld::Platform::iOSMac);
+		if (supportsCatalyst && !forceZld) {
+			useFallbackLd(fallbackPath, argv, "Catalyst");
+		}
+
 		InternalState state(options);
 		
 		// allow libLTO to be overridden by command line -lto_library
@@ -1479,5 +1526,4 @@ void __assert_rtn(const char* func, const char* file, int line, const char* fail
 	_exit(1);
 }
 #endif
-
 

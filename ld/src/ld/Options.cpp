@@ -3987,6 +3987,13 @@ void Options::parse(int argc, const char* argv[])
 			else if (strcmp(arg, "-debug_variant") == 0) {
 			    fDebugVariant = true;
             }
+			else if (strcmp(arg, "-zld_original_ld_path") == 0) {
+				const char* optString = argv[++i];
+				if ( optString == NULL )
+					throw "-zld_original_ld_path missing path";
+			}
+			else if (strcmp(arg, "-zld_force") == 0) {
+			}
 			else if (strcmp(arg, "-no_new_main") == 0) {
 				// HACK until 39514191 is fixed
 			}
