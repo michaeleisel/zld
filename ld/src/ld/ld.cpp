@@ -1356,16 +1356,6 @@ int main(int argc, const char* argv[])
 			fallBackToSystemLd(argv, "WatchOS");
 		}
 
-		// We assume that the alternative would've been to use the default system linker,
-		// i.e. `which ld`
-		// python 2 and python 3 both work with this invocation
-		FILE *file = popen("ld -version_details | python -c \"import sys, json; print(json.load(sys.stdin)['version'])\"", "r");
-		int majorVersion = 0;
-		fscanf(file, "%d", &majorVersion);
-		if (majorVersion > 556 && !forceZld) {
-			fallBackToSystemLd(argv, "Xcode 12");
-		}
-
 		// create object to track command line arguments
 		Options options(argc, argv);
 
