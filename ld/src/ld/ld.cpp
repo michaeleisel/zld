@@ -1325,10 +1325,20 @@ static void getVMInfo(vm_statistics_data_t& info)
 	}
 }
 
-void useFallbackLd(const char *fallbackPath, const char* argv[], const char *reason);
-void useFallbackLd(const char *fallbackPath, const char* argv[], const char *reason) {
+static const char *kOriginalPathFlag = "-zld_original_ld_path";
+
+void useFallbackLd(const char *fallbackPath, int argc, const char* argv[], const char *reason);
+void useFallbackLd(const char *fallbackPath, int argc, const char* argv[], const char *reason) {
 	fprintf(stderr, "note: zld does not fully support this invocation and will instead fall back to ld. Support will be added in the future. Reason: %s\n", reason);
 	argv[0] = fallbackPath;
+	for (int i = 0; i < argc; i++) {
+		if (strcmp(kOriginalPathFlag, argv[i]) == 0) {
+			for (int j = i; j < argc - 1 /* include null char * terminator */; j++) {
+				argv[j] = argv[j + 2];
+			}
+			break;
+		}
+	}
 	execv(fallbackPath, (char * const *)argv);
 }
 
@@ -1349,7 +1359,7 @@ int main(int argc, const char* argv[])
 				forceZld = true;
 			} else if (strcmp(argv[i], "-arch") == 0 && i < argc - 1 && strcmp(argv[i + 1], "arm64_32") == 0) {
 				isArm64_32 = true;
-			} else if (strcmp(argv[i], "-zld_original_ld_path") == 0 && i < argc - 1) {
+			} else if (strcmp(argv[i], kOriginalPathFlag) == 0 && i < argc - 1) {
 				const char *path = argv[i + 1];
 				assert(path[0] != '-');
 				fallbackPath = path;
@@ -1364,7 +1374,7 @@ int main(int argc, const char* argv[])
 
 		if (!forceZld) {
 			if (isArm64_32) {
-				useFallbackLd(fallbackPath, argv, "WatchOS");
+				useFallbackLd(fallbackPath, argc, argv, "WatchOS");
 			}
 
 			// python 2 and python 3 both work with this invocation
@@ -1374,7 +1384,7 @@ int main(int argc, const char* argv[])
 			int majorVersion = 0;
 			fscanf(file, "%d", &majorVersion);
 			if (majorVersion > 556 && !forceZld) {
-				useFallbackLd(fallbackPath, argv, "Xcode 12");
+				useFallbackLd(fallbackPath, argc, argv, "Xcode 12");
 			}
 		}
 
@@ -1383,7 +1393,7 @@ int main(int argc, const char* argv[])
 
 		bool supportsCatalyst = options.platforms().contains(ld::Platform::iOSMac);
 		if (supportsCatalyst && !forceZld) {
-			useFallbackLd(fallbackPath, argv, "Catalyst");
+			useFallbackLd(fallbackPath, argc, argv, "Catalyst");
 		}
 
 		InternalState state(options);
