@@ -29,11 +29,12 @@ brew install michaeleisel/zld/zld
 
 ### Usage
 
-If using Xcode, get the path of zld from `which zld`, then add `-fuse-ld=<path to zld>` to "Other Linker Flags" in the build settings (debug configuration):
+#### If using Xcode:
+Get the path of zld from `which zld`, then add `-fuse-ld=<path to zld> -Wl,-zld_original_ld_path,$(DT_TOOLCHAIN_DIR)/usr/bin/ld` to "Other Linker Flags" in the build settings (debug configuration). That `-zld_original_ld_path` provides the path to the linker Xcode would otherwise use, which is important because there are certain known cases (e.g. arm64_32 and Catalyst) where zld knows that it has issues and will silently use that linker instead. These cases are always a priority to fix, but most of the time is spent waiting and pleading with Apple for more open source releases.
 
-<img src="img/usage.png" width="75%">
+#### If using Rust:
 
-If using Rust, you can edit `~/.cargo/config` to add a linker flag, e.g.:
+You can edit `~/.cargo/config` to add a linker flag, e.g.:
 
 ```
 [target.x86_64-apple-darwin]
