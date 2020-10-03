@@ -1,0 +1,8 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        macosx
+install-name:    '/System/iOSSupport/System/Library/PrivateFrameworks/Private.framework/Versions/A/Private'
+exports:
+  - archs:           [ x86_64 ]
+    symbols:         [ _sym1 ]
+...

@@ -1,0 +1,9 @@
+--- !tapi-tbd-v3
+archs:           [ arm64 ]
+platform:        ios
+flags:           [ installapi ]
+install-name:    /usr/local/lib/libinline.dylib
+exports:
+  - archs:           [ arm64 ]
+    symbols:         [ _bar ]
+...

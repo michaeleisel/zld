@@ -1,0 +1,12 @@
+--- !tapi-tbd
+tbd-version:     4
+targets:         [ x86_64-macos ]
+flags:           [ not_app_extension_safe ]
+install-name:    '/System/Library/Frameworks/Reexport.framework/Versions/A/Reexport'
+reexports:       
+  - targets:         [ x86_64-macos ]
+    symbols:         [ _foo ]
+    objc-classes:    [ Class1, Class2 ]
+    objc-eh-types:   [ Class1 ]
+    objc-ivars:      [ Class2._isValid ]
+...

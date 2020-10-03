@@ -1,0 +1,9 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        zippered
+flags:           [ not_app_extension_safe ]
+install-name:    '/System/Library/Frameworks/Zippered.framework/Versions/A/Zippered'
+exports:         
+  - archs:           [ x86_64 ]
+    symbols:         [ _a, _commonAPI, _iOSAPI, _image, _invalidAPI, _macOSAPI ]
+...

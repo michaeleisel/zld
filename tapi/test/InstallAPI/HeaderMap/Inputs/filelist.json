@@ -1,0 +1,13 @@
+{
+  "version" : "2",
+  "headers" : [
+    {
+      "type" : "project",
+      "path" : "SRC_DIR/a/FooA.h"
+    },
+    {
+      "type" : "project",
+      "path" : "SRC_DIR/b/FooB.h"
+    }
+  ]
+}

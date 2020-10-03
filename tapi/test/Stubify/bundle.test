@@ -1,0 +1,11 @@
+; RUN: rm -rf %t && mkdir -p %t/isysroot
+; RUN: cp -r %inputs/Bundle/* %t/isysroot/
+; RUN: not %tapi stubify %inputs/Bundle/System/Library/Bundles/Bundle -o %t/Bundle.tbd 2>&1 | FileCheck -check-prefix=FILE %s
+; RUN: %tapi stubify %t/isysroot 2>&1 | FileCheck -check-prefix=DIR -allow-empty %s
+; RUN: not test -e %t/isysroot/System/Library/Bundles/Bundle.tbd
+
+; FILE: error: input {{.*}} is not a dynamic library
+; FILE-NOT: warning:
+
+; DIR-NOT: error:
+; DIR-NOT: warning:

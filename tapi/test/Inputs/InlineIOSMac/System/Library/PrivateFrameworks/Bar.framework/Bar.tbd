@@ -1,0 +1,8 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        zippered
+install-name:    /System/Library/Frameworks/Bar.framework/Bar
+exports:
+  - archs:       [ x86_64 ]
+    symbols:     [ _bar1 ]
+...

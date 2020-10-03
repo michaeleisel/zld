@@ -1,0 +1,13 @@
+; When no deployment target is specified, then read the env variables. This
+; should fail, because we defined conflicting env variables.
+; rm -rf %t && mkdir -p %t
+; RUN: env MACOSX_DEPLOYMENT_TARGET=10.14 IPHONEOS_DEPLOYMENT_TARGET=12.0 not %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot %S/Inputs/Foo.framework -o %t/Foo.tbd 2>&1 | FileCheck --check-prefix=CONFLICTING_DEPLOYMENT_TARGETS %s
+; CONFLICTING_DEPLOYMENT_TARGETS: error: conflicting deployment targets, both 'MACOSX_DEPLOYMENT_TARGET' and 'IPHONEOS_DEPLOYMENT_TARGET' are present in environment
+
+; This test should not fail, because a deployment target is specified.
+; RUN: env MACOSX_DEPLOYMENT_TARGET=10.14 IPHONEOS_DEPLOYMENT_TARGET=12.0 %tapi installapi -arch x86_64 -macosx_version_min 10.14 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot %S/Inputs/Foo.framework -o %t/Foo.tbd 2>&1 | FileCheck --allow-empty %s
+
+; This test shouldn't fail either, because we use -target.
+; RUN: env MACOSX_DEPLOYMENT_TARGET=10.14 IPHONEOS_DEPLOYMENT_TARGET=12.0 %tapi installapi -target x86_64-apple-macosx10.14 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot %S/Inputs/Foo.framework -o %t/Foo.tbd 2>&1 | FileCheck --allow-empty %s
+; CHECK-NOT: error:
+; CHECK-NOT: warning:

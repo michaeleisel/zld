@@ -1,0 +1,5 @@
+--- !tapi-tbd-v3
+archs:           [ armv7s ]
+platform:        ios
+install-name:    '/usr/lib/libfat.dylib'
+...

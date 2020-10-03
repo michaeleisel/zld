@@ -1,0 +1,6 @@
+; RUN: rm -rf %t && mkdir -p %t/sysroot
+; RUN: cp -R %p/../Inputs/InlineZippered/ %t/sysroot/
+; RUN: %tapi stubify --inline-private-frameworks -isysroot %t/sysroot  %t/sysroot/ --no-uuids 2>&1 | FileCheck -allow-empty %s
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

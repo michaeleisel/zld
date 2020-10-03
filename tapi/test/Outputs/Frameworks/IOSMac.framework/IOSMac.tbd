@@ -1,0 +1,9 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        iosmac
+flags:           [ not_app_extension_safe ]
+install-name:    '/System/Library/Frameworks/IOSMac.framework/Versions/A/IOSMac'
+exports:         
+  - archs:           [ x86_64 ]
+    symbols:         [ _iOSAPI ]
+...

@@ -1,0 +1,17 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/Simple.framework/Versions/A/Simple -current_version 1.2.3 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %sysroot %inputs/System/Library/Frameworks/Simple.framework -o %t/Simple.tbd --verify-against=%inputs/System/Library/Frameworks/Simple.framework/Simple --verify-mode=ErrorsAndWarnings --exclude-public-header=**/SimpleAPI.h --exclude-private-header=**/SimplePrivateSPI.h 2>&1 | FileCheck -check-prefix=WARNINGS -allow-empty %s
+; RUN: %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/Simple.framework/Versions/A/Simple -current_version 1.2.3 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %sysroot %inputs/System/Library/Frameworks/Simple.framework -o %t/Simple.tbd --verify-against=%inputs/System/Library/Frameworks/Simple.framework/Simple --verify-mode=Pedantic --extra-public-header=%p/../Inputs/Simple/SimpleInternalAPI2.h --extra-public-header=%p/../Inputs/Simple/SimpleInternalAPI.h --extra-public-header=%p/../Inputs/Simple/Extra --extra-private-header=%p/../Inputs/Simple/SimpleInternalSPI.h --exclude-public-header=**/SimpleAPI.h --exclude-private-header=**/SimplePrivateSPI.h 2>&1 | FileCheck -check-prefix=PEDANTIC -allow-empty %s
+; RUN: not %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/Simple.framework/Versions/A/Simple -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %sysroot %inputs/System/Library/Frameworks/Simple.framework -o %t/Simple.tbd --extra-public-header=%p/../Inputs/Simple/NoSuchFile.h 2>&1 | FileCheck -allow-empty -check-prefix=NOPUBLIC %s
+; RUN: not %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/Simple.framework/Versions/A/Simple -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %sysroot %inputs/System/Library/Frameworks/Simple.framework -o %t/Simple.tbd --extra-private-header=%p/../Inputs/Simple/NoSuchFile.h 2>&1 | FileCheck -allow-empty -check-prefix=NOPRIVATE %s
+
+; WARNINGS: warning: headers don't have symbol '_extraGlobalAPI1'
+; WARNINGS: warning: headers don't have symbol '_extraGlobalAPI2'
+; WARNINGS: warning: headers don't have symbol '(ObjC Class) SimpleInternalAPI'
+; WARNINGS: warning: headers don't have symbol '(ObjC Class) SimpleInternalSPI'
+
+
+; PEDANTIC-NOT: error
+; PEDANTIC: warning: cannot find protocol definition for 'ForwardProcotol'
+
+; NOPUBLIC: error: no such public header file:
+; NOPRIVATE: error: no such private header file:

@@ -1,0 +1,3 @@
+// REQUIRES: iosmac
+// RUN: %tapi-binary-reader -no-uuid -json %t.json %inputs/System/Library/Frameworks/Zippered.framework/Zippered
+// RUN: diff -w %t.json %S/Inputs/zippered.json

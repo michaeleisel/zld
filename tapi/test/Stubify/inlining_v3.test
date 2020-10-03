@@ -1,0 +1,7 @@
+; RUN: rm -rf %t && mkdir -p %t/sysroot
+; RUN: cp -R %inputs/ %t/sysroot/
+; RUN: %tapi stubify --inline-private-frameworks -isysroot %t/sysroot %t/sysroot/System/Library/Frameworks/Inlining.framework --no-uuids --filetype=tbd-v3 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %p/../Outputs/Frameworks/v3/Inlining.framework/Inlining.tbd %t/sysroot/System/Library/Frameworks/Inlining.framework/Inlining.tbd
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

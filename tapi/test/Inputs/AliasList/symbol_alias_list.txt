@@ -1,0 +1,7 @@
+# comment
+_simple_symbol _alias_symbol
+_hidden_symbol _exported_symbol
+_moved_here_symbol $ld$hide$os10.4$_moved_here_symbol
+_moved_here_symbol $ld$hide$os10.5$_moved_here_symbol
+_moved_here_symbol $ld$hide$os10.6$_moved_here_symbol
+_private_symbol _public_symbol

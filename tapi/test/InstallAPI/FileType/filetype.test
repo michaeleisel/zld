@@ -1,0 +1,10 @@
+; rm -rf %t && mkdir -p %t
+; RUN: not %tapi installapi --filetype=baz -target x86_64-apple-macosx10.14 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot %S/Inputs/Foo.framework -o %t/Foo.tbd 2>&1 | FileCheck --check-prefix=FILETYPE %s
+; FILETYPE: error: invalid value 'baz' in '--filetype=baz'
+
+; RUN: env TAPI_OUTPUT_FILE_TYPE=foo not %tapi installapi -target x86_64-apple-macosx10.14 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot %S/Inputs/Foo.framework -o %t/Foo.tbd 2>&1 | FileCheck --check-prefix=FILE_TYPE_ENV1 %s
+; FILE_TYPE_ENV1: error: invalid value 'foo' in 'env TAPI_OUTPUT_FILE_TYPE'
+
+; RUN: env TAPI_OUTPUT_FILE_TYPE=tbd-v4 %tapi installapi -target x86_64-apple-macosx10.14 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot %S/Inputs/Foo.framework -o %t/Foo.tbd 2>&1 | FileCheck --check-prefix=FILE_TYPE_ENV2 --allow-empty %s
+; FILE_TYPE_ENV2-NOT: error:
+; FILE_TYPE_ENV2-NOT: warning:

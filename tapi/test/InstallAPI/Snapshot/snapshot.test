@@ -1,0 +1,8 @@
+; RUN: rm -rf %t && mkdir -p %t/
+; RUN: %tapi installapi -target x86_64-apple-macosx.10.15 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot %S/Inputs/Foo.framework -o %t/Foo1.tbd --extra-public-header=%S/Inputs/src/ --exclude-public-header=%S/Inputs/Foo.framework/Headers/ --snapshot --snapshot-dir=%t/snapshot-dir 2>&1 | FileCheck -allow-empty %s
+; RUN: mv %t/snapshot-dir/Foo-* %t/snapshot-dir/Foo
+; RUN: %tapi installapi --load-snapshot=%t/snapshot-dir/Foo --snapshot-dir=%t/snapshot-output -o %t/Foo2.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff %t/Foo1.tbd %t/Foo2.tbd
+
+; CHECK-NOT: error:
+; CHECK-NOT: warning:

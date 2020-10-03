@@ -1,0 +1,9 @@
+; RUN: rm -rf %t && mkdir -p %t/snapshot-test
+; RUN: cp -R %inputs/System/Library/Frameworks/Simple.framework %t/snapshot-test/
+; RUN: %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/Simple.framework/Versions/A/Simple -current_version 1.2.3 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %sysroot %t/snapshot-test/Simple.framework -o %t/Simple.tbd --verify-against=%t/snapshot-test/Simple.framework/Simple --verify-mode=Pedantic --extra-public-header=%p/../Inputs/Simple/SimpleInternalAPI2.h --extra-public-header=%p/../Inputs/Simple/SimpleInternalAPI.h --extra-public-header=%p/../Inputs/Simple/Extra --extra-private-header=%p/../Inputs/Simple/SimpleInternalSPI.h --exclude-public-header=**/SimpleAPI.h --exclude-private-header=**/SimplePrivateSPI.h --snapshot --snapshot-dir=%t/snapshot-dir 2>&1 | FileCheck -allow-empty %s
+; RUN: rm -rf %t/snapshot-test
+; RUN: mv %t/snapshot-dir/Simple-* %t/snapshot-dir/Simple
+; RUN: %tapi --load-snapshot=%t/snapshot-dir/Simple --snapshot-dir=%t/snapshot-output 2>&1 | FileCheck -allow-empty %s
+
+; CHECK-NOT: error:
+; CHECK: warning: cannot find protocol definition for 'ForwardProcotol'

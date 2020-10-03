@@ -1,0 +1,14 @@
+; REQUIRES: iosmac
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi installapi --filetype=tbd-v3 --no-verify-api --no-uuids --target=x86_64-apple-macos10.15 --target-variant=x86_64-apple-ios13.0-macabi -install_name /System/Library/Frameworks/Zippered.framework/Versions/A/Zippered -current_version 1 -compatibility_version 1 -ObjC -isysroot %sysroot -F%inputs/System/Library/Frameworks %inputs/System/Library/Frameworks/Zippered.framework --verify-against=%inputs/System/Library/Frameworks/Zippered.framework/Zippered --verify-mode=Pedantic -o %t/Zippered.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/Zippered.tbd %p/../Outputs/Frameworks/Zippered.framework/Zippered.tbd
+
+; RUN: %tapi installapi --filetype=tbd-v3 --no-verify-api --no-uuids --target-variant=x86_64-apple-macos10.15 --target=x86_64-apple-ios13.0-macabi -install_name /System/Library/Frameworks/Zippered.framework/Versions/A/Zippered -current_version 1 -compatibility_version 1 -ObjC -isysroot %sysroot -F%inputs/System/Library/Frameworks %inputs/System/Library/Frameworks/Zippered.framework --verify-against=%inputs/System/Library/Frameworks/Zippered.framework/Zippered --verify-mode=Pedantic -o %t/Zippered.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/Zippered.tbd %p/../Outputs/Frameworks/Zippered.framework/Zippered.tbd
+
+; RUN: %tapi installapi --filetype=tbd-v4 --no-verify-api --no-uuids --target=x86_64-apple-macos10.15 --target-variant=x86_64-apple-ios13.0-macabi -install_name /System/Library/Frameworks/Zippered.framework/Versions/A/Zippered -current_version 1 -compatibility_version 1 -ObjC -isysroot %sysroot -F%inputs/System/Library/Frameworks %inputs/System/Library/Frameworks/Zippered.framework --verify-against=%inputs/System/Library/Frameworks/Zippered.framework/Zippered --verify-mode=Pedantic -o %t/Zippered.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/Zippered.tbd %p/../Outputs/Frameworks/Zippered.framework/Zippered_v4.tbd
+
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

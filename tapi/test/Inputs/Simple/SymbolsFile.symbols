@@ -1,0 +1,15 @@
+--- !tapi-symbols-v1
+add:
+  - type: public
+    symbols: [ _extraGlobalAPI1, _extraGlobalAPI2 ]
+    objc-classes: [ SimpleInternalAPI ]
+    objc-eh-types: [ SimpleInternalAPI ]
+  - type: private
+    objc-classes: [ SimpleInternalSPI ]
+    objc-eh-types: [ SimpleInternalSPI ]
+remove:
+  - type: public
+    symbols: [ _otherFrameworkAPI ]
+  - type: private
+    symbols: [ _otherFrameworkSPI, _extraGlobalSPI1]
+...

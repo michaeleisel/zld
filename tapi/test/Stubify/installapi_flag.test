@@ -1,0 +1,12 @@
+; RUN: rm -rf %t && mkdir -p %t/sysroot
+; RUN: cp -R %p/../Inputs/InstallAPIFlag/ %t/sysroot/
+; RUN: %tapi stubify %t/sysroot/ 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %p/../Inputs/InstallAPIFlag/usr/lib/libinstallapi.tbd %t/sysroot/usr/lib/libinstallapi.tbd
+
+; RUN: rm -rf %t && mkdir -p %t/sysroot
+; RUN: cp -R %p/../Inputs/InstallAPIFlag/ %t/sysroot/
+; RUN: %tapi stubify --inline-private-frameworks -isysroot %t/sysroot %t/sysroot/ 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %p/../Inputs/InstallAPIFlag/usr/lib/libinstallapi.tbd %t/sysroot/usr/lib/libinstallapi.tbd
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

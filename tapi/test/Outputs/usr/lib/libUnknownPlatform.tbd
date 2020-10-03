@@ -1,0 +1,9 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        unknown
+flags:           [ not_app_extension_safe ]
+install-name:    '/usr/lib/libUnknownPlatform.1.dylib'
+exports:         
+  - archs:           [ x86_64 ]
+    symbols:         [ _foo ]
+...

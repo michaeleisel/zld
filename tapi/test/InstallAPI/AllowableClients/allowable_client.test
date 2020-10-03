@@ -1,0 +1,17 @@
+; RUN: rm -rf %t && mkdir -p %t/AllowableClient.framework/
+; RUN: yaml2obj %S/Inputs/liballowable.yaml -o=%t/AllowableClient.framework/AllowableClient
+
+
+; RUN: not %tapi installapi --no-uuids --target=i386-apple-macos10.15 --target=x86_64-apple-macos10.15 --target-variant=x86_64-apple-ios13.0-macabi -install_name /usr/lib/liballowable.dylib -isysroot %sysroot %t/AllowableClient.framework/ --verify-against=%t/AllowableClient.framework/AllowableClient --verify-mode=Pedantic 2>&1 | FileCheck -check-prefix=ALLOWABLE_MISSING1 %s
+; RUN: not %tapi installapi -allowable_client ClientA --no-uuids --target=i386-apple-macos10.15 --target=x86_64-apple-macos10.15 --target-variant=x86_64-apple-ios13.0-macabi -install_name /usr/lib/liballowable.dylib -isysroot %sysroot %t/AllowableClient.framework/ --verify-against=%t/AllowableClient.framework/AllowableClient --verify-mode=Pedantic 2>&1 | FileCheck -check-prefix=ALLOWABLE_MISSING2 %s
+; RUN: not %tapi installapi -allowable_client ClientA -allowable_client Foo --no-uuids --target=i386-apple-macos10.15 --target=x86_64-apple-macos10.15 --target-variant=x86_64-apple-ios13.0-macabi -install_name /usr/lib/liballowable.dylib -isysroot %sysroot %t/AllowableClient.framework/ --verify-against=%t/AllowableClient.framework/AllowableClient --verify-mode=Pedantic 2>&1 | FileCheck -check-prefix=ALLOWABLE_MISSING3 %s
+; RUN: not %tapi installapi -allowable_client Foo -allowable_client ClientB --no-uuids --target=i386-apple-macos10.15 --target=x86_64-apple-macos10.15 --target-variant=x86_64-apple-ios13.0-macabi -install_name /usr/lib/liballowable.dylib -isysroot %sysroot %t/AllowableClient.framework/ --verify-against=%t/AllowableClient.framework/AllowableClient --verify-mode=Pedantic 2>&1 | FileCheck -check-prefix=ALLOWABLE_MISSING4 %s
+; RUN: %tapi installapi -allowable_client ClientA -allowable_client ClientB --no-uuids --target=i386-apple-macos10.15 --target=x86_64-apple-macos10.15 --target-variant=x86_64-apple-ios13.0-macabi -install_name /usr/lib/liballowable.dylib -isysroot %sysroot %t/AllowableClient.framework/ --verify-against=%t/AllowableClient.framework/AllowableClient --verify-mode=Pedantic 2>&1 | FileCheck -allow-empty %s
+
+
+; ALLOWABLE_MISSING1: error: allowable client missing from tapi option: 'ClientA [ i386 x86_64 ]'
+; ALLOWABLE_MISSING2: error: allowable client missing from tapi option: 'ClientB [ i386 x86_64 ]'
+; ALLOWABLE_MISSING3: error: allowable client missing from binary file: 'Foo [ i386 x86_64 ]'
+; ALLOWABLE_MISSING4: error: allowable client missing from binary file: 'Foo [ i386 x86_64 ]'
+; CHECK-NOT: warning
+; CHECK-NOT: error

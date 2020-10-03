@@ -1,0 +1,11 @@
+--- !tapi-tbd-v3
+archs:           [ i386, x86_64 ]
+platform:        macosx
+flags:           [ not_app_extension_safe ]
+install-name:    '/System/Library/Frameworks/Xarch.framework/Versions/A/Xarch'
+exports:         
+  - archs:           [ i386 ]
+    allowable-clients: [ Foo ]
+  - archs:           [ x86_64 ]
+    re-exports:      [ '/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation' ]
+...

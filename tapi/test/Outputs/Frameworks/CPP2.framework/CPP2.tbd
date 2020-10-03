@@ -1,0 +1,12 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        macosx
+flags:           [ not_app_extension_safe ]
+install-name:    '/System/Library/Frameworks/CPP2.framework/Versions/A/CPP2'
+exports:         
+  - archs:           [ x86_64 ]
+    symbols:         [ __ZN9templates4foo1IiEEiT_ ]
+    weak-def-symbols: [ __ZN9templates3BarIiE7bazingaEv, __ZN9templates3BarIiEC1Ev, 
+                        __ZN9templates3BarIiEC2Ev, __ZN9templates3BarIiED1Ev, __ZN9templates3BarIiED2Ev, 
+                        __ZN9templates4foo1IsEEiT_ ]
+...

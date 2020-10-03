@@ -1,0 +1,9 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi archive --remove i386 %p/../Inputs/Archive/v3/libfat.tbd -o %t/lib2Arch.tbd
+; RUN: %tapi archive --remove x86_64 %t/lib2Arch.tbd  -o %t/lib1Arch.tbd
+; RUN: not %tapi archive --remove x86_64h %t/lib1Arch.tbd -o %t/libEmpty.tbd 2>&1 | FileCheck %s
+
+; RUN: diff -a %p/../Outputs/Archive/v3/lib2Arch.tbd %t/lib2Arch.tbd
+; RUN: diff -a %p/../Outputs/Archive/v3/lib1Arch.tbd  %t/lib1Arch.tbd
+
+; CHECK: cannot remove last architecture slice 'x86_64h'

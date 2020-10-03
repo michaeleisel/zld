@@ -1,0 +1,8 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64, x86_64h ]
+platform:        macosx
+install-name:    '/System/Library/Frameworks/Public.framework/Versions/A/Public'
+exports:
+  - archs:           [ x86_64, x86_64h ]
+    re-exports:      [ '/System/Library/PrivateFrameworks/Private.framework/Versions/A/Private' ]
+...

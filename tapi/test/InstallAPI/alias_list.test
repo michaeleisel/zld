@@ -1,0 +1,5 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi installapi -alias_list %p/../Inputs/AliasList/symbol_alias_list.txt --target=x86_64-apple-macos10.14 -install_name /System/Library/Frameworks/AliasList.framework/Versions/A/AliasList -current_version 1 -compatibility_version 1 -ObjC -isysroot %sysroot %inputs/System/Library/Frameworks/AliasList.framework --verify-against=%inputs/System/Library/Frameworks/AliasList.framework/AliasList --verify-mode=Pedantic -o %t/AliasList.tbd 2>&1 | FileCheck -allow-empty %s
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

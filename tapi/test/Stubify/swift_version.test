@@ -1,0 +1,23 @@
+; RUN: rm -rf %t && mkdir %t
+; RUN: xcrun clang -dynamiclib -install_name libswift1.dylib -o %t/libswift1.dylib %p/../Inputs/swift1.ll
+; RUN: xcrun clang -dynamiclib -install_name libswift2.dylib -o %t/libswift2.dylib %p/../Inputs/swift2.ll
+; RUN: xcrun clang -dynamiclib -install_name libswift3.dylib -o %t/libswift3.dylib %p/../Inputs/swift3.ll
+; RUN: xcrun clang -dynamiclib -install_name libswift4.dylib -o %t/libswift4.dylib %p/../Inputs/swift4.ll
+; RUN: xcrun clang -dynamiclib -install_name libswift5.dylib -o %t/libswift5.dylib %p/../Inputs/swift5.ll
+; RUN: xcrun clang -dynamiclib -install_name libswift99.dylib -o %t/libswift99.dylib %p/../Inputs/swift99.ll
+; RUN: %tapi stubify --no-uuids --filetype=tbd-v2 %t/libswift1.dylib -o %t/libswift1.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: %tapi stubify --no-uuids --filetype=tbd-v2 %t/libswift2.dylib -o %t/libswift2.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: %tapi stubify --no-uuids --filetype=tbd-v2 %t/libswift3.dylib -o %t/libswift3.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: %tapi stubify --no-uuids --filetype=tbd-v2 %t/libswift4.dylib -o %t/libswift4.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: %tapi stubify --no-uuids --filetype=tbd-v2 %t/libswift5.dylib -o %t/libswift5.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: %tapi stubify --no-uuids --filetype=tbd-v2 %t/libswift99.dylib -o %t/libswift99.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: %tapi stubify --no-uuids --filetype=tbd-v3 %t/libswift5.dylib -o %t/libswift5_v3.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %p/../Outputs/swift_version/libswift1.tbd %t/libswift1.tbd
+; RUN: diff -a %p/../Outputs/swift_version/libswift2.tbd %t/libswift2.tbd
+; RUN: diff -a %p/../Outputs/swift_version/libswift3.tbd %t/libswift3.tbd
+; RUN: diff -a %p/../Outputs/swift_version/libswift4.tbd %t/libswift4.tbd
+; RUN: diff -a %p/../Outputs/swift_version/libswift5.tbd %t/libswift5.tbd
+; RUN: diff -a %p/../Outputs/swift_version/libswift99.tbd %t/libswift99.tbd
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

@@ -1,0 +1,93 @@
+{
+  "api_json_version": 1,
+  "binaryInfo": {
+    "allowableClients": [
+      "/usr/lib/libfoo.dylib"
+    ],
+    "compatibilityVersion": "1",
+    "currentVersion": "1",
+    "installName": "/usr/lib/libtest.dylib",
+    "reexportedLibraries": [
+      "/usr/lib/libbar.dylib",
+      "/usr/lib/libbaz.dylib"
+    ],
+    "twoLevelNamespace": true,
+    "type": "dylib",
+    "uuid": "03C94615-BA63-3EF1-B3FA-3DB9F057B9EC"
+  },
+  "categories": [
+    {
+      "instanceMethods": [
+        {
+          "name": "supportsSimple"
+        }
+      ],
+      "interface": "NSManagedObject",
+      "name": "Simple"
+    }
+  ],
+  "globals": [
+    {
+      "linkage": "exported",
+      "name": "_publicGlobalVariable"
+    },
+    {
+      "linkage": "exported",
+      "name": "_weakGlobal",
+      "weakDefined": true
+    },
+    {
+      "linkage": "external",
+      "name": "_weakRefGlobal",
+      "weakReferenced": true
+    },
+    {
+      "linkage": "exported",
+      "name": "_threadGlobal",
+      "threadLocalValue": true
+    },
+    {
+      "linkage": "external",
+      "name": "dyld_stub_binder"
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "Simple",
+      "super": "NSObject"
+    },
+    {
+      "instanceMethods": [
+        {
+          "name": "privateProcotolMethod"
+        },
+        {
+          "name": "baseMethod"
+        },
+        {
+          "name": "protocolMethod"
+        },
+        {
+          "name": "barMethod"
+        }
+      ],
+      "name": "FooClass",
+      "super": ""
+    }
+  ],
+  "potentiallyDefinedSelectors": [
+    "otherSelector",
+    "someSelector"
+  ],
+  "protocols": [
+    {
+      "instanceMethods": [
+        {
+          "name": "baseMethod"
+        }
+      ],
+      "name": "BaseProtocol"
+    }
+  ],
+  "target": "x86_64-apple-macos"
+}

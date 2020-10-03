@@ -1,0 +1,13 @@
+{
+  "version" : "2",
+  "headers" : [
+    {
+      "type" : "public",
+      "path" : "INPUT_DIR/Foo.framework/Headers/Foo.h"
+    },
+    {
+      "type" : "project",
+      "path" : "INPUT_DIR/src/a/Secret.h"
+    }
+  ]
+}

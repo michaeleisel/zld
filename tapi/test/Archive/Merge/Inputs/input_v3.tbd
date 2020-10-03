@@ -1,0 +1,12 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64, x86_64h ]
+platform:        macosx
+install-name:    '/usr/lib/libfoo.dylib'
+exports:
+  - archs:           [ x86_64, x86_64h ]
+    re-exports:      [ '/usr/lib/internal/libbar.dylib' ]
+  - archs:           [ x86_64 ]
+    symbols:         [ _sym1 ]
+  - archs:           [ x86_64h ]
+    symbols:         [ _sym2 ]
+...

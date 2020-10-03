@@ -1,0 +1,16 @@
+; RUN: rm -rf %t && mkdir -p %t/Xarch.framework/
+; RUN: yaml2obj %S/Inputs/Xarch.yaml -o=%t/Xarch.framework/Xarch
+
+; RUN: not %tapi installapi --no-uuids --target=i386-apple-macos10.14 --target=x86_64-apple-macos10.14 -install_name /System/Library/Frameworks/Xarch.framework/Versions/A/Xarch -current_version 1 -compatibility_version 1 -isysroot %sysroot %t/Xarch.framework --verify-against=%t/Xarch.framework/Xarch --verify-mode=Pedantic 2>&1 | FileCheck -check-prefix=REEXPORT_MISSING %s
+; RUN: not %tapi installapi -reexport_install_name /System/Library/Frameworks/Foundation.framework/Versions/C/Foundation --no-uuids --target=i386-apple-macos10.14 --target=x86_64-apple-macos10.14 -install_name /System/Library/Frameworks/Xarch.framework/Versions/A/Xarch -current_version 1 -compatibility_version 1 -isysroot %sysroot %t/Xarch.framework --verify-against=%t/Xarch.framework/Xarch --verify-mode=Pedantic 2>&1 | FileCheck -check-prefix=REEXPORT_MISMATCH %s
+; RUN: not %tapi installapi -Xarch_x86_64 -reexport_install_name /System/Library/Frameworks/Foundation.framework/Versions/C/Foundation --no-uuids --target=i386-apple-macos10.14 --target=x86_64-apple-macos10.14 -install_name /System/Library/Frameworks/Xarch.framework/Versions/A/Xarch -current_version 1 -compatibility_version 1 -isysroot %sysroot %t/Xarch.framework --verify-against=%t/Xarch.framework/Xarch --verify-mode=Pedantic 2>&1 | FileCheck -check-prefix=ALLOWABLE_MISSING %s
+; RUN: not %tapi installapi -allowable_client Foo -Xarch_x86_64 -reexport_install_name /System/Library/Frameworks/Foundation.framework/Versions/C/Foundation --no-uuids --target=i386-apple-macos10.14 --target=x86_64-apple-macos10.14 -install_name /System/Library/Frameworks/Xarch.framework/Versions/A/Xarch -current_version 1 -compatibility_version 1 -isysroot %sysroot %t/Xarch.framework --verify-against=%t/Xarch.framework/Xarch --verify-mode=Pedantic 2>&1 | FileCheck -check-prefix=ALLOWABLE_MISMATCH %s
+; RUN: %tapi installapi --filetype=tbd-v3 -Xarch_i386 -allowable_client Foo -Xarch_x86_64 -reexport_install_name /System/Library/Frameworks/Foundation.framework/Versions/C/Foundation --no-uuids --target=i386-apple-macos10.14 --target=x86_64-apple-macos10.14 -install_name /System/Library/Frameworks/Xarch.framework/Versions/A/Xarch -current_version 1 -compatibility_version 1 -isysroot %sysroot %t/Xarch.framework --verify-against=%t/Xarch.framework/Xarch --verify-mode=Pedantic -o %t/Xarch.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/Xarch.tbd %S/Outputs/Xarch.tbd
+
+; REEXPORT_MISSING: re-exported library missing from tapi option: '/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation [ x86_64 ]'
+; REEXPORT_MISMATCH: error: re-exported libraries do not match: '/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation [ i386 x86_64 ]' (provided) vs '/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation [ x86_64 ]' (found)
+; ALLOWABLE_MISSING: error: allowable client missing from tapi option: 'Foo [ i386 ]'
+; ALLOWABLE_MISMATCH: allowable clients do not match: 'Foo [ i386 x86_64 ]' (provided) vs 'Foo [ i386 ]' (found)
+; CHECK-NOT: warning
+; CHECK-NOT: error

@@ -1,0 +1,3 @@
+; RUN: %tapi-run -arch=x86_64 -version_min=10.0 %inputs/System/Library/Frameworks/Public.framework | FileCheck -allow-empty %s
+; CHECK-NOT: warning
+; CHECK-NOT: error

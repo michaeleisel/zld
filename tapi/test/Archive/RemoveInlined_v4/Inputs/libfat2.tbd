@@ -1,0 +1,17 @@
+--- !tapi-tbd
+tbd-version:     4
+targets:         [ x86_64-macos ]
+install-name:    '/usr/lib/libfat.dylib'
+reexported-libraries:
+  - targets:         [ x86_64-macos ]
+    libraries:      [ '/usr/lib/internal/libfat.dylib' ]
+--- !tapi-tbd
+tbd-version:     4
+targets:         [ x86_64-macos, x86_64h-macos ]
+install-name:    '/usr/lib/internal/libfat.dylib'
+exports:
+  - targets:         [ x86_64-macos ]
+    symbols:         [ _sym1 ]
+  - targets:         [ x86_64h-macos ]
+    symbols:         [ _sym2 ]
+...

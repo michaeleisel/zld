@@ -1,0 +1,5 @@
+; RUN: %tapi installapi -arch x86_64 -reexport_framework FooCC -install_name /System/Library/Frameworks/UmbrellaCC.framework/Versions/A/UmbrellaCC -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %sysroot -F %inputs/System/Library/Frameworks %inputs/System/Library/Frameworks/UmbrellaCC.framework -o %t.tbd --verify-against=%inputs/System/Library/Frameworks/UmbrellaCC.framework/UmbrellaCC --verify-mode=Pedantic -fprofile-instr-generate 2>&1 | FileCheck -allow-empty %s
+
+; CHECK:     warning: cannot find 'clang' in toolchain directory. Looking for 'clang' in PATH instead.
+; CHECK-NOT: error
+; CHECK-NOT: warning

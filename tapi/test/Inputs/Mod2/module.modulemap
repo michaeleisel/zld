@@ -1,0 +1,5 @@
+framework module Mod2 {
+    umbrella header "Mod2.h"
+    export *
+    module * { export * }
+}

@@ -1,0 +1,7 @@
+; REQUIRES: iosmac
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi installapi --filetype=tbd-v3 --no-uuids --target=x86_64-apple-ios13.0-macabi -install_name /System/Library/Frameworks/IOSMac.framework/Versions/A/IOSMac -current_version 1 -compatibility_version 1 -ObjC -isysroot %sysroot %inputs/System/Library/Frameworks/IOSMac.framework --verify-against=%inputs/System/Library/Frameworks/IOSMac.framework/IOSMac --verify-mode=Pedantic -o %t/IOSMac.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/IOSMac.tbd %p/../Outputs/Frameworks/IOSMac.framework/IOSMac.tbd
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

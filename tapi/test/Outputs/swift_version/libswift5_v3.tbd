@@ -1,0 +1,9 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        macosx
+flags:           [ not_app_extension_safe ]
+install-name:    libswift5.dylib
+current-version: 0
+compatibility-version: 0
+swift-abi-version:   5
+...

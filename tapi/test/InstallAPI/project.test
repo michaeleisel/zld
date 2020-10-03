@@ -1,0 +1,8 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: echo '{"version" : "2","headers" : [{"type" : "project", "path" : "%p/../Inputs/Project/Extra/Secret.h"}]}' > %t/Project.json
+; RUN: %tapi installapi --filelist=%t/Project.json -target x86_64-apple-macosx.10.15 -install_name /System/Library/Frameworks/Project.framework/Versions/A/Project -current_version 1 -compatibility_version 1 -isysroot %sysroot %inputs/System/Library/Frameworks/Project.framework -o %t/Project.tbd --verify-against=%inputs/System/Library/Frameworks/Project.framework/Project --verify-mode=Pedantic 2>&1 | FileCheck -allow-empty %s
+
+; RUN: %tapi installapi --extra-project-header=%p/../Inputs/Project/Extra/ --exclude-project-header=**/Ignore.h -target x86_64-apple-macosx.10.15 -install_name /System/Library/Frameworks/Project.framework/Versions/A/Project -current_version 1 -compatibility_version 1 -isysroot %sysroot %inputs/System/Library/Frameworks/Project.framework -o %t/Project.tbd --verify-against=%inputs/System/Library/Frameworks/Project.framework/Project --verify-mode=Pedantic 2>&1 | FileCheck -allow-empty %s
+
+; CHECK-NOT: error:
+; CHECK-NOT: warning:

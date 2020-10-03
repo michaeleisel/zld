@@ -1,0 +1,15 @@
+--- !tapi-tbd-v3
+archs:           [ armv7s, arm64 ]
+platform:        ios
+install-name:    '/usr/lib/libfat.dylib'
+exports:
+  - archs:           [ arm64 ]
+    re-exports:      [ '/usr/lib/internal/libfat.dylib' ]
+--- !tapi-tbd-v3
+archs:           [ arm64 ]
+platform:        ios
+install-name:    '/usr/lib/internal/libfat.dylib'
+exports:
+  - archs:           [ arm64 ]
+    symbols:         [ _sym1 ]
+...

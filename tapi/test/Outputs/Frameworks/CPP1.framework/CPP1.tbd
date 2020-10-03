@@ -1,0 +1,9 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        macosx
+flags:           [ not_app_extension_safe ]
+install-name:    '/System/Library/Frameworks/CPP1.framework/Versions/A/CPP1'
+exports:         
+  - archs:           [ x86_64 ]
+    symbols:         [ __Z3bari, __ZN3Bar1yE ]
+...

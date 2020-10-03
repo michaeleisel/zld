@@ -1,0 +1,8 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/Simple.framework/Versions/A/Simple -current_version 47 -compatibility_version 11 -macosx_version_min 10.10 -isysroot %sysroot %inputs/System/Library/Frameworks/Simple.framework -o %t/Version.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/Version.tbd %p/../Outputs/Version.tbd
+; RUN: %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/Simple.framework/Versions/A/Simple -current_version 1.0.3 -compatibility_version 2.0.0 -macosx_version_min 10.10 -isysroot %sysroot %inputs/System/Library/Frameworks/Simple.framework -o %t/Version2.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/Version2.tbd %p/../Outputs/Version2.tbd
+
+CHECK-NOT: error
+CHECK:     warning: cannot find protocol definition for 'ForwardProcotol'

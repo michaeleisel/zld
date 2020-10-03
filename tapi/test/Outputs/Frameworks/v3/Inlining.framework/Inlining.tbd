@@ -1,0 +1,27 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64, x86_64h ]
+platform:        macosx
+flags:           [ not_app_extension_safe ]
+install-name:    '/System/Library/Frameworks/Inlining.framework/Versions/A/Inlining'
+exports:         
+  - archs:           [ x86_64, x86_64h ]
+    re-exports:      [ '/System/Library/Frameworks/Inlining.framework/Versions/A/Frameworks/Bar.framework/Versions/A/Bar', 
+                       '/System/Library/Frameworks/Inlining.framework/Versions/A/Frameworks/Foo.framework/Versions/A/Foo' ]
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        macosx
+flags:           [ not_app_extension_safe ]
+install-name:    '/System/Library/Frameworks/Inlining.framework/Versions/A/Frameworks/Bar.framework/Versions/A/Bar'
+exports:         
+  - archs:           [ x86_64 ]
+    re-exports:      [ '/System/Library/Frameworks/Public.framework/Versions/A/Public' ]
+    symbols:         [ _bar_sym2 ]
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        macosx
+flags:           [ not_app_extension_safe ]
+install-name:    '/System/Library/Frameworks/Inlining.framework/Versions/A/Frameworks/Foo.framework/Versions/A/Foo'
+exports:         
+  - archs:           [ x86_64 ]
+    symbols:         [ _foo_sym2 ]
+...

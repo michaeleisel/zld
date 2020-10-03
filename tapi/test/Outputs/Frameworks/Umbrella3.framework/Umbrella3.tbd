@@ -1,0 +1,10 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        macosx
+flags:           [ not_app_extension_safe ]
+install-name:    /System/Library/Frameworks/Umbrella3.framework/Versions/A/Umbrella3
+exports:
+  - archs:           [ x86_64 ]
+    re-exports:      [ /System/Library/PrivateFrameworks/Umbrella3Private.framework/Versions/A/Umbrella3Private ]
+    symbols:         [ _umbrella3Symbol ]
+...

@@ -1,0 +1,7 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi installapi -arch x86_64 -dynamiclib -install_name /usr/lib/libfoo.1.dylib -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %sysroot %inputs/dylib_dstroot -o %t/libfoo.tbd --verify-against=%inputs/dylib_dstroot/usr/lib/libfoo.1.dylib --verify-mode=Pedantic 2>&1 | FileCheck -allow-empty %s
+
+; RUN: echo '{"version" : "1","headers" : [{"type" : "public", "path" : "%inputs/dylib_dstroot/usr/include/foo.h"},{"type" : "private","path" : "%inputs/dylib_dstroot/usr/local/include/foo_private.h"}]}' > %t/libfoo.json
+; RUN: %tapi installapi -arch x86_64 -dynamiclib -install_name /usr/lib/libfoo.1.dylib -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %sysroot %inputs/dylib_dstroot -o %t/libfoo.tbd --verify-against=%inputs/dylib_dstroot/usr/lib/libfoo.1.dylib --verify-mode=Pedantic %t/libfoo.json 2>&1 | FileCheck -allow-empty %s
+
+; CHECK-NOT: error

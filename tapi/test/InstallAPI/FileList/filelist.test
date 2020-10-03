@@ -1,0 +1,24 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: sed -e "s:SRC_DIR:%S/Inputs/src:g" %S/Inputs/filelist_v1.json > %t/filelist_v1.json
+; RUN: sed -e "s:SRC_DIR:%S/Inputs/src:g" %S/Inputs/filelist_v2.json > %t/filelist_v2.json
+; RUN: sed -e "s:INPUT_DIR:%S/Inputs:g" %S/Inputs/filelist_framework.json > %t/filelist_framework.json
+; RUN: sed -e "s:INPUT_DIR:%S/Inputs:g" %S/Inputs/filelist_dylib.json > %t/filelist_dylib.json
+
+; Test --filelist option with framework.
+; RUN: %tapi installapi --filelist=%t/filelist_v1.json -target x86_64-apple-macosx.10.15 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot %S/Inputs/Foo.framework -o %t/Foo1.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/Foo1.tbd %S/Outputs/Foo.tbd
+
+; Test --filelist option with framework.
+; RUN: %tapi installapi --filelist=%t/filelist_v2.json -target x86_64-apple-macosx.10.15 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot %S/Inputs/Foo.framework -o %t/Foo2.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/Foo2.tbd %S/Outputs/Foo.tbd
+
+; Test --filelist option with framework (no positional inputs).
+; RUN: %tapi installapi --filelist=%t/filelist_framework.json -target x86_64-apple-macosx.10.15 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot -o %t/Foo3.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/Foo2.tbd %S/Outputs/Foo.tbd
+
+; Test --filelist option with dylib (no positional inputs).
+; RUN: %tapi installapi --filelist=%t/filelist_dylib.json -dynamiclib -target x86_64-apple-macosx.10.15 -install_name /usr/lib/libbar.dylib -isysroot %sysroot -o %t/libbar.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/libbar.tbd %S/Outputs/libbar.tbd
+
+; CHECK-NOT: error:
+; CHECK-NOT: warning:

@@ -1,0 +1,7 @@
+; RUN: yaml2obj %S/Inputs/zippered_multi.yaml -o %t.dylib
+; RUN: %tapi-binary-reader -no-uuid -json %t.json %t.dylib 2>&1
+; RUN: cat %t.json | FileCheck %s
+
+CHECK:     "target": "x86_64-apple-ios12-macabi"
+CHECK:     "target": "x86_64-apple-macos10.14"
+CHECK-NOT: "target": "x86_64-apple-macos10.14"

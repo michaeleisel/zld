@@ -1,0 +1,25 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        macosx
+flags:           [ not_app_extension_safe ]
+install-name:    '/System/Library/Frameworks/CPP3.framework/Versions/A/CPP3'
+exports:         
+  - archs:           [ x86_64 ]
+    symbols:         [ __ZN5test16Simple3runEv, __ZN5test26Simple3runEv, __ZN5test43Sub3runEv, 
+                       __ZN5test53Sub3runEv, __ZN5test63Sub3runEv, __ZN6test113Sub4run3Ev, 
+                       __ZN6test134Base4run3Ev, __ZN6test143SubC1Ev, __ZN6test143SubC2Ev, 
+                       __ZN6test143SubD0Ev, __ZN6test143SubD1Ev, __ZN6test143SubD2Ev, 
+                       __ZN6test153Sub3runEv, __ZN6test153Sub4run1Ev, __ZN6test153SubD0Ev, 
+                       __ZN6test153SubD1Ev, __ZN6test153SubD2Ev, __ZN6test154Sub13runEv, 
+                       __ZN6test154Sub14run1Ev, __ZNK6test143Sub4run1Ev, __ZTIN5test26SimpleE, 
+                       __ZTIN5test43SubE, __ZTIN5test53SubE, __ZTIN5test63SubE, __ZTIN6test134BaseE, 
+                       __ZTIN6test143SubE, __ZTIN6test153SubE, __ZTIN6test154Sub1E, 
+                       __ZTSN5test26SimpleE, __ZTSN5test43SubE, __ZTSN5test53SubE, 
+                       __ZTSN5test63SubE, __ZTSN6test134BaseE, __ZTSN6test143SubE, 
+                       __ZTSN6test153SubE, __ZTSN6test154Sub1E, __ZTVN5test26SimpleE, 
+                       __ZTVN5test43SubE, __ZTVN5test53SubE, __ZTVN5test63SubE, __ZTVN6test134BaseE, 
+                       __ZTVN6test143SubE, __ZTVN6test153SubE, __ZTVN6test154Sub1E, 
+                       __ZThn8_N6test153Sub4run1Ev, __ZThn8_N6test153SubD0Ev, __ZThn8_N6test153SubD1Ev, 
+                       __ZThn8_N6test154Sub14run1Ev ]
+    weak-def-symbols: [ __ZN6test126SimpleIiE3fooEv, __ZTVN6test126SimpleIiEE ]
+...

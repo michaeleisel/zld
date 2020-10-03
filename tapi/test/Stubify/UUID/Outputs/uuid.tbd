@@ -1,0 +1,11 @@
+--- !tapi-tbd
+tbd-version:     4
+targets:         [ x86_64-macos, x86_64-<6> ]
+uuids:           
+  - target:          x86_64-macos
+    value:           99712B7D-62ED-3339-A72A-F8F665DCD916
+  - target:          x86_64-<6>
+    value:           99712B7D-62ED-3339-A72A-F8F665DCD916
+flags:           [ not_app_extension_safe ]
+install-name:    uuid
+...

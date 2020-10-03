@@ -1,0 +1,7 @@
+; RUN: rm -rf %t && mkdir -p %t/sysroot
+; RUN: cp -R %inputs/ %t/sysroot
+; RUN: %tapi stubify %t/sysroot/System/Library/Frameworks/Dummy.extension.framework 2>&1 | FileCheck -allow-empty %s
+; RUN: test -e %t/sysroot/System/Library/Frameworks/Dummy.extension.framework/Dummy.extension.tbd
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

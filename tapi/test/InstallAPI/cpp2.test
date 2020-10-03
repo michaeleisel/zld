@@ -1,0 +1,11 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi installapi -x c++ -std=c++11 -arch x86_64 -install_name /System/Library/Frameworks/CPP2.framework/Versions/A/CPP2 -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %sysroot %inputs/System/Library/Frameworks/CPP2.framework -o %t/CPP2.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: %tapi installapi -demangle -x c++ -std=c++11 -arch x86_64 -install_name /System/Library/Frameworks/CPP2.framework/Versions/A/CPP2 -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %sysroot %inputs/System/Library/Frameworks/CPP2.framework -o %t/CPP2.tbd --verify-against=%inputs/System/Library/Frameworks/CPP2.framework/CPP2 --verify-mode=Pedantic --no-uuids 2>&1 | FileCheck --check-prefix=PEDANTIC -allow-empty %s
+; RUN: diff -a %t/CPP2.tbd %p/../Outputs/Frameworks/CPP2.framework/CPP2.tbd
+
+CHECK-NOT: error
+CHECK-NOT: warning
+
+PEDANTIC-NOT: error
+PEDANTIC-NOT: warning
+

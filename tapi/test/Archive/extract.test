@@ -1,0 +1,8 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi archive --extract i386 %p/../Inputs/Archive/libfat.tbd -o %t/libi386.tbd 
+; RUN: %tapi archive --extract x86_64 %p/../Inputs/Archive/libfat.tbd -o %t/libx86_64.tbd 
+; RUN: %tapi archive --extract x86_64h %p/../Inputs/Archive/libfat.tbd -o %t/libx86_64h.tbd 
+
+; RUN: diff -a %p/../Outputs/Archive/libi386.tbd %t/libi386.tbd
+; RUN: diff -a %p/../Outputs/Archive/libx86_64.tbd %t/libx86_64.tbd
+; RUN: diff -a %p/../Outputs/Archive/libx86_64h.tbd %t/libx86_64h.tbd

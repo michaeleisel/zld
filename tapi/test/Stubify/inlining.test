@@ -1,0 +1,6 @@
+; RUN: rm -rf %t && mkdir -p %t/sysroot
+; RUN: cp -R %inputs/ %t/sysroot/
+; RUN: not %tapi stubify --inline-private-frameworks -isysroot %t/sysroot  %t/sysroot/System/Library/Frameworks/Inlining.framework --filetype=tbd-v2 2>&1 | FileCheck %s
+
+; CHECK: error: inlining is not supported for output file type 'tbd-v2'
+; CHECK-NOT: warning

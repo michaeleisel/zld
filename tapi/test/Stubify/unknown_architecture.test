@@ -1,0 +1,5 @@
+; RUN: yaml2obj %p/../Inputs/unsupported_macho_header.yaml -o %t.dylib
+; RUN: not %tapi stubify %t.dylib 2>&1 | FileCheck %s
+
+; CHECK-NOT: warning
+; CHECK: error: cannot read file

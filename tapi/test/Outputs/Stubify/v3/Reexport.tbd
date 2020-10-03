@@ -1,0 +1,12 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        macosx
+flags:           [ not_app_extension_safe ]
+install-name:    '/System/Library/Frameworks/Reexport.framework/Versions/A/Reexport'
+exports:         
+  - archs:           [ x86_64 ]
+    symbols:         [ _foo ]
+    objc-classes:    [ Class1, Class2 ]
+    objc-eh-types:   [ Class1 ]
+    objc-ivars:      [ Class2._isValid ]
+...

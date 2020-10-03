@@ -1,0 +1,15 @@
+--- !tapi-tbd
+tbd-version:     4
+targets:         [ armv7s-ios, arm64-ios ]
+install-name:    '/usr/lib/libfat.dylib'
+reexported-libraries:
+  - targets:     [ arm64-ios ]
+    libraries:   [ '/usr/lib/internal/libfat.dylib' ]
+--- !tapi-tbd
+tbd-version:     4
+targets:         [ arm64-ios ]
+install-name:    '/usr/lib/internal/libfat.dylib'
+exports:
+  - targets:     [ arm64-ios ]
+    symbols:     [ _sym1 ]
+...

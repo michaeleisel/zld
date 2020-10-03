@@ -1,0 +1,8 @@
+; RUN: rm -rf %t && mkdir -p %t/AppleInternal
+; RUN: echo "/usr/lib/libfoo.1.dylib" > %t/AppleInternal/LinkerAutoZipperList.txt
+; RUN: %tapi installapi -arch x86_64 -dynamiclib -install_name /usr/lib/libfoo.1.dylib -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %t %inputs/dylib_dstroot -o %t/libfoo.tbd --verify-against=%inputs/dylib_dstroot/usr/lib/libfoo.1.dylib --verify-mode=Pedantic 2>&1 | FileCheck %s
+; RUN: cat %t/libfoo.tbd | FileCheck %s --check-prefix=TBD
+
+; CHECK: warning: Auto zippering was requested, output will be zippered
+; CHECK: warning: platform does not match: '[ macOS, macCatalyst ]' (provided) vs '[ macOS ]' (found)
+; TBD: platform:        zippered

@@ -1,0 +1,15 @@
+; RUN: rm -rf %t && mkdir -p %t/sysroot
+; RUN: cp -R %S/Inputs/ %t/sysroot/
+; RUN: %tapi stubify --inline-private-frameworks --delete-private-frameworks -isysroot %t/sysroot  %t/sysroot/ 2>&1 | FileCheck -allow-empty %s
+; RUN: test -d %t/sysroot/System/Library/Frameworks
+; RUN: test -f %t/sysroot/System/Library/CoreServices/SystemVersion.plist
+; RUN: not test -d %t/sysroot/System/Library/PrivateFrameworks
+; RUN: test -d %t/sysroot/usr/lib/swift
+; RUN: test -d %t/sysroot/usr/lib/swift/private
+; RUN: not test -d %t/sysroot/usr/lib/system
+; RUN: test -d %t/sysroot/System/iOSSupport/System/Library/Frameworks
+; RUN: not test -d %t/sysroot/System/iOSSupport/System/Library/PrivateFrameworks
+
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

@@ -1,0 +1,5 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi installapi -filelist %S/Inputs/FooDT.json -target x86_64-apple-macosx.10.15 -install_name /System/Library/Frameworks/FooDT.framework/FooDT -isysroot %sysroot %S/Inputs/FooDT.framework -F %S/Inputs/ -o %t/FooDT.tbd 2>&1 | FileCheck -allow-empty %s
+
+; CHECK-NOT: error:
+; CHECK-NOT: warning:

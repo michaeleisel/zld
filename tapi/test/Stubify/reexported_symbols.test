@@ -1,0 +1,9 @@
+; RUN: rm -rf %t && mkdir %t
+; RUN: %tapi stubify --filetype=tbd-v3 --no-uuids %inputs/System/Library/Frameworks/Reexport.framework/Versions/A/Reexport -o %t/Reexport_v3.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %p/../Outputs/Stubify/v3/Reexport.tbd %t/Reexport_v3.tbd
+
+; RUN: %tapi stubify --filetype=tbd-v4 --no-uuids %inputs/System/Library/Frameworks/Reexport.framework/Versions/A/Reexport -o %t/Reexport_v4.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %p/../Outputs/Stubify/v4/Reexport.tbd %t/Reexport_v4.tbd
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

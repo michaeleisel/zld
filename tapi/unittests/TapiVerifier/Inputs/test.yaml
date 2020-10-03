@@ -1,0 +1,8 @@
+---
+ignore-objc-class: 
+  - MyClass
+  - MyClass2
+bridge-objc-class: 
+  - base:            NSColor
+    to:              UIColor
+...

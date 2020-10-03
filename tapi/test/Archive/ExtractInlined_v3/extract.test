@@ -1,0 +1,9 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi archive --extract x86_64 %S/Inputs/libfat.tbd -o %t/libslim.tbd 2>&1 | FileCheck --allow-empty %s
+; RUN: diff %t/libslim.tbd %S/Outputs/libslim.tbd
+
+; RUN: %tapi archive --extract armv7s %S/Inputs/libfat2.tbd -o %t/libslim2.tbd 2>&1 | FileCheck --allow-empty %s
+; RUN: diff %t/libslim2.tbd %S/Outputs/libslim2.tbd
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

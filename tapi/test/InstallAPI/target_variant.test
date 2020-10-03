@@ -1,0 +1,5 @@
+; RUN: not %tapi installapi --target=x86_64-apple-macos10.15 --target-variant=arm64-apple-ios13.0-macabi 2>&1 | FileCheck --check-prefix=INVALID_ARCH %s
+INVALID_ARCH: error: no matching target found for target variant '--target-variant=arm64-apple-ios13.0-macabi'
+
+; RUN: not %tapi installapi --target=x86_64-apple-macos10.15 --target-variant=x86_64-apple-ios13.0-simulator 2>&1 | FileCheck --check-prefix=INVALID_ENV %s
+INVALID_ENV: error: environment 'simulator' is not supported: '--target-variant=x86_64-apple-ios13.0-simulator'

@@ -1,0 +1,22 @@
+; RUN: %tapi installapi -demangle -arch x86_64 -arch x86_64h -install_name /System/Library/Frameworks/AvailabilityTest.framework/Versions/A/AvailabilityTest -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -ObjC -isysroot %sysroot %inputs/System/Library/Frameworks/AvailabilityTest.framework --verify-against=%inputs/System/Library/Frameworks/AvailabilityTest.framework/AvailabilityTest --verify-mode=ErrorsOnly 2>&1 | FileCheck -allow-empty -check-prefix=ERRORSONLY %s
+; RUN: %tapi installapi -demangle -arch x86_64 -arch x86_64h -install_name /System/Library/Frameworks/AvailabilityTest.framework/Versions/A/AvailabilityTest -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -ObjC -isysroot %sysroot %inputs/System/Library/Frameworks/AvailabilityTest.framework --verify-against=%inputs/System/Library/Frameworks/AvailabilityTest.framework/AvailabilityTest --verify-mode=ErrorsAndWarnings 2>&1 |FileCheck -allow-empty -check-prefix=ERRORSANDWARNINGS %s
+; RUN: not %tapi installapi -demangle -arch x86_64 -arch x86_64h -install_name /System/Library/Frameworks/AvailabilityTest.framework/Versions/A/AvailabilityTest -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -ObjC -isysroot %sysroot %inputs/System/Library/Frameworks/AvailabilityTest.framework --verify-against=%inputs/System/Library/Frameworks/AvailabilityTest.framework/AvailabilityTest --verify-mode=Pedantic 2>&1 | FileCheck -allow-empty -check-prefix=PEDANTIC %s
+
+; ERRORSONLY-NOT: error
+; ERRORSONLY-NOT: warning
+
+; ERRORSANDWARNINGS-NOT: error
+; ERRORSANDWARNINGS:      warning: header marked symbol 'privateGlobalVariable' as unavailable
+; ERRORSANDWARNINGS-NEXT: warning: header marked symbol 'publicGlobalVariable' as unavailable
+; ERRORSANDWARNINGS-NEXT: warning: header marked symbol 'publicGlobalVariable3' as unavailable
+; ERRORSANDWARNINGS-NEXT: warning: header marked symbol '(ObjC Class) Foo' as unavailable
+; ERRORSANDWARNINGS-NOT:  error
+; ERRORSANDWARNINGS-NOT:  warning
+
+; PEDANTIC-NOT: warning
+; PEDANTIC:      error: header marked symbol 'privateGlobalVariable' as unavailable
+; PEDANTIC-NEXT: error: header marked symbol 'publicGlobalVariable' as unavailable
+; PEDANTIC-NEXT: error: header marked symbol 'publicGlobalVariable3' as unavailable
+; PEDANTIC-NEXT: error: header marked symbol '(ObjC Class) Foo' as unavailable
+; PEDANTIC-NOT:  error
+; PEDANTIC-NOT:  warning

@@ -1,0 +1,6 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi reexport -arch x86_64 -macosx_version_min 10.11 -isysroot %sysroot %inputs/System/Library/Frameworks/Reexport.framework/Headers/Header1.h %inputs/System/Library/Frameworks/Reexport.framework/Headers/Header2.h %inputs/System/Library/Frameworks/Reexport.framework/Headers/Header3.h -o %t/symbols.x86_64.reexport 2>&1 | FileCheck -allow-empty %s
+; RUN: ld -dylib -macosx_version_min 10.11 -arch x86_64 -reexported_symbols_list %t/symbols.x86_64.reexport -o %t/Reexport.x86_64 -L %inputs/System/Library/Frameworks/Reexport.framework/Versions/A/Frameworks -lSource
+; RUN: nm -gUj %t/Reexport.x86_64 > %t/Reexport.x86_64.symbols
+; RUN: diff -a %t/Reexport.x86_64.symbols %p/../Inputs/Reexport/reexport.x86_64.symbols
+; CHECK-NOT: error

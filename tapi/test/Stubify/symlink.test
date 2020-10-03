@@ -1,0 +1,6 @@
+; RUN: rm -rf %t && mkdir -p %t/sysroot
+; RUN: cp -R %inputs/symlinktest %t/sysroot
+; RUN: %tapi stubify %t/sysroot 2>&1 | FileCheck -allow-empty %s
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

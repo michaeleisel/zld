@@ -1,0 +1,12 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi archive --remove x86_64h %S/Inputs/libfat.tbd -o %t/libslim.tbd 2>&1 | FileCheck --allow-empty %s
+; RUN: diff %t/libslim.tbd %S/Outputs/libslim.tbd
+
+; RUN: %tapi archive --remove x86_64h %S/Inputs/libfat2.tbd -o %t/libslim2.tbd 2>&1 | FileCheck --allow-empty %s
+; RUN: diff %t/libslim2.tbd %S/Outputs/libslim.tbd
+
+; RUN: %tapi archive --remove x86_64 %S/Inputs/libfat3.tbd -o %t/libslim3.tbd 2>&1 | FileCheck --allow-empty %s
+; RUN: diff %t/libslim3.tbd %S/Outputs/libslim3.tbd
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

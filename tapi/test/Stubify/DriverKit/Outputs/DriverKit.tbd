@@ -1,0 +1,12 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+uuids:           [ 'x86_64: 1A1C6547-9375-3C75-983E-2D2252B048AB' ]
+platform:        driverkit
+flags:           [ not_app_extension_safe ]
+install-name:    DriverKit
+current-version: 0
+compatibility-version: 0
+exports:         
+  - archs:           [ x86_64 ]
+    symbols:         [ _load_driver ]
+...

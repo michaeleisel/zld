@@ -1,0 +1,6 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/IVarExtensionTest.framework/Versions/A/IVarExtensionTest -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -ObjC -isysroot %sysroot %inputs/System/Library/Frameworks/IVarExtensionTest.framework -o %t/IVarExtensionTest.tbd --verify-mode=Pedantic --verify-against=%inputs/System/Library/Frameworks/IVarExtensionTest.framework/Versions/A/IVarExtensionTest --no-uuids 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %p/../Outputs/Frameworks/IVarExtensionTest.framework/IVarExtensionTest.tbd %t/IVarExtensionTest.tbd
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

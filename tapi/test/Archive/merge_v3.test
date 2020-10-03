@@ -1,0 +1,8 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi archive --merge %p/../Inputs/Archive/v3/libi386.tbd %p/../Inputs/Archive/v3/libx86_64.tbd %p/../Inputs/Archive/v3/libx86_64h.tbd -o %t/libfat.tbd
+; RUN: diff -a %p/../Outputs/Archive/v3/libfat.tbd %t/libfat.tbd
+
+; RUN: %tapi archive --merge %p/../Inputs/Archive/v3/Swift.tbd %p/../Inputs/Archive/v3/ObjC.tbd -o %t/FullFramework.tbd
+; RUN: diff -a %p/../Outputs/Archive/v3/FullFramework.tbd %t/FullFramework.tbd
+; RUN: %tapi archive --merge --allow-arch-merges %p/../Inputs/Archive/v3/Swift.tbd %p/../Inputs/Archive/v3/ObjC.tbd -o %t/FullFramework.tbd
+; RUN: diff -a %p/../Outputs/Archive/v3/FullFramework.tbd %t/FullFramework.tbd

@@ -1,0 +1,8 @@
+--- !tapi-tbd-v3
+archs:           [ i386, x86_64, x86_64h ]
+platform:        macosx
+install-name:    /System/Library/Frameworks/Foo.framework/Foo
+exports:         
+  - archs:           [ i386, x86_64, x86_64h ]
+    objc-classes:    [ Bar, Foo ]
+...

@@ -1,0 +1,7 @@
+--- !tapi-tbd-v2
+archs:           [ i386 ]
+uuids:           [ 'i386: 348EA2CA-63D7-3263-822A-5F3F848D9D5D' ]
+platform:        macosx
+flags:           [ not_app_extension_safe ]
+install-name:    libuuid.dylib
+...

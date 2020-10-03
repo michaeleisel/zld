@@ -1,0 +1,6 @@
+; RUN: rm -rf %t && mkdir %t
+; RUN: cp -r %S/Inputs %t/
+; RUN: %tapi stubify %t 2>&1 | FileCheck --allow-empty %s
+
+; CHECK-NOT: error:
+; CHECK-NOT: warning:

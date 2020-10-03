@@ -1,0 +1,98 @@
+; RUN: not %tapi installapi -arch foo 2>&1 | FileCheck --check-prefix=INVALID_ARCH_NAME %s
+INVALID_ARCH_NAME: error: invalid arch name 'foo'
+
+; RUN: not %tapi installapi -Xarch_foo 2>&1 | FileCheck --check-prefix=INVALID_ARCH_NAME2 %s
+INVALID_ARCH_NAME2: error: invalid arch name '-Xarch_foo'
+
+; RUN: not %tapi installapi -Xarch_x86_64 2>&1 | FileCheck --check-prefix=MISSING_XARCH_OPTION %s
+MISSING_XARCH_OPTION: error: argument to '-Xarch_x86_64' is missing (expected 1 value)
+
+; RUN: not %tapi installapi -Xarch_x86_64 -x c++ 2>&1 | FileCheck --check-prefix=INVALID_XARCH_OPTION %s
+INVALID_XARCH_OPTION: error: invalid argument '-Xarch_x86_64' not allowed with '-x c++'
+
+; RUN: not %tapi installapi -x c++ 2>&1 | FileCheck --check-prefix=NO_TARGET %s
+NO_TARGET: error: no target specified: add --target=<triple>
+
+; RUN: not %tapi installapi -arch arm64 -target armv7-apple-ios12 2>&1 | FileCheck --check-prefix=CONFLICITNG_TARGET %s
+CONFLICITNG_TARGET: error: invalid argument '-arch arm64' not allowed with '--target=armv7-apple-ios12'
+
+; RUN: not %tapi installapi -arch x86_64 -target-variant x86_64-apple-ios13.0-macabi 2>&1 | FileCheck --check-prefix=CONFLICITNG_TARGET_VARIANT %s
+CONFLICITNG_TARGET_VARIANT: error: invalid argument '-arch x86_64' not allowed with '--target-variant=x86_64-apple-ios13.0-macabi'
+
+; RUN: not %tapi installapi -arch arm64 2>&1 | FileCheck --check-prefix=NO_INSTALL_NAME %s
+NO_INSTALL_NAME: error: no install name specified: add -install_name <path>
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -current_version 1.2.3.4.5.6 2>&1 | FileCheck --check-prefix=INVALID_CURRENT_VERSION %s
+INVALID_CURRENT_VERSION: error: invalid current version '1.2.3.4.5.6'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -current_version ... 2>&1 | FileCheck --check-prefix=INVALID_CURRENT_VERSION2 %s
+INVALID_CURRENT_VERSION2: error: invalid current version '...'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -current_version 1.2.3.4.5 2>&1 | FileCheck --check-prefix=TRUNCATE_CURRENT_VERSION %s
+TRUNCATE_CURRENT_VERSION: warning: truncating current version '1.2.3.4.5' to fit in 32-bit space used by old mach-o format
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -current_version 1.2.3 -compatibility_version 1.2.3.4.5 2>&1 | FileCheck --check-prefix=INVALID_COMPATIBILITY_VERSION %s
+INVALID_COMPATIBILITY_VERSION: error: invalid compatibility version '1.2.3.4.5'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -current_version 1.2.3 -compatibility_version .... 2>&1 | FileCheck --check-prefix=INVALID_COMPATIBILITY_VERSION2 %s
+INVALID_COMPATIBILITY_VERSION2: error: invalid compatibility version '....'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -mmacos-version-min=10.12 -mios-version-min=10.0 -mtvos-version-min=10.0 -mwatchos-version-min=3.0 -mbridgeos-version-min=2.0 2>&1 | FileCheck --check-prefix=DEPLOYMENT_TARGET_NOT_ALLOWED1 %s
+DEPLOYMENT_TARGET_NOT_ALLOWED1: error: invalid argument '-mmacos-version-min=10.12' not allowed with '-mios-version-min=10.0'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -mmacos-version-min=10.12 -mtvos-version-min=10.0 -mwatchos-version-min=3.0 -mbridgeos-version-min=2.0 2>&1 | FileCheck --check-prefix=DEPLOYMENT_TARGET_NOT_ALLOWED2 %s
+DEPLOYMENT_TARGET_NOT_ALLOWED2: error: invalid argument '-mmacos-version-min=10.12' not allowed with '-mtvos-version-min=10.0'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -mmacos-version-min=10.12 -mwatchos-version-min=3.0 -mbridgeos-version-min=2.0 2>&1 | FileCheck --check-prefix=DEPLOYMENT_TARGET_NOT_ALLOWED3 %s
+DEPLOYMENT_TARGET_NOT_ALLOWED3: error: invalid argument '-mmacos-version-min=10.12' not allowed with '-mwatchos-version-min=3.0'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -mmacos-version-min=10.12 -mbridgeos-version-min=2.0 2>&1 | FileCheck --check-prefix=DEPLOYMENT_TARGET_NOT_ALLOWED4 %s
+DEPLOYMENT_TARGET_NOT_ALLOWED4: error: invalid argument '-mmacos-version-min=10.12' not allowed with '-mbridgeos-version-min=2.0'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -mios-version-min=10.0 -mtvos-version-min=10.0 -mwatchos-version-min=3.0 -mbridgeos-version-min=2.0 2>&1 | FileCheck --check-prefix=DEPLOYMENT_TARGET_NOT_ALLOWED5 %s
+DEPLOYMENT_TARGET_NOT_ALLOWED5: error: invalid argument '-mios-version-min=10.0' not allowed with '-mtvos-version-min=10.0'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -mios-version-min=10.0 -mwatchos-version-min=3.0 -mbridgeos-version-min=2.0 2>&1 | FileCheck --check-prefix=DEPLOYMENT_TARGET_NOT_ALLOWED6 %s
+DEPLOYMENT_TARGET_NOT_ALLOWED6: error: invalid argument '-mios-version-min=10.0' not allowed with '-mwatchos-version-min=3.0'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -mios-version-min=10.0 -mbridgeos-version-min=2.0 2>&1 | FileCheck --check-prefix=DEPLOYMENT_TARGET_NOT_ALLOWED7 %s
+DEPLOYMENT_TARGET_NOT_ALLOWED7: error: invalid argument '-mios-version-min=10.0' not allowed with '-mbridgeos-version-min=2.0'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -mtvos-version-min=10.0 -mwatchos-version-min=3.0 -mbridgeos-version-min=2.0 2>&1 | FileCheck --check-prefix=DEPLOYMENT_TARGET_NOT_ALLOWED8 %s
+DEPLOYMENT_TARGET_NOT_ALLOWED8: error: invalid argument '-mtvos-version-min=10.0' not allowed with '-mwatchos-version-min=3.0'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -mtvos-version-min=10.0 -mbridgeos-version-min=2.0 2>&1 | FileCheck --check-prefix=DEPLOYMENT_TARGET_NOT_ALLOWED9 %s
+DEPLOYMENT_TARGET_NOT_ALLOWED9: error: invalid argument '-mtvos-version-min=10.0' not allowed with '-mbridgeos-version-min=2.0'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -mwatchos-version-min=3.0 -mbridgeos-version-min=2.0 2>&1 | FileCheck --check-prefix=DEPLOYMENT_TARGET_NOT_ALLOWED10 %s
+DEPLOYMENT_TARGET_NOT_ALLOWED10: error: invalid argument '-mwatchos-version-min=3.0' not allowed with '-mbridgeos-version-min=2.0'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo 2>&1 | FileCheck --check-prefix=NO_DEPLOYMENT_TARGET %s
+NO_DEPLOYMENT_TARGET: error: no deployment target specified
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -mmacos-version-min=10.12 -isysroot /no/such/path 2>&1 | FileCheck --check-prefix=INVALID_ISYSROOT %s
+INVALID_ISYSROOT: error: no such sysroot directory: '/no/such/path'
+
+; RUN: not %tapi installapi -arch arm64 -install_name Foo -mmacos-version-min=10.12 --verify-mode=Invalid 2>&1 | FileCheck --check-prefix=INVALID_VERIFY_MODE %s
+INVALID_VERIFY_MODE: error: invalid value 'Invalid' in '--verify-mode=Invalid'
+
+; RUN: not %tapi installapi -arch x86_64h -install_name Simple -current_version 3 -compatibility_version 2 -mmacos-version-min=10.12 -isysroot %sysroot %inputs/System/Library/Frameworks/Simple.framework -o %t.tbd --verify-against=%inputs/System/Library/Frameworks/Simple.framework/Simple 2>&1 | FileCheck -check-prefix=ARCHITECTURE %s
+ARCHITECTURE: error: architectures do not match: 'x86_64h' (provided) vs 'x86_64' (found)
+
+; RUN: not %tapi installapi -arch x86_64 -install_name Simple -current_version 3 -compatibility_version 2 -mmacos-version-min=10.12 -isysroot %sysroot %inputs/System/Library/Frameworks/Simple.framework -o %t.tbd --verify-against=%inputs/System/Library/Frameworks/Simple.framework/Simple 2>&1 | FileCheck -check-prefix=INSTALL_NAME %s
+INSTALL_NAME: error: install_name does not match: 'Simple' (provided) vs '/System/Library/Frameworks/Simple.framework/Versions/A/Simple' (found)
+
+; RUN: not %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/Simple.framework/Versions/A/Simple -current_version 3 -compatibility_version 2 -mmacos-version-min=10.12 -isysroot %sysroot %inputs/System/Library/Frameworks/Simple.framework -o %t.tbd --verify-against=%inputs/System/Library/Frameworks/Simple.framework/Simple 2>&1 | FileCheck -check-prefix=CURRENT_VERSION %s
+CURRENT_VERSION: error: current_version does not match: '3' (provided) vs '1.2.3' (found)
+
+; RUN: not %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/Simple.framework/Versions/A/Simple -current_version 1.2.3 -compatibility_version 2 -mmacos-version-min=10.12 -isysroot %sysroot %inputs/System/Library/Frameworks/Simple.framework -o %t.tbd --verify-against=%inputs/System/Library/Frameworks/Simple.framework/Simple 2>&1 | FileCheck -check-prefix=COMPATIBILITY_VERSION %s
+COMPATIBILITY_VERSION: error: compatibility_version does not match: '2' (provided) vs '1' (found)
+
+; RUN: not %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/Simple.framework/Versions/A/Simple -current_version 1.2.3 -compatibility_version 1 -fapplication-extension -mmacos-version-min=10.12 -isysroot %sysroot %inputs/System/Library/Frameworks/Simple.framework -o %t.tbd --verify-against=%inputs/System/Library/Frameworks/Simple.framework/Simple 2>&1 | FileCheck -check-prefix=APPEXTSAFE %s
+APPEXTSAFE: error: ApplicationExtensionSafe flag does not match: 'true' (provided) vs 'false' (found)
+
+; RUN: not %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/Simple.framework/Versions/A/Simple -current_version 1.2.3 -compatibility_version 1 -mmacos-version-min=10.12 -reexport_install_name Foo -reexport_install_name Bar -isysroot %sysroot %inputs/System/Library/Frameworks/Simple.framework -o %t.tbd --verify-against=%inputs/System/Library/Frameworks/Simple.framework/Simple 2>&1 | FileCheck -check-prefix=REEXPORT %s
+REEXPORT:      error: re-exported library missing from binary file: 'Bar [ x86_64 ]'
+
+; RUN: not %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/Simple.framework/Versions/A/Simple -current_version 1.2.3 -compatibility_version 1 -mmacos-version-min=10.12 -allowable_client Foo -allowable_client Bar -isysroot %sysroot %inputs/System/Library/Frameworks/Simple.framework -o %t.tbd --verify-against=%inputs/System/Library/Frameworks/Simple.framework/Simple 2>&1 | FileCheck -check-prefix=ALLOWABLE %s
+ALLOWABLE:      error: allowable client missing from binary file: 'Bar [ x86_64 ]'

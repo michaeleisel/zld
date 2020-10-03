@@ -1,0 +1,4 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi archive --remove arm64 %p/../Inputs/Archive/v3/libfat.tbd -o %t/lib2Arch.tbd 2>&1 | FileCheck %s
+
+; CHECK: warning: file doesn't have architecture 'arm64'

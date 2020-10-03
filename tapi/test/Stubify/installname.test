@@ -1,0 +1,16 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: cp -R %inputs/System/Library/Frameworks/InstallName.framework %t/
+; RUN: %tapi stubify %t/InstallName.framework 2>&1 | FileCheck -allow-empty %s
+; RUN: test -L %t/InstallName.framework/InstallName.tbd
+; RUN: test -f %t/InstallName.framework/Versions/A/InstallName.tbd
+
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: cp -R %inputs/System/Library/Frameworks/InstallName.framework %t/
+; RUN: %tapi stubify %t/InstallName.framework --delete-input-file 2>&1 | FileCheck -allow-empty %s
+; RUN: not test -e %t/InstallName.framework/InstallName
+; RUN: test -L %t/InstallName.framework/InstallName.tbd
+; RUN: not test -e %t/InstallName.framework/Versions/A/InstallName
+; RUN: test -f %t/InstallName.framework/Versions/A/InstallName.tbd
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

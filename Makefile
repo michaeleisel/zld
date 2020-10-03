@@ -8,7 +8,7 @@ test: fetch
 abseil-cpp-20200225:
 	curl -# -L https://github.com/abseil/abseil-cpp/archive/20200225.tar.gz | tar xz
 	mkdir $@/build
-	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -S $@ -B $@/build
+	cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.14 -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -S $@ -B $@/build
 	make -C $@/build -j
 	find $@/build/absl -name '*.a' | xargs libtool -static -o $@/build/libabsl.a
 

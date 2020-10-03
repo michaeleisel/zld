@@ -1,0 +1,5 @@
+--- !tapi-tbd
+tbd-version:     4
+targets:         [ x86_64h-macos ]
+install-name:    '/usr/lib/libfat.dylib'
+...

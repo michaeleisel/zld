@@ -1,0 +1,25 @@
+{
+  'version': 0,
+  'use-external-names': EXTERNAL_NAMES,
+  'roots': [
+    {
+      'name': 'OUT_DIR', 'type': 'directory',
+      'contents': [
+        {
+          'name': 'VFS.framework', 'type': 'directory',
+          'contents': [
+            {
+              'name': 'Headers', 'type': 'directory',
+              'contents': [
+                {
+                  'type': 'file', 'name': 'VFS.h',
+                  'external-contents': 'INPUT_DIR/VFS.framework/Headers/VFS.h'
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

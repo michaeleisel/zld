@@ -1,0 +1,10 @@
+--- !tapi-tbd
+tbd-version:     4
+targets:         [ x86_64-macos, x86_64-<6>, x86_64h-macos, x86_64h-<6> ]
+install-name:    '/usr/lib/libfoo.dylib'
+exports:
+  - targets:         [ x86_64-macos, x86_64h-macos ]
+    symbols:         [ _sym3 ]
+  - targets:         [ x86_64-<6>, x86_64h-<6> ]
+    symbols:         [ _sym4 ]
+...

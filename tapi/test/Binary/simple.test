@@ -1,0 +1,813 @@
+// RUN: %tapi-binary-reader -no-uuid -json %t.json %inputs/System/Library/Frameworks/Simple.framework/Simple 2>&1 | FileCheck %s
+// RUN: diff %t.json %S/Inputs/simple.json
+
+// CHECK:      Architecture: x86_64
+// CHECK-NEXT: globals:
+// CHECK-NEXT: - name: _OBJC_EHTYPE_$_Base
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_EHTYPE_$_SubClass
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_EHTYPE_$_SimpleInternalAPI
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_EHTYPE_$_SimpleInternalSPI
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_IVAR_$_Basic4.ivar1
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_IVAR_$_Basic4.ivar2
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_IVAR_$_Basic4_2.ivar2
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_IVAR_$_Basic4_2.ivar1
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_IVAR_$_Basic6.ivar1
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_SimpleInternalAPI
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_SimpleInternalSPI
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_Simple
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_SubClass
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_Base
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_Basic1
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_Basic2
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_Basic3
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_Basic4_2
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_Basic4
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_Basic5
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_Basic6
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_Basic8
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_Basic9
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_ExternalManagedObject
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_A
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_FooClass
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_SimpleInternalAPI
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_SimpleInternalSPI
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_Simple
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_SubClass
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_Base
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_Basic1
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_Basic2
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_Basic3
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_Basic4_2
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_Basic4
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_Basic5
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_Basic6
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_Basic8
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_Basic9
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_ExternalManagedObject
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_A
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_FooClass
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _weakPublicGlobalVariable
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: true
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _weakPrivateGlobalVariable
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: true
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _extraGlobalAPI1
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _extraGlobalAPI2
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _privateGlobalVariable
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _publicGlobalVariable
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: _OBJC_CLASS_$_NSManagedObject
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: external
+// CHECK-NEXT: - name: _OBJC_CLASS_$_NSObject
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: external
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_NSManagedObject
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: external
+// CHECK-NEXT: - name: _OBJC_METACLASS_$_NSObject
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: external
+// CHECK-NEXT: - name: __objc_empty_cache
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: external
+// CHECK-NEXT: - name: _objc_ehtype_vtable
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: external
+// CHECK-NEXT: - name: dyld_stub_binder
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   access: unknown
+// CHECK-NEXT:   isWeakDefined: false
+// CHECK-NEXT:   isThreadLocalValue: false
+// CHECK-NEXT:   kind: unknown
+// CHECK-NEXT:   linkage: external
+// CHECK-NEXT: objective-c protocols:
+// CHECK-NEXT: - name: BaseProtocol
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   - name: baseMethod
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   properties:
+// CHECK-NEXT: - name: FooProtocol
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   - name: protocolMethod
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   properties:
+// CHECK-NEXT: - name: BarProtocol
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   - name: barMethod
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   properties:
+// CHECK-NEXT: - name: PrivateProtocol
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   - name: privateProcotolMethod
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   properties:
+// CHECK-NEXT: objective-c interfaces:
+// CHECK-NEXT: - name: Simple
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: Base
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: SubClass
+// CHECK-NEXT:   superClassName: Base
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: SimpleInternalAPI
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: SimpleInternalSPI
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: Basic1
+// CHECK-NEXT:   superClassName:
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: Basic2
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: Basic3
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   - name: property1
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: setProperty1:
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: property2
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: isProperty3
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: setProperty3:
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   - name: property1
+// CHECK-NEXT:     attributes:
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     getter name: property1
+// CHECK-NEXT:     setter name: setProperty1:
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: property2
+// CHECK-NEXT:     attributes: readonly
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     getter name: property2
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: property3
+// CHECK-NEXT:     attributes:
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     getter name: isProperty3
+// CHECK-NEXT:     setter name: setProperty3:
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: dynamicProp
+// CHECK-NEXT:     attributes: dynamic
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     getter name: dynamicProp
+// CHECK-NEXT:     setter name: setDynamicProp:
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: Basic4
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: Basic4_1
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: Basic4_2
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: Basic5
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   - name: aClassMethod
+// CHECK-NEXT:     kind: class
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: anInstanceMethod
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: Basic6
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   - name: property2
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: setProperty2:
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: anInstanceMethodFromACategory
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: anInstanceMethodFromAnExtension
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: property1
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: setProperty1:
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   - name: property2
+// CHECK-NEXT:     attributes:
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     getter name: property2
+// CHECK-NEXT:     setter name: setProperty2:
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: property1
+// CHECK-NEXT:     attributes:
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     getter name: property1
+// CHECK-NEXT:     setter name: setProperty1:
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: Basic7
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   - name: anInstanceMethodFromAnHiddenExtension
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: ExternalManagedObject
+// CHECK-NEXT:   superClassName: NSManagedObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   - name: foo
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: HiddenClass
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: Basic8
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   - name: useSameName
+// CHECK-NEXT:     kind: class
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: useSameName
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: A
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   - name: aMethod
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: Basic9
+// CHECK-NEXT:   superClassName: NSObject
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   - name: aProperty
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   - name: aProperty
+// CHECK-NEXT:     attributes:
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     getter name: aProperty
+// CHECK-NEXT:     setter name: setAProperty:
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: aProperty
+// CHECK-NEXT:     attributes: readonly
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     getter name: aProperty
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: - name: FooClass
+// CHECK-NEXT:   superClassName:
+// CHECK-NEXT:   hasExceptionAttribute: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   categories:
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   - name: privateProcotolMethod
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: baseMethod
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: protocolMethod
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   - name: barMethod
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:
+// CHECK-NEXT:   linkage: exported
+// CHECK-NEXT: objective-c categories:
+// CHECK-NEXT: - name: Simple
+// CHECK-NEXT:   interfaceName: NSManagedObject
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   protocols:
+// CHECK-NEXT:   methods:
+// CHECK-NEXT:   - name: supportsSimple
+// CHECK-NEXT:     kind: instance
+// CHECK-NEXT:     isOptional: false
+// CHECK-NEXT:     isDynamic: false
+// CHECK-NEXT:   availability: i:0 o:0 u:0
+// CHECK-NEXT:   properties:
+// CHECK-NEXT:   instance variables:

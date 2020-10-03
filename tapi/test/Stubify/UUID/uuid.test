@@ -1,0 +1,7 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: yaml2obj %S/Inputs/uuid.yaml -o=%t/uuid
+; RUN: %tapi stubify --filetype=tbd-v4 %t/uuid -o %t/uuid.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/uuid.tbd %S/Outputs/uuid.tbd
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

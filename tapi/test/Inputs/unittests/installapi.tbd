@@ -1,0 +1,9 @@
+--- !tapi-tbd-v2
+archs:           [ i386, x86_64, x86_64h ]
+platform:        macosx
+flags:           [ installapi ]
+install-name:    installapi.dylib
+exports:
+  - archs:           [ i386, x86_64, x86_64h ]
+    symbols:         [ _foo ]
+...

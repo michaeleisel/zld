@@ -1,0 +1,9 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi archive --merge %S/Inputs/input_v3.tbd %S/Inputs/input_v4.tbd -o %t/merge.tbd 2>&1 | FileCheck --allow-empty %s
+; RUN: diff %t/merge.tbd %S/Outputs/merge.tbd
+
+; RUN: %tapi archive --merge %S/Inputs/zippered_v3.tbd %S/Inputs/zippered_v4.tbd -o %t/merge2.tbd 2>&1 | FileCheck --allow-empty %s
+; RUN: diff %t/merge2.tbd %S/Outputs/merge2.tbd
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

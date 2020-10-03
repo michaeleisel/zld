@@ -1,0 +1,4 @@
+; RUN: %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/TapiDefine.framework/Versions/A/TapiDefine -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -ObjC -isysroot %sysroot %inputs/System/Library/Frameworks/TapiDefine.framework 2>&1 | FileCheck -allow-empty %s
+
+; CHECK-NOT: warning
+; CHECK-NOT: error

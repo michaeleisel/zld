@@ -1,0 +1,13 @@
+// RUN: %tapi-binary-reader %inputs/ArchDiff/System/Library/Frameworks/ArchDiff.framework/ArchDiff 2>&1 | FileCheck %s --check-prefix=X86 --check-prefix=I386
+// RUN: %tapi-binary-reader -arch x86_64h %inputs/ArchDiff/System/Library/Frameworks/ArchDiff.framework/ArchDiff 2>&1 | FileCheck %s --check-prefix=X86H --check-prefix=NO-X86
+// RUN: %tapi-binary-reader -arch x86_64 %inputs/ArchDiff/System/Library/Frameworks/ArchDiff.framework/ArchDiff 2>&1 | FileCheck %s --check-prefix=NO-X86H --check-prefix=X86
+// RUN: not %tapi-binary-reader -arch arm64 %inputs/ArchDiff/System/Library/Frameworks/ArchDiff.framework/ArchDiff
+
+// X86:      Architecture: x86_64
+// X86-NEXT: globals
+// X86-NEXT: - name: _general_func
+// NO-X86-NOT: - name: _x86_64h_func
+// X86H:      Architecture: x86_64h
+// X86H-NEXT: globals:
+// X86H-NEXT:  - name: _x86_64h_func
+// NO-X86H-NOT: - name: _general_func

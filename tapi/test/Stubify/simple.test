@@ -1,0 +1,10 @@
+; RUN: rm -rf %t && mkdir %t 
+; RUN: %tapi stubify --no-uuids --filetype=tbd-v2  %inputs/System/Library/Frameworks/Simple.framework/Versions/A/Simple -o %t/Simple.tbd_v2 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %p/../Outputs/Stubify/v2/Simple.tbd %t/Simple.tbd_v2
+; RUN: %tapi stubify --no-uuids --filetype=tbd-v3 %inputs/System/Library/Frameworks/Simple.framework/Versions/A/Simple -o %t/Simple.tbd_v3 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %p/../Outputs/Stubify/v3/Simple.tbd %t/Simple.tbd_v3
+; RUN: %tapi stubify --no-uuids --filetype=tbd-v4 %inputs/System/Library/Frameworks/Simple.framework/Versions/A/Simple -o %t/Simple.tbd_v4 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %p/../Outputs/Stubify/v4/Simple.tbd %t/Simple.tbd_v4
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

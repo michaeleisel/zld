@@ -1,0 +1,10 @@
+; RUN: rm -rf %t && mkdir -p %t/sysroot
+; RUN: cp -R %S/Inputs/ %t/sysroot/
+; RUN: %tapi stubify --inline-private-frameworks -isysroot %t/sysroot  %t/sysroot/ 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/sysroot/System/iOSSupport/System/Library/Frameworks/Public.framework/Versions/A/Public.tbd %S/Outputs/Public.tbd
+
+; RUN: %tapi stubify --inline-private-frameworks --delete-private-frameworks -isysroot %t/sysroot  %t/sysroot/ 2>&1 | FileCheck -allow-empty %s
+; RUN: not test -d %t/sysroot/System/iOSSupport/System/Library/PrivateFrameworks
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

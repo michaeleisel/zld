@@ -1,0 +1,13 @@
+--- !tapi-tbd-v2
+archs:           [ x86_64 ]
+platform:        macosx
+install-name:    /usr/lib/FullFramework.dylib
+objc-constraint: retain_release
+exports:         
+  - archs:           [ x86_64 ]
+    symbols:         [ _sym2 ]
+    objc-classes:    [ _B ]
+    objc-ivars:      [ _B._ivar1 ]
+    weak-def-symbols: [ _weak2 ]
+    thread-local-symbols: [ _tlv2 ]
+...

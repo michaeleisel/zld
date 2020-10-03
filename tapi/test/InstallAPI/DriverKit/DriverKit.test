@@ -1,0 +1,8 @@
+; RUN: rm -rf %t && mkdir -p %t/DriverKit.framework/Headers/ && mkdir -p %t/SDKs/DriverKit19.0.sdk
+; RUN: cp %S/Inputs/DriverKit.h %t/DriverKit.framework/Headers/
+; RUN: yaml2obj %S/Inputs/DriverKit.yaml -o=%t/DriverKit.framework/DriverKit
+; RUN: %tapi installapi --no-uuids --target=x86_64-apple-driverkit19.0 -install_name /System/Library/Frameworks/DriverKit.framework/Versions/A/DriverKit -current_version 1 -compatibility_version 1 -isysroot %t/SDKs/DriverKit19.0.sdk %t/DriverKit.framework --verify-against=%t/DriverKit.framework/DriverKit --verify-mode=Pedantic -o %t/DriverKit.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/DriverKit.tbd %S/Outputs/DriverKit.tbd
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

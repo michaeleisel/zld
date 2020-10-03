@@ -1,0 +1,4 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/Mod2.framework/Versions/A/Mod2 -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %sysroot %inputs/System/Library/Frameworks/Mod2.framework -o %t/Mod2.tbd --verify-against=%inputs/System/Library/Frameworks/Mod2.framework/Versions/A/Mod2 --verify-mode=Pedantic -fmodules -fmodules-verify-system-headers -fmodules-cache-path=%t/module_test 2>&1 | FileCheck -allow-empty %s
+
+; CHECK-NOT: error

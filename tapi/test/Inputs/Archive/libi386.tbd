@@ -1,0 +1,13 @@
+--- !tapi-tbd-v2
+archs:           [ i386 ]
+platform:        macosx
+install-name:    /usr/lib/libfat.dylib
+exports:         
+  - archs:           [ i386 ]
+    allowable-clients: [ ClientAll ]
+    re-exports:      [ /usr/lib/liball.dylib ]
+    symbols:         [ _sym1 ]
+    objc-classes:    [ _A ]
+    weak-def-symbols: [ _weak1 ]
+    thread-local-symbols: [ _tlv1 ]
+...

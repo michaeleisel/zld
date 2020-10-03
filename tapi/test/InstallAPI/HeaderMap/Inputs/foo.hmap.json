@@ -1,0 +1,9 @@
+{
+  "mappings" :
+    {
+     "Foo.h" : "Foo/Foo.h",
+     "Foo_Private.h" : "Foo/Foo_Private.h",
+     "FooA.h" : "SRC_DIR/a/FooA.h",
+     "FooB.h" : "SRC_DIR/b/FooB.h"
+    }
+}

@@ -1,0 +1,130 @@
+// RUN: %tapi-binary-reader --no-print -json - %S/Inputs/swift.dylib 2>&1 | FileCheck %s
+
+// test swift generics and potentially defined selectors
+
+CHECK:      {
+CHECK-NEXT:   "api_json_version": 1,
+CHECK-NEXT:   "binaryInfo": {
+CHECK-NEXT:     "compatibilityVersion": "1",
+CHECK-NEXT:     "currentVersion": "1",
+CHECK-NEXT:     "installName": "@rpath/SwiftGenerics.framework/Versions/A/SwiftGenerics",
+CHECK-NEXT:     "swiftABI": 7,
+CHECK-NEXT:     "twoLevelNamespace": true,
+CHECK-NEXT:     "type": "dylib",
+CHECK-NEXT:     "uuid": "1A28F36A-4C06-3B4A-AC9B-263F1EC0648B"
+CHECK-NEXT:   },
+CHECK-NEXT:   "globals": [
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "exported",
+CHECK-NEXT:       "name": "_$s13SwiftGenerics7myClassCACyxGycfC"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "exported",
+CHECK-NEXT:       "name": "_$s13SwiftGenerics7myClassCACyxGycfc"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "exported",
+CHECK-NEXT:       "name": "_$s13SwiftGenerics7myClassCMa"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "exported",
+CHECK-NEXT:       "name": "_$s13SwiftGenerics7myClassCMn"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "exported",
+CHECK-NEXT:       "name": "_$s13SwiftGenerics7myClassCfD"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "exported",
+CHECK-NEXT:       "name": "_SwiftGenericsVersionString"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "exported",
+CHECK-NEXT:       "name": "_SwiftGenericsVersionNumber"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "_OBJC_METACLASS_$_NSObject"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "__objc_empty_cache"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "__swift_FORCE_LOAD_$_swiftCoreFoundation",
+CHECK-NEXT:       "weakReferenced": true
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "__swift_FORCE_LOAD_$_swiftCoreGraphics",
+CHECK-NEXT:       "weakReferenced": true
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "__swift_FORCE_LOAD_$_swiftDarwin",
+CHECK-NEXT:       "weakReferenced": true
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "__swift_FORCE_LOAD_$_swiftDispatch",
+CHECK-NEXT:       "weakReferenced": true
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "__swift_FORCE_LOAD_$_swiftFoundation",
+CHECK-NEXT:       "weakReferenced": true
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "__swift_FORCE_LOAD_$_swiftIOKit",
+CHECK-NEXT:       "weakReferenced": true
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "__swift_FORCE_LOAD_$_swiftObjectiveC",
+CHECK-NEXT:       "weakReferenced": true
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "__swift_FORCE_LOAD_$_swiftXPC",
+CHECK-NEXT:       "weakReferenced": true
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "_objc_allocWithZone"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "_objc_msgSend"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "_objc_msgSendSuper2"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "_swift_allocateGenericClassMetadata"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "_swift_getGenericMetadata"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "_swift_initClassMetadata2"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "_swift_isaMask"
+CHECK-NEXT:     },
+CHECK-NEXT:     {
+CHECK-NEXT:       "linkage": "external",
+CHECK-NEXT:       "name": "dyld_stub_binder"
+CHECK-NEXT:     }
+CHECK-NEXT:   ],
+CHECK-NEXT:   "potentiallyDefinedSelectors": [
+CHECK-NEXT:     "init"
+CHECK-NEXT:   ],
+CHECK-NEXT:   "target": "x86_64-apple-macos10.15"
+CHECK-NEXT: }

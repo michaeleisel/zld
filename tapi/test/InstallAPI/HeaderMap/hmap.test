@@ -1,0 +1,18 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: sed -e "s:SRC_DIR:%S/Inputs/src:g" %S/Inputs/foo.hmap.json > %t/foo.hmap.json
+; RUN: sed -e "s:SRC_DIR:%S/Inputs/src:g" %S/Inputs/bar.hmap.json > %t/bar.hmap.json
+; RUN: sed -e "s:SRC_DIR:%S/Inputs/src:g" %S/Inputs/filelist.json > %t/filelist.json
+; RUN: %hmaptool write %t/foo.hmap.json %t/foo.hmap
+; RUN: %hmaptool write %t/bar.hmap.json %t/bar.hmap
+
+; Test that the invocation fails with a missing header map.
+; RUN: not %tapi installapi --filelist=%t/filelist.json -target x86_64-apple-macosx.10.15 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot %S/Inputs/Foo.framework -o %t/Foo.tbd 2>&1 | FileCheck --check-prefix=NOHMAP %s
+; Test that the invocation succeeds with the header map.
+; RUN: %tapi installapi --filelist=%t/filelist.json -I %t/foo.hmap -target x86_64-apple-macosx.10.15 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot %S/Inputs/Foo.framework -o %t/Foo.tbd 2>&1 | FileCheck --allow-empty --check-prefix=HMAP %s
+; Test that the header map is not used for public header files.
+; RUN: not %tapi installapi -I %t/bar.hmap -target x86_64-apple-macosx.10.15 -install_name /System/Library/Frameworks/Bar.framework/Bar -isysroot %sysroot %S/Inputs/Bar.framework -o %t/Bar.tbd 2>&1 | FileCheck --check-prefix=HMAP2 %s
+
+; NOHMAP: {{.*}}Inputs/src/a/FooA.h:3:9: fatal error: 'FooB.h' file not found
+; HMAP-NOT: error:
+; HMAP-NOT: warning:
+; HMAP2: {{.*}}Inputs/Bar.framework/Headers/Bar.h:1:9: fatal error: 'BarProject.h' file not found

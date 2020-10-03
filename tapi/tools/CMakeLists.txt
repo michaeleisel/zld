@@ -1,0 +1,7 @@
+add_subdirectory(libtapi)
+add_subdirectory(tapi)
+add_subdirectory(tapi-api-verifier)
+add_subdirectory(tapi-binary-reader)
+add_subdirectory(tapi-frontend)
+add_subdirectory(tapi-import)
+add_subdirectory(tapi-run)

@@ -1,0 +1,9 @@
+--- !tapi-tbd
+tbd-version:     4
+targets:         [ x86_64-macos, x86_64-<6> ]
+flags:           [ not_app_extension_safe, installapi ]
+install-name:    '/System/Library/Frameworks/MacCatalyst.framework/MacCatalyst'
+exports:         
+  - targets:         [ x86_64-macos, x86_64-<6> ]
+    symbols:         [ _foo ]
+...

@@ -1,0 +1,6 @@
+; RUN: rm -rf %t && mkdir -p %t 
+; RUN: %tapi installapi --filetype=tbd-v4 --no-uuids --target=x86_64-apple-macos10.15 --target-variant=x86_64-apple-ios13.0-macabi -install_name /System/Library/Frameworks/MacCatalyst.framework/MacCatalyst -current_version 1 -compatibility_version 1 %S/Inputs/MacCatalyst.framework -o %t/MacCatalyst.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff -a %t/MacCatalyst.tbd %S/Outputs/MacCatalyst.tbd
+
+; CHECK-NOT: error
+; CHECK-NOT: warning

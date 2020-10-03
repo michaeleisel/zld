@@ -1,0 +1,10 @@
+; RUN: not %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/SpecialLinkerSymbols.framework/Versions/A/SpecialLinkerSymbols -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %sysroot %inputs/System/Library/Frameworks/SpecialLinkerSymbols.framework -o %t.tbd --verify-mode=ErrorsOnly --verify-against=%inputs/System/Library/Frameworks/SpecialLinkerSymbols.framework/SpecialLinkerSymbols 2>&1 | FileCheck %s
+
+CHECK:      error: headers don't have symbol '$ld$add$os10.4$_symbol2'
+CHECK-NEXT: error: headers don't have symbol '$ld$add$os10.5$_symbol2'
+CHECK-NEXT: error: headers don't have symbol '$ld$hide$os10.6$_symbol1'
+CHECK-NEXT: error: headers don't have symbol '$ld$hide$os10.7$_symbol1'
+CHECK-NEXT: error: headers don't have symbol '$ld$install_name$os10.4$/System/Library/Frameworks/A.framework/Versions/A/A'
+CHECK-NEXT: error: headers don't have symbol '$ld$install_name$os10.5$/System/Library/Frameworks/B.framework/Versions/A/B'
+CHECK-NEXT: error: headers don't have symbol '$ld$weak$os10.4$_symbol3'
+CHECK-NEXT: error: headers don't have symbol '$ld$weak$os10.5$_symbol3'

@@ -1,0 +1,9 @@
+; RUN: rm -rf %t && mkdir -p %t
+; RUN: not %tapi installapi -dynamiclib -arch x86_64 -install_name /System/Library/Frameworks/Simple.framework/Versions/A/Simple -current_version 1.2.3 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %sysroot %inputs/System/Library/Frameworks/Simple.framework -o %t/Simple.tbd 2>&1 | FileCheck %s
+
+; RUN: not %tapi installapi -arch x86_64 -dynamiclib -install_name /usr/lib/libfoo.1.dylib -current_version 1 -compatibility_version 1 -ios_version_min 12.0 -isysroot %sysroot %inputs/dylib_dstroot -o %t/libfoo.tbd --verify-against=%inputs/dylib_dstroot/usr/lib/libfoo.1.dylib --verify-mode=Pedantic 2>&1 | FileCheck %s --check-prefix=PLATFORM_MISMATCH
+
+; CHECK: error: cannot find any public (usr/include) or private (usr/local/include) header directory
+; CHECK-NOT: warning
+
+; PLATFORM_MISMATCH: error: platform does not match: '[ iOS ]' (provided) vs '[ macOS ]' (found)

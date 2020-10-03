@@ -1,0 +1,6 @@
+; RUN: rm -rf %t && mkdir -p %t/.BuildData
+; RUN: TAPI_SNAPSHOT_CREATE=1 TAPI_USE_CC_LOG_PATH=1 CC_LOG_DIAGNOSTICS_FILE=%t/.BuildData/.CC_LOG_DIAGNOSTICS %tapi installapi -target x86_64-apple-macosx.10.15 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot %S/Inputs/Foo.framework -o %t/Foo.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: test -d %t/.BuildData/.TAPI_SNAPSHOT
+
+; CHECK-NOT: error:
+; CHECK-NOT: warning:

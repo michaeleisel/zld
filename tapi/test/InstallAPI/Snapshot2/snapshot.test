@@ -1,0 +1,17 @@
+; RUN: rm -rf %t && mkdir -p %t/dstroot && mkdir -p %t/BuiltProducts && mkdir -p %t/JumpDir
+; RUN: cp -r %S/Inputs/Foo.framework %t/dstroot/
+; RUN: ln -s %t/dstroot/Foo.framework %t/BuiltProducts/Foo.framework
+; RUN: ln -s %t/BuiltProducts/Foo.framework %t/JumpDir/Foo.framework
+; RUN: ln -s . %t/dstroot/Foo.framework/Headers/ruby
+; RUN: %tapi installapi -target x86_64-apple-macosx.10.15 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot %t/dstroot/Foo.framework -F%t/BuiltProducts/ -o %t/Foo1.tbd --snapshot --snapshot-dir=%t/snapshot-dir 2>&1 | FileCheck -allow-empty %s
+; RUN: mv %t/snapshot-dir/Foo-* %t/snapshot-dir/Foo
+; RUN: %tapi installapi --load-snapshot=%t/snapshot-dir/Foo --snapshot-dir=%t/snapshot-output -o %t/Foo2.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff %t/Foo1.tbd %t/Foo2.tbd
+
+; RUN: %tapi installapi -target x86_64-apple-macosx.10.15 -install_name /System/Library/Frameworks/Foo.framework/Foo -isysroot %sysroot %t/dstroot/Foo.framework -F%t/JumpDir/ -o %t/Foo3.tbd --snapshot --snapshot-dir=%t/snapshot-dir2 2>&1 | FileCheck -allow-empty %s
+; RUN: mv %t/snapshot-dir2/Foo-* %t/snapshot-dir2/Foo
+; RUN: %tapi installapi --load-snapshot=%t/snapshot-dir2/Foo --snapshot-dir=%t/snapshot-output2 -o %t/Foo4.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: diff %t/Foo3.tbd %t/Foo4.tbd
+
+; CHECK-NOT: error:
+; CHECK-NOT: warning:

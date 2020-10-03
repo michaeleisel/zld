@@ -1,0 +1,8 @@
+; RUN: %tapi installapi -umbrella test -arch x86_64 -install_name /System/Library/Frameworks/SubFramework.framework/Versions/A/SubFramework -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -ObjC -isysroot %sysroot %inputs/System/Library/Frameworks/SubFramework.framework --verify-against=%inputs/System/Library/Frameworks/SubFramework.framework/Versions/A/SubFramework --verify-mode=Pedantic -o %t.tbd 2>&1 | FileCheck -allow-empty %s
+; RUN: %tapi installapi -umbrella foo -arch x86_64 -install_name /System/Library/Frameworks/SubFramework.framework/Versions/A/SubFramework -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -ObjC -isysroot %sysroot %inputs/System/Library/Frameworks/SubFramework.framework --verify-against=%inputs/System/Library/Frameworks/SubFramework.framework/Versions/A/SubFramework --verify-mode=Pedantic -o %t.tbd 2>&1 | FileCheck --check-prefix=WARNING -allow-empty %s
+; RUN: %tapi installapi -arch x86_64 -install_name /System/Library/Frameworks/SubFramework.framework/Versions/A/SubFramework -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -ObjC -isysroot %sysroot %inputs/System/Library/Frameworks/SubFramework.framework --verify-against=%inputs/System/Library/Frameworks/SubFramework.framework/Versions/A/SubFramework --verify-mode=Pedantic -o %t.tbd 2>&1 | FileCheck --check-prefix=WARNING -allow-empty %s
+
+; CHECK-NOT: error
+; CHECK-NOT: warning
+; WARNING-NOT: error
+; WARNING: warning

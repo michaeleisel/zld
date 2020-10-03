@@ -1,0 +1,90 @@
+{
+  "api_json_version": 1,
+  "binaryInfo": {
+    "compatibilityVersion": "1",
+    "currentVersion": "1",
+    "installName": "/System/Library/Frameworks/Zippered.framework/Versions/A/Zippered",
+    "twoLevelNamespace": true,
+    "type": "dylib"
+  },
+  "globals": [
+    {
+      "linkage": "exported",
+      "name": "_invalidAPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_iOSAPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_image"
+    },
+    {
+      "linkage": "exported",
+      "name": "_macOSAPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_commonAPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_obsoletedMacOSAPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_a"
+    },
+    {
+      "linkage": "external",
+      "name": "dyld_stub_binder"
+    }
+  ],
+  "target": "x86_64-apple-ios13-macabi"
+}
+{
+  "api_json_version": 1,
+  "binaryInfo": {
+    "compatibilityVersion": "1",
+    "currentVersion": "1",
+    "installName": "/System/Library/Frameworks/Zippered.framework/Versions/A/Zippered",
+    "twoLevelNamespace": true,
+    "type": "dylib"
+  },
+  "globals": [
+    {
+      "linkage": "exported",
+      "name": "_invalidAPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_iOSAPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_image"
+    },
+    {
+      "linkage": "exported",
+      "name": "_macOSAPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_commonAPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_obsoletedMacOSAPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_a"
+    },
+    {
+      "linkage": "external",
+      "name": "dyld_stub_binder"
+    }
+  ],
+  "target": "x86_64-apple-macos10.15"
+}

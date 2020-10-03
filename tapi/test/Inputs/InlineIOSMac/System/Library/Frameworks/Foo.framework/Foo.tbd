@@ -1,0 +1,8 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        iosmac
+install-name:    /System/Library/Frameworks/Foo.framework/Foo
+exports:
+  - archs:       [ x86_64 ]
+    re-exports:  [ /System/Library/PrivateFrameworks/Bar.framework/Bar ]
+...

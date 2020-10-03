@@ -1,0 +1,21 @@
+--- !mach-o
+FileHeader:      
+  magic:           0xFEEDFACF
+  cputype:         0x0000000C
+  cpusubtype:      0x00000001
+  filetype:        0x00000006
+  ncmds:           1
+  sizeofcmds:      48
+  flags:           0x00100085
+  reserved:        0x00000000
+LoadCommands:    
+  - cmd:             LC_ID_DYLIB
+    cmdsize:         48
+    dylib:           
+      name:            24
+      timestamp:       1
+      current_version: 65536
+      compatibility_version: 65536
+    PayloadString:   /usr/lib/libfoo.dylib
+    ZeroPadBytes:    3
+...

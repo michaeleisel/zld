@@ -1,0 +1,530 @@
+{
+  "api_json_version": 1,
+  "binaryInfo": {
+    "compatibilityVersion": "1",
+    "currentVersion": "1.2.3",
+    "installName": "/System/Library/Frameworks/Simple.framework/Versions/A/Simple",
+    "twoLevelNamespace": true,
+    "type": "dylib"
+  },
+  "categories": [
+    {
+      "instanceMethods": [
+        {
+          "name": "supportsSimple"
+        }
+      ],
+      "interface": "NSManagedObject",
+      "name": "Simple"
+    }
+  ],
+  "globals": [
+    {
+      "linkage": "exported",
+      "name": "_OBJC_EHTYPE_$_Base"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_EHTYPE_$_SubClass"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_EHTYPE_$_SimpleInternalAPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_EHTYPE_$_SimpleInternalSPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_IVAR_$_Basic4.ivar1"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_IVAR_$_Basic4.ivar2"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_IVAR_$_Basic4_2.ivar2"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_IVAR_$_Basic4_2.ivar1"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_IVAR_$_Basic6.ivar1"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_SimpleInternalAPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_SimpleInternalSPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_Simple"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_SubClass"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_Base"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_Basic1"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_Basic2"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_Basic3"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_Basic4_2"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_Basic4"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_Basic5"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_Basic6"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_Basic8"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_Basic9"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_ExternalManagedObject"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_A"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_METACLASS_$_FooClass"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_SimpleInternalAPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_SimpleInternalSPI"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_Simple"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_SubClass"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_Base"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_Basic1"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_Basic2"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_Basic3"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_Basic4_2"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_Basic4"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_Basic5"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_Basic6"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_Basic8"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_Basic9"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_ExternalManagedObject"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_A"
+    },
+    {
+      "linkage": "exported",
+      "name": "_OBJC_CLASS_$_FooClass"
+    },
+    {
+      "linkage": "exported",
+      "name": "_weakPublicGlobalVariable",
+      "weakDefined": true
+    },
+    {
+      "linkage": "exported",
+      "name": "_weakPrivateGlobalVariable",
+      "weakDefined": true
+    },
+    {
+      "linkage": "exported",
+      "name": "_extraGlobalAPI1"
+    },
+    {
+      "linkage": "exported",
+      "name": "_extraGlobalAPI2"
+    },
+    {
+      "linkage": "exported",
+      "name": "_privateGlobalVariable"
+    },
+    {
+      "linkage": "exported",
+      "name": "_publicGlobalVariable"
+    },
+    {
+      "linkage": "external",
+      "name": "_OBJC_CLASS_$_NSManagedObject"
+    },
+    {
+      "linkage": "external",
+      "name": "_OBJC_CLASS_$_NSObject"
+    },
+    {
+      "linkage": "external",
+      "name": "_OBJC_METACLASS_$_NSManagedObject"
+    },
+    {
+      "linkage": "external",
+      "name": "_OBJC_METACLASS_$_NSObject"
+    },
+    {
+      "linkage": "external",
+      "name": "__objc_empty_cache"
+    },
+    {
+      "linkage": "external",
+      "name": "_objc_ehtype_vtable"
+    },
+    {
+      "linkage": "external",
+      "name": "dyld_stub_binder"
+    }
+  ],
+  "interfaces": [
+    {
+      "linkage": "exported",
+      "name": "Simple",
+      "super": "NSObject"
+    },
+    {
+      "linkage": "exported",
+      "name": "Base",
+      "super": "NSObject"
+    },
+    {
+      "linkage": "exported",
+      "name": "SubClass",
+      "super": "Base"
+    },
+    {
+      "linkage": "exported",
+      "name": "SimpleInternalAPI",
+      "super": "NSObject"
+    },
+    {
+      "linkage": "exported",
+      "name": "SimpleInternalSPI",
+      "super": "NSObject"
+    },
+    {
+      "linkage": "exported",
+      "name": "Basic1",
+      "super": ""
+    },
+    {
+      "linkage": "exported",
+      "name": "Basic2",
+      "super": "NSObject"
+    },
+    {
+      "instanceMethods": [
+        {
+          "name": "property1"
+        },
+        {
+          "name": "setProperty1:"
+        },
+        {
+          "name": "property2"
+        },
+        {
+          "name": "isProperty3"
+        },
+        {
+          "name": "setProperty3:"
+        }
+      ],
+      "linkage": "exported",
+      "name": "Basic3",
+      "properties": [
+        {
+          "getter": "property1",
+          "name": "property1",
+          "setter": "setProperty1:"
+        },
+        {
+          "attr": [
+            "readonly"
+          ],
+          "getter": "property2",
+          "name": "property2"
+        },
+        {
+          "getter": "isProperty3",
+          "name": "property3",
+          "setter": "setProperty3:"
+        },
+        {
+          "attr": [
+            "dynamic"
+          ],
+          "getter": "dynamicProp",
+          "name": "dynamicProp",
+          "setter": "setDynamicProp:"
+        }
+      ],
+      "super": "NSObject"
+    },
+    {
+      "linkage": "exported",
+      "name": "Basic4",
+      "super": "NSObject"
+    },
+    {
+      "linkage": "exported",
+      "name": "Basic4_1",
+      "super": "NSObject"
+    },
+    {
+      "linkage": "exported",
+      "name": "Basic4_2",
+      "super": "NSObject"
+    },
+    {
+      "classMethods": [
+        {
+          "name": "aClassMethod"
+        }
+      ],
+      "instanceMethods": [
+        {
+          "name": "anInstanceMethod"
+        }
+      ],
+      "linkage": "exported",
+      "name": "Basic5",
+      "super": "NSObject"
+    },
+    {
+      "instanceMethods": [
+        {
+          "name": "property2"
+        },
+        {
+          "name": "setProperty2:"
+        },
+        {
+          "name": "anInstanceMethodFromACategory"
+        },
+        {
+          "name": "anInstanceMethodFromAnExtension"
+        },
+        {
+          "name": "property1"
+        },
+        {
+          "name": "setProperty1:"
+        }
+      ],
+      "linkage": "exported",
+      "name": "Basic6",
+      "properties": [
+        {
+          "getter": "property2",
+          "name": "property2",
+          "setter": "setProperty2:"
+        },
+        {
+          "getter": "property1",
+          "name": "property1",
+          "setter": "setProperty1:"
+        }
+      ],
+      "super": "NSObject"
+    },
+    {
+      "instanceMethods": [
+        {
+          "name": "anInstanceMethodFromAnHiddenExtension"
+        }
+      ],
+      "linkage": "exported",
+      "name": "Basic7",
+      "super": "NSObject"
+    },
+    {
+      "instanceMethods": [
+        {
+          "name": "foo"
+        }
+      ],
+      "linkage": "exported",
+      "name": "ExternalManagedObject",
+      "super": "NSManagedObject"
+    },
+    {
+      "linkage": "exported",
+      "name": "HiddenClass",
+      "super": "NSObject"
+    },
+    {
+      "classMethods": [
+        {
+          "name": "useSameName"
+        }
+      ],
+      "instanceMethods": [
+        {
+          "name": "useSameName"
+        }
+      ],
+      "linkage": "exported",
+      "name": "Basic8",
+      "super": "NSObject"
+    },
+    {
+      "instanceMethods": [
+        {
+          "name": "aMethod"
+        }
+      ],
+      "linkage": "exported",
+      "name": "A",
+      "super": "NSObject"
+    },
+    {
+      "instanceMethods": [
+        {
+          "name": "aProperty"
+        }
+      ],
+      "linkage": "exported",
+      "name": "Basic9",
+      "properties": [
+        {
+          "getter": "aProperty",
+          "name": "aProperty",
+          "setter": "setAProperty:"
+        },
+        {
+          "attr": [
+            "readonly"
+          ],
+          "getter": "aProperty",
+          "name": "aProperty"
+        }
+      ],
+      "super": "NSObject"
+    },
+    {
+      "instanceMethods": [
+        {
+          "name": "privateProcotolMethod"
+        },
+        {
+          "name": "baseMethod"
+        },
+        {
+          "name": "protocolMethod"
+        },
+        {
+          "name": "barMethod"
+        }
+      ],
+      "linkage": "exported",
+      "name": "FooClass",
+      "super": ""
+    }
+  ],
+  "protocols": [
+    {
+      "instanceMethods": [
+        {
+          "name": "baseMethod"
+        }
+      ],
+      "name": "BaseProtocol"
+    },
+    {
+      "instanceMethods": [
+        {
+          "name": "protocolMethod"
+        }
+      ],
+      "name": "FooProtocol"
+    },
+    {
+      "instanceMethods": [
+        {
+          "name": "barMethod"
+        }
+      ],
+      "name": "BarProtocol"
+    },
+    {
+      "instanceMethods": [
+        {
+          "name": "privateProcotolMethod"
+        }
+      ],
+      "name": "PrivateProtocol"
+    }
+  ],
+  "target": "x86_64-apple-macos10.10"
+}

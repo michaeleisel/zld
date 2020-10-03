@@ -1,0 +1,5 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64h ]
+platform:        macosx
+install-name:    '/usr/lib/libfat.dylib'
+...

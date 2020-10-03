@@ -1,0 +1,15 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64, x86_64h ]
+platform:        macosx
+install-name:    '/usr/lib/libfat.dylib'
+exports:
+  - archs:           [ x86_64 ]
+    re-exports:      [ '/usr/lib/internal/libfat.dylib' ]
+--- !tapi-tbd-v3
+archs:           [ x86_64 ]
+platform:        macosx
+install-name:    '/usr/lib/internal/libfat.dylib'
+exports:
+  - archs:           [ x86_64 ]
+    symbols:         [ _sym1 ]
+...

@@ -1,0 +1,7 @@
+; REQUIRES: i386
+; obj2yaml didn't have enough information to produce usable export symbol list.
+
+; RUN: %tapi installapi -arch i386 -arch x86_64 -install_name /System/Library/Frameworks/FragileObjCABI.framework/Versions/A/FragileObjCABI -current_version 1 -compatibility_version 1 -macosx_version_min 10.10 -isysroot %sysroot %inputs/System/Library/Frameworks/FragileObjCABI.framework -o %t.tbd --verify-against=%inputs/System/Library/Frameworks/FragileObjCABI.framework/FragileObjCABI --verify-mode=Pedantic 2>&1 | FileCheck -allow-empty %s
+
+; CHECK-NOT: error
+; CHECK-NOT: warning
