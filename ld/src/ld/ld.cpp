@@ -1372,29 +1372,12 @@ int main(int argc, const char* argv[])
 			forceZld = true;
 		}
 
-		if (!forceZld) {
-			if (isArm64_32) {
-				useFallbackLd(fallbackPath, argc, argv, "WatchOS");
-			}
-
-			// python 2 and python 3 both work with this invocation
-			char *cmd = NULL;
-			asprintf(&cmd, "%s -version_details | python -c \"import sys, json; print(json.load(sys.stdin)['version'])\"", fallbackPath);
-			FILE *file = popen(cmd, "r");
-			int majorVersion = 0;
-			fscanf(file, "%d", &majorVersion);
-			if (majorVersion > 556 && !forceZld) {
-				useFallbackLd(fallbackPath, argc, argv, "Xcode 12");
-			}
+		if (!forceZld && isArm64_32) {
+			useFallbackLd(fallbackPath, argc, argv, "WatchOS");
 		}
 
 		// create object to track command line arguments
 		Options options(argc, argv);
-
-		bool supportsCatalyst = options.platforms().contains(ld::Platform::iOSMac);
-		if (supportsCatalyst && !forceZld) {
-			useFallbackLd(fallbackPath, argc, argv, "Catalyst");
-		}
 
 		InternalState state(options);
 		
