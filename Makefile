@@ -16,13 +16,13 @@ cfe-7.0.1.src:
 	curl -# -L http://releases.llvm.org/7.0.1/cfe-7.0.1.src.tar.xz | tar xJ
 
 clean:
-	rm -rf abseil-cpp-20200225 build cfe-7.0.1.src dyld-635.2 llvm-7.0.1.src pstl tapi-b920569 tbb
+	rm -rf abseil-cpp-20200225 build cfe-7.0.1.src dyld-635.2 llvm-7.0.1.src pstl tapi tbb
 
 dyld-635.2:
 	curl -# -L https://opensource.apple.com/tarballs/dyld/dyld-635.2.tar.gz | tar xz
 	patch -p1 -d dyld-635.2 < patches/dyld.patch
 
-fetch: abseil-cpp-20200225 cfe-7.0.1.src dyld-635.2 llvm-7.0.1.src tapi-b920569 tbb
+fetch: abseil-cpp-20200225 cfe-7.0.1.src dyld-635.2 llvm-7.0.1.src tapi tbb
 
 llvm-7.0.1.src:
 	curl -# -L http://releases.llvm.org/7.0.1/llvm-7.0.1.src.tar.xz | tar xJ
@@ -32,9 +32,9 @@ package:
 	tar -C build/Build/Products/Release -cvJf build/Build/Products/Release/zld.$(HASH).tar.xz zld
 	tar -C build/Build/Products/Release -cvJf build/Build/Products/Release/zld.dSYM.$(HASH).tar.xz zld.dSYM
 
-tapi-b920569:
+tapi:
 	mkdir -p $@
-	curl -# -L https://github.com/ributzka/tapi/tarball/b920569 | tar xz -C $@ --strip-components=1
+	curl -# -L https://opensource.apple.com/tarballs/tapi/tapi-1100.0.11.tar.gz | tar xz -C $@ --strip-components=1
 	patch -p1 -d $@ < patches/tapi.patch
 
 tbb:

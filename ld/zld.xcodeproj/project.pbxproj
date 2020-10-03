@@ -1273,7 +1273,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(DT_TOOLCHAIN_DIR)/usr/local/include",
 					"$(TOOLCHAIN_DIR)/usr/local/include",
-					"$(SRCROOT)/../tapi-b920569/include",
+					"$(SRCROOT)/../tapi/include",
 					"$(SRCROOT)/../dyld-635.2/include",
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
@@ -1367,7 +1367,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(DT_TOOLCHAIN_DIR)/usr/local/include",
 					"$(TOOLCHAIN_DIR)/usr/local/include",
-					"$(SRCROOT)/../tapi-b920569/include",
+					"$(SRCROOT)/../tapi/include",
 					"$(SRCROOT)/../dyld-635.2/include",
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
@@ -1721,7 +1721,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(DT_TOOLCHAIN_DIR)/usr/local/include",
 					"$(TOOLCHAIN_DIR)/usr/local/include",
-					"$(SRCROOT)/../tapi-b920569/include",
+					"$(SRCROOT)/../tapi/include",
 					"$(SRCROOT)/../dyld-635.2/include",
 					"$(SRCROOT)/../llvm-7.0.1.src/include",
 					"$(SRCROOT)/../cfe-7.0.1.src/include",
