@@ -23,9 +23,7 @@ It all depends on your risk tolerance and how much you value the speedup in incr
 
 ### Installation
 
-```
-brew install michaeleisel/zld/zld
-```
+Download the [latest release](https://github.com/michaeleisel/zld/releases/latest) and install the Xcode toolchain if you haven't.
 
 ### Usage
 
