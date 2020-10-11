@@ -16,13 +16,13 @@ cfe-8.0.1.src:
 	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz | tar xJ
 
 clean:
-	rm -rf abseil-cpp-20200225 build cfe-8.0.1.src dyld-635.2 llvm-8.0.1.src pstl tapi-1100.0.11 tbb
+	rm -rf abseil-cpp-20200225 build cfe-8.0.1.src dyld-733.6 llvm-8.0.1.src pstl tapi-1100.0.11 tbb
 
-dyld-635.2:
-	curl -# -L https://opensource.apple.com/tarballs/dyld/dyld-635.2.tar.gz | tar xz
-	patch -p1 -d dyld-635.2 < patches/dyld.patch
+dyld-733.6:
+	curl -# -L https://opensource.apple.com/tarballs/dyld/dyld-733.6.tar.gz | tar xz
+	patch -p1 -d dyld-733.6 < patches/dyld.patch
 
-fetch: abseil-cpp-20200225 cfe-8.0.1.src dyld-635.2 llvm-8.0.1.src tapi-1100.0.11 tbb
+fetch: abseil-cpp-20200225 cfe-8.0.1.src dyld-733.6 llvm-8.0.1.src tapi-1100.0.11 tbb
 
 llvm-8.0.1.src:
 	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz | tar xJ
