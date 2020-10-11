@@ -77,6 +77,7 @@ public:
 	void						archives(ld::Internal& state);
 	
 	void						addLinkerOptionLibraries(ld::Internal& state, ld::File::AtomHandler& handler);
+	void handleLinkerOptionException(const char *msg, ld::Internal& state, const char *libName);
 	void						createIndirectDylibs();
 
 	// for -print_statistics
