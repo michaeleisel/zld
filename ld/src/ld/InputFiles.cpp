@@ -718,13 +718,21 @@ void InputFiles::addLinkerOptionLibraries(ld::Internal& state, ld::File::AtomHan
 		for (const char* libName : newLibraries) {
 			if ( state.linkerOptionLibraries.count(libName) )
 				continue;
-			Options::FileInfo info = _options.findLibrary(libName);
-			if ( ! this->libraryAlreadyLoaded(info.path) ) {
-				_linkerOptionOrdinal = _linkerOptionOrdinal.nextLinkerOptionOrdinal();
-				info.ordinal = _linkerOptionOrdinal;
-				//<rdar://problem/17787306> -force_load_swift_libs
-				info.options.fForceLoad = _options.forceLoadSwiftLibs() && (strncmp(libName, "swift", 5) == 0);
-				infosToParse.emplace_back(info, libName);
+			try {
+				Options::FileInfo info = _options.findLibrary(libName);
+				if ( ! this->libraryAlreadyLoaded(info.path) ) {
+					_linkerOptionOrdinal = _linkerOptionOrdinal.nextLinkerOptionOrdinal();
+					info.ordinal = _linkerOptionOrdinal;
+					//<rdar://problem/17787306> -force_load_swift_libs
+					info.options.fForceLoad = _options.forceLoadSwiftLibs() && (strncmp(libName, "swift", 5) == 0);
+					infosToParse.emplace_back(info, libName);
+				}
+			}
+			catch (const char* msg) {
+				if ( strstr(msg, "but linking") != nullptr )
+					warning("%s '%s'", msg, "<libname>");
+				// <rdar://problem/40829444> only warn about missing auto-linked library if some missing symbol error happens later
+				state.missingLinkerOptionLibraries.insert(libName);
 			}
 		}
 		typedef std::tuple<ld::File *, Options::FileInfo&, const char *> Triple;
