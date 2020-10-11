@@ -42,11 +42,7 @@
 #include <mach-o/fat.h>
 #include <sys/sysctl.h>
 #include <libkern/OSAtomic.h>
-#include <Foundation/Foundation.h>
-#include "pstl/algorithm"
-#include "pstl/execution"
 
-#include <fstream>
 #include <string>
 #include <map>
 #include <set>
@@ -197,7 +193,7 @@ const char* InputFiles::extractFileInfo(const uint8_t* p, unsigned len, const ch
 		cpu_subtype_t subtype;
 		uint32_t      ignore;
 		mach_o::relocatable::isObjectFile(p, len, &type, &subtype, &platform, &ignore);
-		 return result;
+		return result;
 	}
 
     result = mach_o::dylib::archName(p);
@@ -212,14 +208,14 @@ const char* InputFiles::extractFileInfo(const uint8_t* p, unsigned len, const ch
 	result = lto::archName(p, len);
 	if ( result != NULL  )
 		 return result;
-	
+
 	const char* archiveArchName;
 	if ( ::archive::isArchiveFile(p, len, &platform, &archiveArchName) )
 		return archiveArchName;
 
 	if ( textstub::dylib::isTextStubFile(p, len, path) )
 		return "text-stub";
-	
+
 	char *unsupported = (char *)malloc(128);
 	strcpy(unsupported, "unsupported file format (");
 	for (unsigned i=0; i<len && i < 16; i++) {
@@ -713,65 +709,47 @@ void InputFiles::addLinkerOptionLibraries(ld::Internal& state, ld::File::AtomHan
 		// process libraries specified in .o linker options
 		// fixme optimize with std::move?
 		CStringSet newLibraries = std::move(state.unprocessedLinkerOptionLibraries);
-		std::vector<std::pair<Options::FileInfo, const char *>> infosToParse;
 		state.unprocessedLinkerOptionLibraries.clear();
 		for (const char* libName : newLibraries) {
 			if ( state.linkerOptionLibraries.count(libName) )
 				continue;
-			Options::FileInfo info = _options.findLibrary(libName);
-			if ( ! this->libraryAlreadyLoaded(info.path) ) {
-				_linkerOptionOrdinal = _linkerOptionOrdinal.nextLinkerOptionOrdinal();
-				info.ordinal = _linkerOptionOrdinal;
-				//<rdar://problem/17787306> -force_load_swift_libs
-				info.options.fForceLoad = _options.forceLoadSwiftLibs() && (strncmp(libName, "swift", 5) == 0);
-				infosToParse.emplace_back(info, libName);
-			}
-		}
-		typedef std::tuple<ld::File *, Options::FileInfo&, const char *> Triple;
-		std::vector<size_t> iz;
-		std::vector<Triple> readers;
-		readers.reserve(infosToParse.size());
-		std::transform(infosToParse.begin(), infosToParse.end(), std::back_inserter(readers), [&](auto &&pair) {
-			return Triple(NULL, pair.first, pair.second);
-		});
-		for (size_t i = 0; i < infosToParse.size(); i++) {
-			iz.push_back(i);
-		}
-		std::for_each(pstl::execution::par, iz.begin(), iz.end(), [&](auto &&idx) {
-			auto &pair = infosToParse[idx];
-			auto triple = Triple(this->makeFile(pair.first, true), pair.first, pair.second);
-			readers[idx] = triple;
-		});
-		for (auto &triple : readers) {
 			try {
-    			ld::dylib::File* dylibReader = dynamic_cast<ld::dylib::File*>(std::get<0>(triple));
-    			ld::archive::File* archiveReader = dynamic_cast<ld::archive::File*>(std::get<0>(triple));
-    			if ( dylibReader != NULL ) {
+				Options::FileInfo info = _options.findLibrary(libName);
+				if ( ! this->libraryAlreadyLoaded(info.path) ) {
+					_linkerOptionOrdinal = _linkerOptionOrdinal.nextLinkerOptionOrdinal();
+					info.ordinal = _linkerOptionOrdinal;
+ 					//<rdar://problem/17787306> -force_load_swift_libs
+					info.options.fForceLoad = _options.forceLoadSwiftLibs() && (strncmp(libName, "swift", 5) == 0);
+					ld::File* reader = this->makeFile(info, true);
+					ld::dylib::File* dylibReader = dynamic_cast<ld::dylib::File*>(reader);
+					ld::archive::File* archiveReader = dynamic_cast<ld::archive::File*>(reader);
+					if ( dylibReader != NULL ) {
 						checkDylibClientRestrictions(dylibReader);
-    				dylibReader->forEachAtom(handler);
-    				dylibReader->setImplicitlyLinked();
-    				dylibReader->setSpeculativelyLoaded();
-    				this->addDylib(dylibReader, std::get<1>(triple));
-    			}
-    			else if ( archiveReader != NULL ) {
-    				_searchLibraries.push_back(LibraryInfo(archiveReader));
-    				_options.addDependency(Options::depArchive, archiveReader->path());
-    				//<rdar://problem/17787306> -force_load_swift_libs
-    				if (std::get<1>(triple).options.fForceLoad) {
-    					archiveReader->forEachAtom(handler);
-    				}
-    			}
-    			else {
-    				throwf("linker option dylib at %s is not a dylib", std::get<1>(triple).path);
-    			}
-    		}
-    		catch (const char* msg) {
+						dylibReader->forEachAtom(handler);
+						dylibReader->setImplicitlyLinked();
+						dylibReader->setSpeculativelyLoaded();
+						this->addDylib(dylibReader, info);
+					}
+					else if ( archiveReader != NULL ) {
+						_searchLibraries.push_back(LibraryInfo(archiveReader));
+						_options.addDependency(Options::depArchive, archiveReader->path());
+						//<rdar://problem/17787306> -force_load_swift_libs
+						if (info.options.fForceLoad) {
+							archiveReader->forEachAtom(handler);
+						}
+					}
+					else {
+						throwf("linker option dylib at %s is not a dylib", info.path);
+ 					}
+ 				}
+ 			}
+			catch (const char* msg) {
 				if ( strstr(msg, "but linking") != nullptr )
-					warning("%s '%s'", msg, "<libname>");
-    			// <rdar://problem/40829444> only warn about missing auto-linked library if some missing symbol error happens later
-    			state.missingLinkerOptionLibraries.insert(std::get<2>(triple));
-    		}
-    		state.linkerOptionLibraries.insert(std::get<2>(triple));
+					warning("%s '%s'", msg, libName);
+				// <rdar://problem/40829444> only warn about missing auto-linked library if some missing symbol error happens later
+				state.missingLinkerOptionLibraries.insert(libName);
+			}
+			state.linkerOptionLibraries.insert(libName);
 		}
 	}
 }
@@ -780,12 +758,12 @@ void InputFiles::createIndirectDylibs()
 {	
 	// keep processing dylibs until no more dylibs are added
 	unsigned long lastMapSize = 0;
-	LDSet<ld::dylib::File*>  dylibsProcessed;
+	std::set<ld::dylib::File*>  dylibsProcessed;
 	while ( lastMapSize != _allDylibs.size() ) {
 		lastMapSize = _allDylibs.size();
 		// can't iterator _installPathToDylibs while modifying it, so use temp buffer
 		std::vector<ld::dylib::File*> unprocessedDylibs;
-		for (LDOrderedSet<ld::dylib::File*>::iterator it=_allDylibs.begin(); it != _allDylibs.end(); it++) {
+		for (std::set<ld::dylib::File*>::iterator it=_allDylibs.begin(); it != _allDylibs.end(); it++) {
 			if ( dylibsProcessed.count(*it) == 0 )
 				unprocessedDylibs.push_back(*it);
 		}
@@ -804,7 +782,16 @@ void InputFiles::createIndirectDylibs()
 		const char* myLeaf = strrchr(_options.installPath(), '/');
 		if ( myLeaf != NULL ) {
 			for (std::vector<class ld::File*>::const_iterator it=_inputFiles.begin(); it != _inputFiles.end(); it++) {
-				(*it)->markSubFrameworksAsExported(myLeaf);
+				ld::dylib::File* dylibReader = dynamic_cast<ld::dylib::File*>(*it);
+				if ( dylibReader != NULL ) {
+					const char* childParent = dylibReader->parentUmbrella();
+					if ( childParent != NULL ) {
+						if ( strcmp(childParent, &myLeaf[1]) == 0 ) {
+							// mark that this dylib will be re-exported
+							dylibReader->setWillBeReExported();
+						}
+					}
+				}
 			}
 		}
 	}
@@ -921,10 +908,10 @@ void InputFiles::checkDylibClientRestrictions(ld::dylib::File* dylib)
 			}
 			else {
 				throwf("cannot link directly with dylib/framework, your binary is not an allowed client of %s", dylib->path());
-				}
 			}
 		}
 	}
+}
 
 
 InputFiles::InputFiles(Options& opts) 
@@ -1160,7 +1147,7 @@ void InputFiles::waitForInputFiles()
 	try {
 		const char *fifo = _options.pipelineFifo();
 		assert(fifo);
-		LDOrderedMap<const char *, const Options::FileInfo*, strcompclass> fileMap;
+		std::map<const char *, const Options::FileInfo*, strcompclass> fileMap;
 		const std::vector<Options::FileInfo>& files = _options.getInputFiles();
 		for (std::vector<Options::FileInfo>::const_iterator it = files.begin(); it != files.end(); ++it) {
 			const Options::FileInfo& entry = *it;
@@ -1178,7 +1165,7 @@ void InputFiles::waitForInputFiles()
 			int len = strlen(path_buf);
 			if (path_buf[len-1] == '\n')
 				path_buf[len-1] = 0;
-			LDOrderedMap<const char *, const Options::FileInfo*, strcompclass>::iterator it = fileMap.find(path_buf);
+			std::map<const char *, const Options::FileInfo*, strcompclass>::iterator it = fileMap.find(path_buf);
 			if (it == fileMap.end())
 				throwf("pipelined linking error - not in file list: %s\n", path_buf);
 			Options::FileInfo* inputInfo = (Options::FileInfo*)it->second;
@@ -1285,9 +1272,7 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 				break;
 		}
 		try {
-			if (file->type() != ld::File::Archive) {
-    			file->forEachAtom(handler);
-			}
+			file->forEachAtom(handler);
 		}
 		catch (const char* msg) {
 			asprintf((char**)&_exception, "%s file '%s'", msg, file->path());
@@ -1299,26 +1284,16 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 		throw _exception;
 	}
 
-	preParseLibraries();
-	for (auto &file : _inputFiles) {
-		if (file->type() == ld::File::Archive) {
-			file->forEachAtom(handler);
-		}
-	}
-
 	markExplicitlyLinkedDylibs();
 	addLinkerOptionLibraries(state, handler);
 	createIndirectDylibs();
 	createOpaqueFileSections();
-
+	
 	while (fileIndex < _inputFiles.size()) {
 		ld::File *file = _inputFiles[fileIndex];
-		if (file->type() != ld::File::Archive) {
-    		file->forEachAtom(handler);
-		}
+		file->forEachAtom(handler);
 		fileIndex++;
 	}
-
     
     switch ( _options.outputKind() ) {
         case Options::kStaticExecutable:
@@ -1363,71 +1338,6 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 	}
 }
 
-
-void InputFiles::preParseLibraries() const {
-	std::string line;
-	std::ifstream infile(_options.cacheFilePath());
-	LDSet<std::string> currentSet;
-	LDMap<std::string, LDSet<std::string>> map;
-	std::string currentLib;
-	std::getline(infile, currentLib);
-	while (std::getline(infile, line)) {
-		if (line[0] == '\t') {
-			line.erase(0, 1);
-			currentSet.insert(line);
-		} else {
-			map[currentLib] = currentSet;
-			currentLib = line;
-			currentSet = LDSet<std::string>();
-		}
-	}
-	map[currentLib] = currentSet;
-	struct Operation {
-		void *_member;
-		ld::archive::File *_file;
-		Operation(void *member, ld::archive::File *file) : _member(member), _file(file) {}
-	};
-	std::vector<Operation> ops;
-
-    for (std::vector<LibraryInfo>::const_iterator it=_searchLibraries.begin(); it != _searchLibraries.end(); ++it) {
-		auto lib = *it;
-		if (lib.isDylib()) {
-			auto dylib = lib.dylib();
-			auto it = map.find(dylib->path());
-			if (it == map.end()) {
-				continue;
-			}
-			//dylib->insertFilesToLoad();
-		} else {
-			auto archiveFile = lib.archive();
-			auto it = map.find(archiveFile->path());
-			if (it == map.end()) {
-				continue;
-			}
-			auto members = archiveFile->membersToParse(it->second);
-			for (auto member : members) {
-				ops.emplace_back(member, archiveFile);
-			}
-		}
-	}
-	const tbb::blocked_range<size_t> range(0, ops.size());
-	tbb::parallel_for(range, [=](const tbb::blocked_range<size_t>& subrange) {
-		for (auto i = subrange.begin(); i != subrange.end(); i++) {
-			ops[i]._file->parseMember(ops[i]._member);
-		}
-	});
-}
-
-void InputFiles::dumpMembersParsed(std::ofstream &stream) const {
-    for (std::vector<LibraryInfo>::const_iterator it=_searchLibraries.begin(); it != _searchLibraries.end(); ++it) {
-		auto lib = *it;
-		if (lib.isDylib()) {
-		} else {
-			auto archive = lib.archive();
-			archive->dumpMembersParsed(stream);
-		}
-	}
-}
 
 bool InputFiles::searchLibraries(const char* name, bool searchDylibs, bool searchArchives, bool dataSymbolOnly, ld::File::AtomHandler& handler) const
 {

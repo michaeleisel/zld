@@ -63,17 +63,9 @@ namespace lto {
 // magic to place command line in crash reports
 const int crashreporterBufferSize = 2000;
 static char crashreporterBuffer[crashreporterBufferSize];
-#if 0
-	#include <CrashReporterClient.h>
-	// hack until ld does not need to build on 10.6 anymore
-    struct crashreporter_annotations_t gCRAnnotations 
-        __attribute__((section("__DATA," CRASHREPORTER_ANNOTATIONS_SECTION))) 
-        = { CRASHREPORTER_ANNOTATIONS_VERSION, 0, 0, 0, 0, 0, 0 };
-#else
-	extern "C" char* __crashreporter_info__;
-	__attribute__((used)) 
-	char* __crashreporter_info__ = crashreporterBuffer;
-#endif
+extern "C" char* __crashreporter_info__;
+__attribute__((used))
+char* __crashreporter_info__ = crashreporterBuffer;
 
 
 static bool			sEmitWarnings = true;
@@ -359,7 +351,7 @@ uint32_t Options::initialSegProtection(const char* segName) const
 	else if ( strcmp(segName, "__LINKEDIT") == 0 ) {
 		return VM_PROT_READ;
 	}
-	
+
 	// all others default to read-write
 	return VM_PROT_READ | VM_PROT_WRITE;
 }
@@ -458,7 +450,7 @@ bool Options::segmentOrderAfterFixedAddressSegment(const char* segName) const
 	return false;
 }
 
-bool Options::hasExportedSymbolOrder() const
+bool Options::hasExportedSymbolOrder()
 {
 	return (fExportSymbolsOrder.size() > 0);
 }
@@ -688,18 +680,18 @@ void Options::setInferredArch(cpu_type_t type, cpu_subtype_t subtype)
 	assert(fArchitecture == 0);
 	for (const ArchInfo* t=archInfoArray; t->archName != NULL; ++t) {
 		if ( (type == t->cpuType) && (subtype == t->cpuSubType) ) {
-			fArchitecture = type;
-			fSubArchitecture = subtype;
-			fArchitectureName = t->archName;
+			fArchitecture        = type;
+			fSubArchitecture     = subtype;
+			fArchitectureName    = t->archName;
 			fHasPreferredSubType = t->isSubType;
-			fArchSupportsThumb2 = t->supportsThumb2;
+			fArchSupportsThumb2  = t->supportsThumb2;
 #if SUPPORT_ARCH_arm64e
 			if ( (fArchitecture == CPU_TYPE_ARM64) && (fSubArchitecture == CPU_SUBTYPE_ARM64E) ) {
-						fSupportsAuthenticatedPointers = true;
-					}
-#endif
-					break;
+				fSupportsAuthenticatedPointers = true;
 			}
+#endif
+			break;
+		}
 	}
 	if ( fArchitecture == 0 ) {
 		// some arch not in our table
@@ -708,7 +700,7 @@ void Options::setInferredArch(cpu_type_t type, cpu_subtype_t subtype)
 		fArchitectureName    = "unknown";
 	}
 
-			fLinkSnapshot.recordArch(fArchitectureName);
+	fLinkSnapshot.recordArch(fArchitectureName);
 }
 
 void Options::setInferredPlatform(ld::Platform platform, uint32_t minOsVers)
@@ -716,14 +708,14 @@ void Options::setInferredPlatform(ld::Platform platform, uint32_t minOsVers)
 	assert(platforms().empty());
 	fPlatforms.insert(ld::PlatformVersion(platform, minOsVers));
 
-			// only use compressed LINKEDIT for:
-			//			Mac OS X 10.6 or later
-			//			iOS 3.1 or later
-			if ( !fMakeCompressedDyldInfo && platforms().minOS(ld::version2009) && !fMakeCompressedDyldInfoForceOff )
-				fMakeCompressedDyldInfo = true;
-			// Mac OS X 10.5 and iPhoneOS 2.0 support LC_REEXPORT_DYLIB
-			if ( platforms().minOS(ld::version2008) )
-				fUseSimplifiedDylibReExports = true;
+	// only use compressed LINKEDIT for:
+	//			Mac OS X 10.6 or later
+	//			iOS 3.1 or later
+	if ( !fMakeCompressedDyldInfo && platforms().minOS(ld::version2009) && !fMakeCompressedDyldInfoForceOff )
+		fMakeCompressedDyldInfo = true;
+	// Mac OS X 10.5 and iPhoneOS 2.0 support LC_REEXPORT_DYLIB
+	if ( platforms().minOS(ld::version2008) )
+		fUseSimplifiedDylibReExports = true;
 }
 
 bool Options::armUsesZeroCostExceptions() const
@@ -973,7 +965,7 @@ bool Options::findFile(const std::string &path, const std::vector<std::string> &
 		else {
 			// <rdar://problem/48850374> Suppress warnings about iOSHostAdditions until mastering is fixed (rdar://46486148)
 			if ( strstr(tbdInfo.path, "/SDKs/iOSHostAdditions") == NULL )
-			warning("text-based stub file %s and library file %s are out of sync. Falling back to library file for linking.", tbdInfo.path, dylibInfo.path);
+				warning("text-based stub file %s and library file %s are out of sync. Falling back to library file for linking.", tbdInfo.path, dylibInfo.path);
 			result = dylibInfo;
 		}
 	} else {
@@ -1326,7 +1318,7 @@ std::vector<const char*> Options::exportsData() const
 std::vector<const char*> Options::SetWithWildcards::data() const
 {
 	std::vector<const char*> data;
-	for (auto it=regularBegin(); it != regularEnd(); ++it) {
+	for (NameSet::iterator it=regularBegin(); it != regularEnd(); ++it) {
 		data.push_back(*it);
 	}
 	for (std::vector<const char*>::const_iterator it=fWildCard.begin(); it != fWildCard.end(); ++it) {
@@ -3114,7 +3106,7 @@ void Options::parse(int argc, const char* argv[])
 					fPlatforms.updateSDKVersion(info->platform, SDKValue);
 				} else {
 					fPlatforms.insert(ld::PlatformVersion(info->platform, minVersValue, SDKValue));
-			}
+				}
 				fPlatfromVersionCmdFound = true;
 			}
 			else if ( const ld::PlatformInfo* info = isPlatformOption(arg) ) {
@@ -3136,7 +3128,7 @@ void Options::parse(int argc, const char* argv[])
 					fPlatforms.updateMinVersion(info->platform, value);
 				} else {
 					fPlatforms.insert(ld::PlatformVersion(info->platform, value));
-			}
+				}
 			}
 			else if ( strcmp(arg, "-multiply_defined") == 0 ) {
 				//warnObsolete(arg);
@@ -3987,13 +3979,6 @@ void Options::parse(int argc, const char* argv[])
 			else if (strcmp(arg, "-debug_variant") == 0) {
 			    fDebugVariant = true;
             }
-			else if (strcmp(arg, "-zld_original_ld_path") == 0) {
-				const char* optString = argv[++i];
-				if ( optString == NULL )
-					throw "-zld_original_ld_path missing path";
-			}
-			else if (strcmp(arg, "-zld_force") == 0) {
-			}
 			else if (strcmp(arg, "-no_new_main") == 0) {
 				// HACK until 39514191 is fixed
 			}
@@ -4716,11 +4701,11 @@ void Options::reconfigureDefaults()
 			case Options::kPreload:
 			case Options::kKextBundle:
 				break;
+		}
 	}
-	}
-	
+
 	// Use V2 shared cache info when targetting newer OSs
-	if ( fSharedRegionEligible && platforms().minOS(ld::supportsSplitSegV2)) {
+	if ( fSharedRegionEligible && platforms().minOS(ld::supportsSplitSegV2) ) {
 		fSharedRegionEncodingV2 = true;
 		if ( platforms().contains(ld::Platform::macOS) && (fArchitecture == CPU_TYPE_X86_64) ) {
 			fSharedRegionEncodingV2 = false;
@@ -4735,13 +4720,13 @@ void Options::reconfigureDefaults()
 				}
 			}
 		}
-			if ( fSharedRegionEncodingV2 && (fArchitecture == CPU_TYPE_I386) ) {
-				// Disable V2 on i386 as its not qualififed yet.
-				fSharedRegionEncodingV2 = false;
-			}
+		if ( fSharedRegionEncodingV2 && (fArchitecture == CPU_TYPE_I386) ) {
+			// Disable V2 on i386 as its not qualififed yet.
+			fSharedRegionEncodingV2 = false;
+		}
 		fIgnoreOptimizationHints = true;
 	}
-
+	
 	if ( fUseDataConstSegmentForceOn ) {
 		fUseDataConstSegment = true;
 	}
@@ -4789,7 +4774,7 @@ void Options::reconfigureDefaults()
 	// <rdar://problem/49907181> automatically move thread local data to __DATA_DIRTY if dirty data is in use
 	if ( fSharedRegionEncodingV2 && fUseDataConstSegment ) {
 		addSectionRename("__DATA", "__thread_vars",	        "__DATA_DIRTY", "__thread_vars");
-		}
+	}
 
 	// <rdar://problem/5366363> -r -x implies -S
 	if ( (fOutputKind == Options::kObjectFile) && (fLocalSymbolHandling == kLocalSymbolsNone) )
@@ -5259,19 +5244,19 @@ void Options::reconfigureDefaults()
 		}
 	} else {
 		bool inferredFromSDKpath = false;
-	// if -sdk_version not on command line, infer from -syslibroot
+		// if -sdk_version not on command line, infer from -syslibroot
 		if ( !fPlatfromVersionCmdFound && (fSDKPaths.size() > 0) ) {
-		const char* sdkPath = fSDKPaths.front();
-		const char* end = &sdkPath[strlen(sdkPath)-1];
-		while ( !isdigit(*end) && (end > sdkPath) )
-			--end;
-		const char* start = end-1;
-		while ( (isdigit(*start) || (*start == '.')) && (start > sdkPath))
-			--start;
-		char sdkVersionStr[32];
-		int len = end-start+1;
-		if ( len > 2 ) {
-			strlcpy(sdkVersionStr, start+1, len);
+			const char* sdkPath = fSDKPaths.front();
+			const char* end = &sdkPath[strlen(sdkPath)-1];
+			while ( !isdigit(*end) && (end > sdkPath) )
+				--end;
+			const char* start = end-1;
+			while ( (isdigit(*start) || (*start == '.')) && (start > sdkPath))
+				--start;
+			char sdkVersionStr[32];
+			int len = end-start+1;
+			if ( len > 2 ) {
+				strlcpy(sdkVersionStr, start+1, len);
 				__block ld::Platform currentPlatform;
 				fPlatforms.forEach(^(ld::Platform platform, uint32_t minVersion, uint32_t sdkVersion, bool &stop) {
 					if ( platform != ld::Platform::iOSMac )
@@ -5279,8 +5264,8 @@ void Options::reconfigureDefaults()
 				});
 				fPlatforms.updateSDKVersion(currentPlatform, parseVersionNumber32(sdkVersionStr));
 				inferredFromSDKpath = true;
+			}
 		}
-	}
 
 		// if no version was explicitly set on the commandline or by an environemt variable, and the
 		// the platform is macOS then set the min version to the current
@@ -5296,7 +5281,7 @@ void Options::reconfigureDefaults()
 			}
 		}
 	}
-	
+
 	// allow trie based absolute symbols if targeting new enough OS
 	if ( fMakeCompressedDyldInfo || fMakeChainedFixups ) {
 		if ( platforms().minOS(ld::version2013) ) {
@@ -5327,8 +5312,7 @@ void Options::reconfigureDefaults()
 			case Options::kStaticExecutable:
 			case Options::kKextBundle:
 				// <rdar://problem/14676611> 16KB segments for arm64 kexts
-				if ( (fArchitecture == CPU_TYPE_ARM64)
-					) {
+				if ( fArchitecture == CPU_TYPE_ARM64) {
 					fSegmentAlignment = 4096*4;
 				}
 				break;
@@ -5452,8 +5436,8 @@ void Options::reconfigureDefaults()
 		if ( strncmp(fDylibInstallName, "@rpath", 6) == 0 )
 			warning("OS dylibs should not use @rpath for -install_name.  Use absolute path instead");
 		if ( strcmp(fDylibInstallName, fFinalName) != 0 )
-				warning("OS dylibs -install_name should match its real absolute path");
-		}
+			warning("OS dylibs -install_name should match its real absolute path");
+	}
 
 #if SUPPORT_ARCH_arm64e
 	// arm64e chained fixups do not support misaligned pointers
@@ -5467,10 +5451,10 @@ void Options::reconfigureDefaults()
 	if ( fUnalignedPointerTreatment == Options::kUnalignedPointerIgnore ) {
 		if ( platforms().minOS(ld::mac10_12) && fSharedRegionEligible ) {
 			fUnalignedPointerTreatment = Options::kUnalignedPointerWarning;
-	}
-	else if ( platforms().minOS(ld::iOS_10_0) ) {
+		}
+		else if ( platforms().minOS(ld::iOS_10_0) ) {
 			fUnalignedPointerTreatment = Options::kUnalignedPointerWarning;
-	}
+		}
 	}
 
 	// warn by default for OS dylibs
@@ -5785,7 +5769,7 @@ void Options::checkIllegalOptionCombinations()
 
 	// make sure all required exported symbols exist
 	std::vector<const char*> impliedExports;
-	for (auto it=fExportSymbols.regularBegin(); it != fExportSymbols.regularEnd(); ++it) {
+	for (NameSet::iterator it=fExportSymbols.regularBegin(); it != fExportSymbols.regularEnd(); ++it) {
 		const char* name = *it;
 		const int len = strlen(name);
 		if ( (strcmp(&name[len-3], ".eh") == 0) || (strncmp(name, ".objc_category_name_", 20) == 0) ) {
@@ -5817,7 +5801,7 @@ void Options::checkIllegalOptionCombinations()
 	}
 
 	// make sure all required re-exported symbols exist
-	for (auto it=fReExportSymbols.regularBegin(); it != fReExportSymbols.regularEnd(); ++it) {
+	for (NameSet::iterator it=fReExportSymbols.regularBegin(); it != fReExportSymbols.regularEnd(); ++it) {
 		fInitialUndefines.push_back(*it);
 	}
 	
@@ -5832,7 +5816,7 @@ void Options::checkIllegalOptionCombinations()
 		case Options::kDyld:
 		case Options::kPreload:
 			if ( !platforms().contains(ld::Platform::driverKit) )
-			fInitialUndefines.push_back(fEntryName);
+				fInitialUndefines.push_back(fEntryName);
 			break;
 		case Options::kDynamicLibrary:
 		case Options::kDynamicBundle:
@@ -6028,7 +6012,7 @@ void Options::checkIllegalOptionCombinations()
 	// If the platform is only macOS check to see if the dylib is on the implicit zipper list
 	if (fDylibInstallName && platforms().count() == 1 && platforms().contains(ld::Platform::macOS)) {
 		std::vector<const char*> implictZipperPaths;
-			for (const auto& sdkPath : fSDKPaths) {
+		for (const auto& sdkPath : fSDKPaths) {
 			char autoZipperPath[MAXPATHLEN];
 			strlcpy(autoZipperPath, sdkPath, MAXPATHLEN);
 			strlcat(autoZipperPath, "/AppleInternal/LinkerAutoZipperList.txt", MAXPATHLEN);
@@ -6039,10 +6023,10 @@ void Options::checkIllegalOptionCombinations()
 				// FIXME: once we are reading the SDK version out of the actual SDK set this dynamically
 				// For now hardcode to 13.0
 				fPlatforms.insert(ld::PlatformVersion(ld::Platform::iOSMac, 0x000D0000));
-					break;
-				}
+				break;
 			}
 		}
+	}
 
 	// Check zippered combinations.
 	if (platforms().count() > 2) {
@@ -6061,14 +6045,14 @@ void Options::checkIllegalOptionCombinations()
 		}
 	}
 
-		for (const char* sdkPath : fSDKPaths) {
-			std::string possiblePath = std::string(sdkPath) + "/AppleInternal/";
-			struct stat statBuffer;
-			if ( stat(possiblePath.c_str(), &statBuffer) == 0 ) {
+	for (const char* sdkPath : fSDKPaths) {
+		std::string possiblePath = std::string(sdkPath) + "/AppleInternal/";
+		struct stat statBuffer;
+		if ( stat(possiblePath.c_str(), &statBuffer) == 0 ) {
 			fInternalSDK = true;
-				break;
-			}
+			break;
 		}
+	}
 
 	// <rdar://problem/39095109> Linker warning for i386 macOS binaries
 	if ( (architecture() == CPU_TYPE_I386) && platforms().contains(ld::Platform::macOS) ) {
@@ -6100,7 +6084,7 @@ void Options::checkIllegalOptionCombinations()
 				throwf("chained fixups cannot be used with kext bundles");
 				break;
 		}
-}
+	}
 
 }
 
@@ -6165,19 +6149,12 @@ void Options::checkForClassic(int argc, const char* argv[])
 	bool newLinker = false;
 	
 	// build command line buffer in case ld crashes
-#if 0
-	CRSetCrashLogMessage(crashreporterBuffer);
-#endif
 	const char* srcRoot = getenv("SRCROOT");
 	if ( srcRoot != NULL ) {
 		strlcpy(crashreporterBuffer, "SRCROOT=", crashreporterBufferSize);
 		strlcat(crashreporterBuffer, srcRoot, crashreporterBufferSize);
 		strlcat(crashreporterBuffer, "\n", crashreporterBufferSize);
 	}
-#ifdef LD_VERS
-	strlcat(crashreporterBuffer, LD_VERS, crashreporterBufferSize);
-	strlcat(crashreporterBuffer, "\n", crashreporterBufferSize);
-#endif
 	strlcat(crashreporterBuffer, "ld ", crashreporterBufferSize);
 	for(int i=1; i < argc; ++i) {
 		strlcat(crashreporterBuffer, argv[i], crashreporterBufferSize);

@@ -134,7 +134,7 @@ public:
 	virtual void								copyRawContent(uint8_t buffer[]) const; 
 
 	virtual void								encode() const = 0;
-	
+
 	const uint8_t*								rawContent() const { return this->_encodedData.start(); }
 
 												LinkEditAtom(const Options& opts, ld::Internal& state, 
@@ -1365,14 +1365,6 @@ private:
 
 	const ld::Atom*								stubForResolverFunction(const ld::Atom* resolver) const;
 
-	struct TrieAddressSorter
-	{
-		bool operator()(const mach_o::trie::Entry& left, const mach_o::trie::Entry& right)
-		{
-				return (left.address < right.address);
-		}
-	};
-	
 	struct TrieEntriesSorter
 	{
 		TrieEntriesSorter(const Options& o) : _options(o) {}
@@ -1500,12 +1492,8 @@ void ExportInfoAtom<A>::encode() const
 	}
 
 	// sort vector by -exported_symbols_order, and any others by address
-	if (_options.hasExportedSymbolOrder()) {
-		std::sort(entries.begin(), entries.end(), TrieEntriesSorter(_options));
-	} else {
-		std::sort(entries.begin(), entries.end(), TrieAddressSorter());
-	}
-
+	std::sort(entries.begin(), entries.end(), TrieEntriesSorter(_options));
+	
 	// create trie
 	mach_o::trie::makeTrie(entries, this->_encodedData.bytes());
 
@@ -1804,9 +1792,9 @@ private:
 	// FromOffset	 :== <kind> <count> <from-sect-offset-delta>
 
 	typedef uint32_t SectionIndexes;
-	typedef LDOrderedMap<uint8_t, std::vector<uint64_t> > FromOffsetMap;
-	typedef LDOrderedMap<uint64_t, FromOffsetMap> ToOffsetMap;
-	typedef LDOrderedMap<SectionIndexes, ToOffsetMap> WholeMap;
+	typedef std::map<uint8_t, std::vector<uint64_t> > FromOffsetMap;
+	typedef std::map<uint64_t, FromOffsetMap> ToOffsetMap;
+	typedef std::map<SectionIndexes, ToOffsetMap> WholeMap;
 
 
 	static ld::Section			_s_section;

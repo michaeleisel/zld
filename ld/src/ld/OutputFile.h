@@ -66,7 +66,7 @@ public:
 	uint32_t					encryptedTextEndOffset()	{ return _encryptedTEXTendOffset; }
 	int							compressedOrdinalForAtom(const ld::Atom* target);
 	uint64_t					fileSize() const { return _fileSize; }
-	
+
 	bool						needsBind(const ld::Atom* toTarget, uint64_t* accumulator = nullptr,
 										  uint64_t* inlineAddend = nullptr, uint32_t* bindOrdinal = nullptr,
 										  uint32_t* libOrdinal = nullptr) const;
@@ -175,17 +175,6 @@ public:
 	};
 
 private:
-	struct AtomOperation {
-	public:
-		const Atom *atom;
-		uint64_t fileOffset;
-		uint64_t fileOffsetOfEndOfLastAtom;
-		uint64_t mhAddress;
-		bool lastAtomUsesNoOps;
-		bool lastAtomWasThumb;
-		AtomOperation(const Atom *atom, uint64_t fileOffset, uint64_t fileOffsetOfEndOfLastAtom, uint64_t mhAddress, bool lastAtomUsesNoOps, bool lastAtomWasThumb): atom(atom), fileOffset(fileOffset), fileOffsetOfEndOfLastAtom(fileOffsetOfEndOfLastAtom), mhAddress(mhAddress), lastAtomUsesNoOps(lastAtomUsesNoOps), lastAtomWasThumb(lastAtomWasThumb) {}
-	};
-
 	void						writeAtoms(ld::Internal& state, uint8_t* wholeBuffer);
 	void						computeContentUUID(ld::Internal& state, uint8_t* wholeBuffer);
 	void						buildDylibOrdinalMapping(ld::Internal&);
@@ -220,7 +209,7 @@ private:
 													  ld::Fixup* fixupWithMinusTarget, ld::Fixup* fixupWithStore,
 													  const ld::Atom* target, const ld::Atom* minusTarget,
 													  uint64_t targetAddend, uint64_t minusTargetAddend);
-	void						addClassicRelocs(ld::Internal& state, ld::Internal::FinalSection* sect,  
+	void						addClassicRelocs(ld::Internal& state, ld::Internal::FinalSection* sect,
 												const ld::Atom* atom, ld::Fixup* fixupWithTarget, 
 												ld::Fixup* fixupWithMinusTarget, ld::Fixup* fixupWithStore,
 												const ld::Atom* target, const ld::Atom* minusTarget, 
@@ -308,7 +297,7 @@ private:
 	void 						chain32bitFirmwarePointers(dyld_chained_ptr_32_firmware_rebase* prevLoc, dyld_chained_ptr_32_firmware_rebase* finalLoc,
 															ChainedFixupSegInfo& segInfo, uint8_t* pageBufferStart, uint32_t pageIndex);
 	dyld_chained_ptr_32_firmware_rebase* farthestChainableLocation(dyld_chained_ptr_32_firmware_rebase* start);
-	
+
 	struct InstructionInfo {
 		uint32_t			offsetInAtom;
 		const ld::Fixup*	fixup; 
@@ -337,7 +326,7 @@ private:
 			const ld::Atom*		atom;
 			uint64_t			addend;
 		};
-		LDMap<const ld::Atom*, uint32_t> 	_bindOrdinalsWithNoAddend;
+		std::unordered_map<const ld::Atom*, uint32_t> 	_bindOrdinalsWithNoAddend;
 		std::vector<AtomAndAddend>						_bindsTargets;
 		uint64_t										_maxRebase = 0;
 		bool											_hasLargeAddends = false;
@@ -345,7 +334,7 @@ private:
 	};
 
 
-	void setInfo(ld::Internal& state, const ld::Atom* atom, uint8_t* buffer, const LDOrderedMap<uint32_t, const Fixup*>& usedHints, 
+	void setInfo(ld::Internal& state, const ld::Atom* atom, uint8_t* buffer, const std::map<uint32_t, const Fixup*>& usedHints, 
 						uint32_t offsetInAtom, uint32_t delta, InstructionInfo* info);
 
 	static uint16_t				get16LE(uint8_t* loc);
@@ -365,7 +354,7 @@ private:
 
 
 	const Options&							_options;
-	LDOrderedMap<const ld::dylib::File*, int>	_dylibToOrdinal;
+	std::map<const ld::dylib::File*, int>	_dylibToOrdinal;
 	std::vector<const ld::dylib::File*>		_dylibsToLoad;
 	std::vector<const char*>				_dylibOrdinalPaths;
 	const bool								_hasDyldInfo;
@@ -382,7 +371,7 @@ private:
 		  bool								_hasExternalRelocations;
 		  bool								_hasOptimizationHints;
 	uint64_t								_fileSize;
-	LDOrderedMap<uint64_t, uint32_t>			_lazyPointerAddressToInfoOffset;
+	std::map<uint64_t, uint32_t>			_lazyPointerAddressToInfoOffset;
 	uint32_t								_encryptedTEXTstartOffset;
 	uint32_t								_encryptedTEXTendOffset;
 public:
@@ -395,7 +384,7 @@ public:
 	uint32_t								_globalSymbolsCount;
 	uint32_t								_importSymbolsStartIndex;
 	uint32_t								_importSymbolsCount;
-	LDOrderedMap<const ld::Atom*, uint32_t>		_atomToSymbolIndex;
+	std::map<const ld::Atom*, uint32_t>		_atomToSymbolIndex;
 	std::vector<RebaseInfo>					_rebaseInfo;
 	std::vector<BindingInfo>				_bindingInfo;
 	std::vector<BindingInfo>				_lazyBindingInfo;
@@ -404,11 +393,11 @@ public:
 	// Note, <= 0 values are indices in to rebases, > 0 are binds.
 	std::vector<int64_t>					_threadedRebaseBindIndices;
 	std::vector<uint64_t>				 	_chainedFixupAddresses;
-	LDMap<const ld::Atom*, uint32_t> _chainedFixupNoAddendBindOrdinals;
+	std::unordered_map<const ld::Atom*, uint32_t> _chainedFixupNoAddendBindOrdinals;
 	ChainedFixupBinds						_chainedFixupBinds;
 	std::vector<ChainedFixupSegInfo>    	_chainedFixupSegments;
 #if SUPPORT_ARCH_arm64e
-	LDOrderedMap<uintptr_t, std::pair<Fixup::AuthData, uint64_t>> _authenticatedFixupData;
+	std::map<uintptr_t, std::pair<Fixup::AuthData, uint64_t>> _authenticatedFixupData;
 #endif
 	std::vector<SplitSegInfoEntry>			_splitSegInfos;
 	std::vector<SplitSegInfoV2Entry>		_splitSegV2Infos;

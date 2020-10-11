@@ -258,16 +258,6 @@ public:
 	
 	typedef const char* const*	UndefinesIterator;
 
-	std::string cacheFilePath() const {
-		const char *path = outputFilePath();
-		size_t hash = 5183;
-		while (*path) {
-			hash = hash * 5 + *path;
-			path++;
-		}
-		return "/tmp/zld-" + std::to_string(hash);
-	}
-
 //	const ObjectFile::ReaderOptions&	readerOptions();
 	const char*							outputFilePath() const { return fOutputFile; }
 	const std::vector<FileInfo>&		getInputFiles() const { return fInputFiles; }
@@ -366,7 +356,7 @@ public:
 	bool						hasCustomSegmentAddress(const char* segName) const;
 	bool						hasCustomSectionAlignment(const char* segName, const char* sectName) const;
 	uint8_t						customSectionAlignment(const char* segName, const char* sectName) const;
-	uint32_t					initialSegProtection(const char*) const; 
+	uint32_t					initialSegProtection(const char*) const;
 	bool						readOnlyDataSegment(const char*) const;
 	uint32_t					maxSegProtection(const char*) const; 
 	bool						saveTempFiles() const { return fSaveTempFiles; }
@@ -396,7 +386,7 @@ public:
 	const std::vector<const char*>&	astFilePaths() const{ return fASTFilePaths; }
 	bool						makeCompressedDyldInfo() const { return fMakeCompressedDyldInfo; }
 	bool						makeThreadedStartsSection() const { return fMakeThreadedStartsSection; }
-	bool						hasExportedSymbolOrder() const;
+	bool						hasExportedSymbolOrder();
 	bool						exportedSymbolOrder(const char* sym, unsigned int* order) const;
 	bool						orderData() { return fOrderData; }
 	bool						errorOnOtherArchFiles() const { return fErrorOnOtherArchFiles; }
@@ -534,8 +524,8 @@ public:
 	static uint32_t				parseVersionNumber32(const char*);
 
 private:
-	typedef LDMap<const char*, unsigned int, ld::CStringHash, ld::CStringEquals> NameToOrder;
-	typedef LDSet<const char*, ld::CStringHash, ld::CStringEquals>  NameSet;
+	typedef std::unordered_map<const char*, unsigned int, ld::CStringHash, ld::CStringEquals> NameToOrder;
+	typedef std::unordered_set<const char*, ld::CStringHash, ld::CStringEquals>  NameSet;
 	enum ExportMode { kExportDefault, kExportSome, kDontExportSome };
 	enum LibrarySearchMode { kSearchDylibAndArchiveInEachDir, kSearchAllDirsForDylibsThenAllDirsForArchives };
 	enum InterposeMode { kInterposeNone, kInterposeAllExternal, kInterposeSome };
@@ -548,8 +538,8 @@ private:
 		bool					containsNonWildcard(const char*) const;
 		bool					empty() const			{ return fRegular.empty() && fWildCard.empty(); }
 		bool					hasWildCards() const	{ return !fWildCard.empty(); }
-		NameSet::const_iterator		regularBegin() const	{ return fRegular.begin(); }
-		NameSet::const_iterator		regularEnd() const		{ return fRegular.end(); }
+		NameSet::iterator		regularBegin() const	{ return fRegular.begin(); }
+		NameSet::iterator		regularEnd() const		{ return fRegular.end(); }
 		void					remove(const NameSet&); 
 		std::vector<const char*>		data() const;
 	private:

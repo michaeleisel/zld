@@ -23,15 +23,6 @@
  */
 
 
-#ifndef NDEBUG
-#define NDEBUG
-#include "pstl/execution"
-#include "pstl/algorithm"
-#undef NDEBUG
-#else
-#include "pstl/execution"
-#include "pstl/algorithm"
-#endif
 #include <stdint.h>
 #include <math.h>
 #include <unistd.h>
@@ -45,7 +36,6 @@
 
 #include "ld.hpp"
 #include "order.h"
-#include "Tweaks.hpp"
 
 namespace ld {
 namespace passes {
@@ -95,11 +85,11 @@ private:
 		ld::Internal&	_state;
 	};
 				
-	typedef LDMap<const char*, const ld::Atom*, CStringHash, CStringEquals> NameToAtom;
+	typedef std::unordered_map<const char*, const ld::Atom*, CStringHash, CStringEquals> NameToAtom;
 	
-	typedef LDOrderedMap<const ld::Atom*, const ld::Atom*> AtomToAtom;
+	typedef std::map<const ld::Atom*, const ld::Atom*> AtomToAtom;
 	
-	typedef LDOrderedMap<const ld::Atom*, uint32_t> AtomToOrdinal;
+	typedef std::map<const ld::Atom*, uint32_t> AtomToOrdinal;
 	
 	const ld::Atom*		findAtom(const Options::OrderedSymbol& orderedSymbol);
 	void				buildNameTable();
@@ -244,7 +234,7 @@ bool Layout::Comparer::operator()(const ld::Atom* left, const ld::Atom* right)
 			return rightLast;
 	}
 #endif
-	
+
 	// sort cold functions to end
 	bool leftCold  = left->cold();
 	bool rightCold = right->cold();
@@ -495,13 +485,13 @@ void Layout::buildFollowOnTables()
 class InSet
 {
 public:
-	InSet(const LDOrderedSet<const ld::Atom*>& theSet) : _set(theSet)  {}
+	InSet(const std::set<const ld::Atom*>& theSet) : _set(theSet)  {}
 
 	bool operator()(const ld::Atom* atom) const {
 		return ( _set.count(atom) != 0 );
 	}
 private:
-	const LDOrderedSet<const ld::Atom*>&  _set;
+	const std::set<const ld::Atom*>&  _set;
 };
 
 
@@ -518,7 +508,7 @@ void Layout::buildOrdinalOverrideMap()
 	// with the start/next maps of follow-on atoms we can process the order file and produce override ordinals
 	uint32_t index = 0;
 	uint32_t matchCount = 0;
-	LDOrderedSet<const ld::Atom*> moveToData;
+	std::set<const ld::Atom*> moveToData;
 	for(Options::OrderedSymbolsIterator it = _options.orderedSymbolsBegin(); it != _options.orderedSymbolsEnd(); ++it) {
 		const ld::Atom* atom = this->findAtom(*it);
 		if ( atom != NULL ) {
@@ -602,7 +592,7 @@ void Layout::buildOrdinalOverrideMap()
 				}
 			}
 			// update atom-to-section map
-			for (LDOrderedSet<const ld::Atom*>::iterator it=moveToData.begin(); it != moveToData.end(); ++it) {
+			for (std::set<const ld::Atom*>::iterator it=moveToData.begin(); it != moveToData.end(); ++it) {
 				_state.atomToSection[*it] = dataSect;
 			}
 		}
@@ -644,7 +634,7 @@ void Layout::doPass()
 				break;
 			default:
 				if ( log ) fprintf(stderr, "sorting section %s\n", sect->sectionName());
-    				std::sort(sect->atoms.begin(), sect->atoms.end(), _comparer);
+				std::sort(sect->atoms.begin(), sect->atoms.end(), _comparer);
 				break;
 		}
 	}

@@ -215,7 +215,7 @@ protected:
 	class Atom<A>*					_beginAtoms;
 	class Atom<A>*					_endAtoms;
 	bool							_hasAliases;
-	LDOrderedSet<const class Atom<A>*>	_altEntries;
+	std::set<const class Atom<A>*>	_altEntries;
 };
 
 
@@ -665,7 +665,6 @@ public:
 protected:
 	typedef typename A::P::uint_t	pint_t;
 
-	mutable size_t _sectionHash = 0;
 	virtual ld::Atom::Alignment		alignmentForAddress(pint_t addr)		{ return ld::Atom::Alignment(log2(sizeof(pint_t))); }
 	virtual const char*				unlabeledAtomName(Parser<A>&, pint_t)	{ return "pointer-to-literal-cstring"; }
 	virtual	pint_t					elementSizeAtAddress(pint_t addr)		{ return sizeof(pint_t); }
@@ -765,7 +764,6 @@ public:
 	virtual void								setFile(const ld::File* f);
 
 private:
-	mutable const uint8_t *_contentPointer = NULL;
 
 	enum {	kFixupStartIndexBits = 32,
 			kLineInfoStartIndexBits = 32, 
@@ -847,11 +845,11 @@ private:
 												_lineInfoCount			: kLineInfoCountBits,
 												_unwindInfoCount		: kUnwindInfoCountBits;
 												
-	static LDMap<const ld::Atom*, const ld::File*> _s_fileOverride;
+	static std::map<const ld::Atom*, const ld::File*> _s_fileOverride;
 };
 
 template <typename A>
-LDMap<const ld::Atom*, const ld::File*> Atom<A>::_s_fileOverride;
+std::map<const ld::Atom*, const ld::File*> Atom<A>::_s_fileOverride;
 
 template <typename A>
 void Atom<A>::setFile(const ld::File* f) {
@@ -861,10 +859,7 @@ void Atom<A>::setFile(const ld::File* f) {
 template <typename A>
 const ld::File* Atom<A>::file() const
 {
-	if (_s_fileOverride.empty()) {
-		return &sect().file();
-	}
-	LDMap<const ld::Atom*, const ld::File*>::iterator pos = _s_fileOverride.find(this);
+	std::map<const ld::Atom*, const ld::File*>::iterator pos = _s_fileOverride.find(this);
 	if ( pos != _s_fileOverride.end() )
 		return pos->second;
 		
@@ -915,15 +910,11 @@ void Atom<A>::setLineInfoRange(uint32_t startIndex, uint32_t count)
 template <typename A>
 const uint8_t* Atom<A>::contentPointer() const
 {
-	if (_contentPointer != NULL)  {
-		return _contentPointer;
-	}
 	const macho_section<P>* sct = this->sect().machoSection();
 	if ( this->_objAddress > sct->addr() + sct->size() )
 		throwf("malformed .o file, symbol has address 0x%0llX which is outside range of its section", (uint64_t)this->_objAddress);
 	uint32_t fileOffset = sct->offset() - sct->addr() + this->_objAddress;
-	_contentPointer = this->sect().file().fileContent()+fileOffset;
-	return _contentPointer;
+	return this->sect().file().fileContent()+fileOffset;
 }
 
 
@@ -3724,7 +3715,7 @@ void Parser<A>::parseDebugInfo()
 				uint32_t curAtomOffset = 0;
 				uint32_t curAtomAddress = 0;
 				uint32_t curAtomSize = 0;
-				LDMap<uint32_t,const char*>	dwarfIndexToFile;
+				std::map<uint32_t,const char*>	dwarfIndexToFile;
 				if ( lines != NULL ) {
 					while ( line_next(lines, &result, line_stop_pc) ) {
 						//fprintf(stderr, "curAtom=%p, result.pc=0x%llX, result.line=%llu, result.end_of_sequence=%d,"
@@ -3785,7 +3776,7 @@ void Parser<A>::parseDebugInfo()
 							}
 						}
 						const char* filename;
-						LDMap<uint32_t,const char*>::iterator pos = dwarfIndexToFile.find(result.file);
+						std::map<uint32_t,const char*>::iterator pos = dwarfIndexToFile.find(result.file);
 						if ( pos == dwarfIndexToFile.end() ) {
 							filename = line_file(lines, result.file);
 							dwarfIndexToFile[result.file] = filename;
@@ -3842,7 +3833,7 @@ void Parser<A>::parseDebugInfo()
 template <typename A>
 void Parser<A>::parseStabs()
 {
-	typedef LDMap<const char*, Atom<A>*, ld::CStringHash, ld::CStringEquals> CStringToAtom;
+	typedef std::unordered_map<const char*, Atom<A>*, ld::CStringHash, ld::CStringEquals> CStringToAtom;
 	CStringToAtom atomMap;
 
 	{
@@ -5648,8 +5639,12 @@ bool Literal16Section<A>::ignoreLabel(const char* label) const
 template <typename A>
 unsigned long Literal16Section<A>::contentHash(const class Atom<A>* atom, const ld::IndirectBindingTable& ind) const
 {
-	const uint64_t* byteContent = (uint64_t *)atom->contentPointer();
-	return _mm_crc32_u64(5381, byteContent[0]) ^ _mm_crc32_u64(5381, byteContent[1]);
+	unsigned long hash = 5381;
+	const uint8_t* byteContent = atom->contentPointer();
+	for (int i=0; i < 16; ++i) {
+		hash = hash * 33 + byteContent[i];
+	}
+	return hash;
 }
 
 template <typename A>
@@ -5703,8 +5698,12 @@ Atom<A>* CStringSection<A>::findAtomByAddress(pint_t addr)
 template <typename A>
 unsigned long CStringSection<A>::contentHash(const class Atom<A>* atom, const ld::IndirectBindingTable& ind) const
 {
+	unsigned long hash = 5381;
 	const char* stringContent = (char*)atom->contentPointer();
-	return ld::CRCHash(stringContent, strlen(stringContent));
+	for (const char* s = stringContent; *s != '\0'; ++s) {
+		hash = hash * 33 + *s;
+	}
+	return hash;
 }
 
 
@@ -6281,18 +6280,15 @@ template <typename A>
 unsigned long PointerToCStringSection<A>::contentHash(const class Atom<A>* atom, 
 													const ld::IndirectBindingTable& indirectBindingTable) const
 {
+	// make hash from section name and target cstring name
 	unsigned long hash = 123;
-	if (this->_sectionHash == 0) {
-    	// make hash from section name and target cstring name
-    	for (const char* s = this->sectionName(); *s != '\0'; ++s) {
-    		hash = hash * 33 + *s;
-    	}
-		this->_sectionHash = hash;
-	} else {
-		hash = this->_sectionHash;
+	for (const char* s = this->sectionName(); *s != '\0'; ++s) {
+		hash = hash * 33 + *s;
 	}
-	const char* s = this->targetCString(atom, indirectBindingTable);
-	return hash ^ ld::CRCHash(s, strlen(s));
+	for (const char* s = this->targetCString(atom, indirectBindingTable); *s != '\0'; ++s) {
+		hash = hash * 33 + *s;
+	}
+	return hash;
 }
 
 template <typename A>
