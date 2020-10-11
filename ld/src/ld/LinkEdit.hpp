@@ -1804,9 +1804,9 @@ private:
 	// FromOffset	 :== <kind> <count> <from-sect-offset-delta>
 
 	typedef uint32_t SectionIndexes;
-	typedef LDOrderedMap<uint8_t, std::vector<uint64_t> > FromOffsetMap;
-	typedef LDOrderedMap<uint64_t, FromOffsetMap> ToOffsetMap;
-	typedef LDOrderedMap<SectionIndexes, ToOffsetMap> WholeMap;
+	typedef std::map<uint8_t, std::vector<uint64_t> > FromOffsetMap;
+	typedef std::map<uint64_t, FromOffsetMap> ToOffsetMap;
+	typedef std::map<SectionIndexes, ToOffsetMap> WholeMap;
 
 
 	static ld::Section			_s_section;

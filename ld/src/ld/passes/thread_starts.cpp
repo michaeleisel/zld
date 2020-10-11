@@ -42,7 +42,7 @@ namespace passes {
 namespace thread_starts {
 
 
-static LDOrderedMap<const Atom*, uint64_t> sAtomToAddress;
+static std::map<const Atom*, uint64_t> sAtomToAddress;
 
 
 

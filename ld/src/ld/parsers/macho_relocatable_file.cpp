@@ -215,7 +215,7 @@ protected:
 	class Atom<A>*					_beginAtoms;
 	class Atom<A>*					_endAtoms;
 	bool							_hasAliases;
-	LDOrderedSet<const class Atom<A>*>	_altEntries;
+	std::set<const class Atom<A>*>	_altEntries;
 };
 
 
@@ -847,11 +847,11 @@ private:
 												_lineInfoCount			: kLineInfoCountBits,
 												_unwindInfoCount		: kUnwindInfoCountBits;
 												
-	static LDMap<const ld::Atom*, const ld::File*> _s_fileOverride;
+	static std::unordered_map<const ld::Atom*, const ld::File*> _s_fileOverride;
 };
 
 template <typename A>
-LDMap<const ld::Atom*, const ld::File*> Atom<A>::_s_fileOverride;
+std::unordered_map<const ld::Atom*, const ld::File*> Atom<A>::_s_fileOverride;
 
 template <typename A>
 void Atom<A>::setFile(const ld::File* f) {
@@ -864,7 +864,7 @@ const ld::File* Atom<A>::file() const
 	if (_s_fileOverride.empty()) {
 		return &sect().file();
 	}
-	LDMap<const ld::Atom*, const ld::File*>::iterator pos = _s_fileOverride.find(this);
+	std::unordered_map<const ld::Atom*, const ld::File*>::iterator pos = _s_fileOverride.find(this);
 	if ( pos != _s_fileOverride.end() )
 		return pos->second;
 		
@@ -3724,7 +3724,7 @@ void Parser<A>::parseDebugInfo()
 				uint32_t curAtomOffset = 0;
 				uint32_t curAtomAddress = 0;
 				uint32_t curAtomSize = 0;
-				LDMap<uint32_t,const char*>	dwarfIndexToFile;
+				std::unordered_map<uint32_t,const char*>	dwarfIndexToFile;
 				if ( lines != NULL ) {
 					while ( line_next(lines, &result, line_stop_pc) ) {
 						//fprintf(stderr, "curAtom=%p, result.pc=0x%llX, result.line=%llu, result.end_of_sequence=%d,"
@@ -3785,7 +3785,7 @@ void Parser<A>::parseDebugInfo()
 							}
 						}
 						const char* filename;
-						LDMap<uint32_t,const char*>::iterator pos = dwarfIndexToFile.find(result.file);
+						std::unordered_map<uint32_t,const char*>::iterator pos = dwarfIndexToFile.find(result.file);
 						if ( pos == dwarfIndexToFile.end() ) {
 							filename = line_file(lines, result.file);
 							dwarfIndexToFile[result.file] = filename;
@@ -3842,7 +3842,7 @@ void Parser<A>::parseDebugInfo()
 template <typename A>
 void Parser<A>::parseStabs()
 {
-	typedef LDMap<const char*, Atom<A>*, ld::CStringHash, ld::CStringEquals> CStringToAtom;
+	typedef std::unordered_map<const char*, Atom<A>*, ld::CStringHash, ld::CStringEquals> CStringToAtom;
 	CStringToAtom atomMap;
 
 	{

@@ -647,7 +647,7 @@ void BitcodeBundle::doPass()
         sprintf(tempdir, "%s.bundle.XXXXXX", finalOutput);
     ::mkdtemp(tempdir);
     // A lookup map to look for BundlerHandler base on filename
-    LDMap<std::string, BundleHandler*> handlerMap;
+    std::unordered_map<std::string, BundleHandler*> handlerMap;
 
     BitcodeObfuscator* obfuscator = _options.hideSymbols() ? new BitcodeObfuscator() : NULL;
     // Build must keep symbols if we need to hide all the symbols
