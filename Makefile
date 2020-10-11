@@ -12,20 +12,20 @@ abseil-cpp-20200225:
 	make -C $@/build -j
 	find $@/build/absl -name '*.a' | xargs libtool -static -o $@/build/libabsl.a
 
-cfe-7.0.1.src:
-	curl -# -L http://releases.llvm.org/7.0.1/cfe-7.0.1.src.tar.xz | tar xJ
+cfe-8.0.1.src:
+	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz | tar xJ
 
 clean:
-	rm -rf abseil-cpp-20200225 build cfe-7.0.1.src dyld-635.2 llvm-7.0.1.src pstl tapi-1100.0.11 tbb
+	rm -rf abseil-cpp-20200225 build cfe-8.0.1.src dyld-635.2 llvm-8.0.1.src pstl tapi-1100.0.11 tbb
 
 dyld-635.2:
 	curl -# -L https://opensource.apple.com/tarballs/dyld/dyld-635.2.tar.gz | tar xz
 	patch -p1 -d dyld-635.2 < patches/dyld.patch
 
-fetch: abseil-cpp-20200225 cfe-7.0.1.src dyld-635.2 llvm-7.0.1.src tapi-1100.0.11 tbb
+fetch: abseil-cpp-20200225 cfe-8.0.1.src dyld-635.2 llvm-8.0.1.src tapi-1100.0.11 tbb
 
-llvm-7.0.1.src:
-	curl -# -L http://releases.llvm.org/7.0.1/llvm-7.0.1.src.tar.xz | tar xJ
+llvm-8.0.1.src:
+	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz | tar xJ
 
 HASH := $(shell git rev-parse --short HEAD)
 package:
