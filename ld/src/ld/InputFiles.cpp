@@ -715,6 +715,7 @@ void InputFiles::addLinkerOptionLibraries(ld::Internal& state, ld::File::AtomHan
 		CStringSet newLibraries = std::move(state.unprocessedLinkerOptionLibraries);
 		std::vector<std::pair<Options::FileInfo, const char *>> infosToParse;
 		state.unprocessedLinkerOptionLibraries.clear();
+		// The try-catch statement here is a bit tricky w.r.t. the parallelization, see https://github.com/michaeleisel/zld/pull/63
 		for (const char* libName : newLibraries) {
 			if ( state.linkerOptionLibraries.count(libName) )
 				continue;
@@ -729,10 +730,7 @@ void InputFiles::addLinkerOptionLibraries(ld::Internal& state, ld::File::AtomHan
 				}
 			}
 			catch (const char* msg) {
-				if ( strstr(msg, "but linking") != nullptr )
-					warning("%s '%s'", msg, "<libname>");
-				// <rdar://problem/40829444> only warn about missing auto-linked library if some missing symbol error happens later
-				state.missingLinkerOptionLibraries.insert(libName);
+				handleLinkerOptionException(msg, state, libName);
 			}
 		}
 		typedef std::tuple<ld::File *, Options::FileInfo&, const char *> Triple;
@@ -774,14 +772,18 @@ void InputFiles::addLinkerOptionLibraries(ld::Internal& state, ld::File::AtomHan
     			}
     		}
     		catch (const char* msg) {
-				if ( strstr(msg, "but linking") != nullptr )
-					warning("%s '%s'", msg, "<libname>");
-    			// <rdar://problem/40829444> only warn about missing auto-linked library if some missing symbol error happens later
-    			state.missingLinkerOptionLibraries.insert(std::get<2>(triple));
+				handleLinkerOptionException(msg, state, std::get<2>(triple));
     		}
     		state.linkerOptionLibraries.insert(std::get<2>(triple));
 		}
 	}
+}
+
+void InputFiles::handleLinkerOptionException(const char *msg, ld::Internal& state, const char *libName) {
+	if ( strstr(msg, "but linking") != nullptr )
+		warning("%s '%s'", msg, "<libname>");
+	// <rdar://problem/40829444> only warn about missing auto-linked library if some missing symbol error happens later
+	state.missingLinkerOptionLibraries.insert(libName);
 }
 
 void InputFiles::createIndirectDylibs()
