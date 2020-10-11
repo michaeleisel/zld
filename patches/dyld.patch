@@ -1,6 +1,6 @@
-diff -Naur dyld-635.2.orig/include/mach-o/dyld.h dyld-635.2/include/mach-o/dyld.h
---- dyld-635.2.orig/include/mach-o/dyld.h	2018-06-18 16:44:51.000000000 -0700
-+++ dyld-635.2/include/mach-o/dyld.h	2019-01-18 20:58:51.000000000 -0800
+diff -Naur dyld-733.6.orig/include/mach-o/dyld.h dyld-733.6/include/mach-o/dyld.h
+--- dyld-733.6.orig/include/mach-o/dyld.h	2018-06-18 16:44:51.000000000 -0700
++++ dyld-733.6/include/mach-o/dyld.h	2019-01-18 20:58:51.000000000 -0800
 @@ -144,6 +144,7 @@
  
  typedef struct __NSObjectFileImage* NSObjectFileImage;
@@ -9,9 +9,9 @@ diff -Naur dyld-635.2.orig/include/mach-o/dyld.h dyld-635.2/include/mach-o/dyld.
  
  
  /* NSObjectFileImage can only be used with MH_BUNDLE files */
-diff -Naur dyld-635.2.orig/include/mach-o/dyld_priv.h dyld-635.2/include/mach-o/dyld_priv.h
---- dyld-635.2.orig/include/mach-o/dyld_priv.h	2018-04-19 21:42:22.000000000 -0700
-+++dyld-635.2/include/mach-o/dyld_priv.h	2019-01-18 21:10:56.000000000 -0800
+diff -Naur dyld-733.6.orig/include/mach-o/dyld_priv.h dyld-733.6/include/mach-o/dyld_priv.h
+--- dyld-733.6.orig/include/mach-o/dyld_priv.h	2018-04-19 21:42:22.000000000 -0700
++++dyld-733.6/include/mach-o/dyld_priv.h	2019-01-18 21:10:56.000000000 -0800
 @@ -180,6 +180,8 @@
      uint32_t        version;
  } dyld_build_version_t;
