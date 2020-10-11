@@ -23,7 +23,7 @@ It all depends on your risk tolerance and how much you value the speedup in incr
 
 ### Installation
 
-Download the [latest release](https://github.com/michaeleisel/zld/releases/latest) and install the Xcode toolchain if you haven't.
+Checkout the [latest release](https://github.com/michaeleisel/zld/releases/latest) from master and run `make`, then see in the output where it built zld (e.g. `build/Build/Products/Release/zld`).
 
 ### Usage
 
