@@ -24,8 +24,8 @@ dyld-635.2:
 
 fetch: abseil-cpp-20200225 cfe-7.0.1.src dyld-635.2 llvm-7.0.1.src tapi-1100.0.11 tbb
 
-llvm-7.0.1.src:
-	curl -# -L http://releases.llvm.org/7.0.1/llvm-7.0.1.src.tar.xz | tar xJ
+llvm-8.0.1.src:
+	curl -# -L http://releases.llvm.org/8.0.1/llvm-8.0.1.src.tar.xz | tar xJ
 
 HASH := $(shell git rev-parse --short HEAD)
 package:
