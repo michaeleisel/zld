@@ -177,10 +177,18 @@ void VersionSet::checkDylibCrosslink(const VersionSet& dylibPlatforms, const std
                             break;
                     case PlatEnforce::warning: {
                         // zld: if the .tbd supports macOS, and cmdLinePlatform is some simulator platform, then
-                        // allow it to occur. Otherwise, it seems with tapi v4 files in Xcode 12, there are .tbd files
+                        // allow it to occur. Otherwise, it seems with tapi v4 files in Xcode 12, there are system .tbd files
                         // in that folder without the right simulators included in their platform list
                         bool isSimulator = cmdLinePlatform == Platform::iOS_simulator || cmdLinePlatform == Platform::tvOS_simulator || cmdLinePlatform == Platform::watchOS_simulator;
-                        if (isSimulator && dylibPlatforms.contains(Platform::macOS)) {
+                        auto slashPos = targetPath.rfind("/");
+                        bool isSystem = false;
+                        if (slashPos != std::string::npos) {
+                            auto basename = targetPath.substr(slashPos + 1);
+                            if (basename.find("libsystem_") == 0 || targetPath.rfind("/host/") == slashPos - 5) {
+                                isSystem = true;
+                            }
+                        }
+                        if (isSimulator && isSystem && dylibPlatforms.contains(Platform::macOS)) {
                             break;
                         }
                         if ( !warned ) {
