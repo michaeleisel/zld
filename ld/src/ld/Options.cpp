@@ -3994,6 +3994,8 @@ void Options::parse(int argc, const char* argv[])
 			}
 			else if (strcmp(arg, "-zld_force") == 0) {
 			}
+			else if (strcmp(arg, "-no_adhoc_codesign") == 0) {
+			}
 			else if (strcmp(arg, "-no_new_main") == 0) {
 				// HACK until 39514191 is fixed
 			}
