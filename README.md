@@ -30,6 +30,15 @@ Checkout the [latest release](https://github.com/michaeleisel/zld/releases/lates
 #### If using Xcode:
 Get the path of zld from `which zld`, then add `-fuse-ld=<path to zld> -Wl,-zld_original_ld_path,$(DT_TOOLCHAIN_DIR)/usr/bin/ld` to "Other Linker Flags" in the build settings (debug configuration). That `-zld_original_ld_path` provides the path to the linker Xcode would otherwise use, which is important because there are certain known cases (e.g. arm64_32 and Catalyst) where zld knows that it has issues and will silently use that linker instead. Fixing these cases is a work-in-progress (largely blocked by Apple being slow to release source code).
 
+#### If using Bazel:
+
+Add these to your `.bazelrc` or pass them to your command line.
+
+```
+build --linkopt=-fuse-ld=<path to zld>
+build --linkopt=-Wl,-zld_original_ld_path,__BAZEL_XCODE_DEVELOPER_DIR__/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
+```
+
 #### If using Rust:
 
 You can edit `~/.cargo/config` to add a linker flag, e.g.:
