@@ -24,7 +24,7 @@ It all depends on your risk tolerance and how much you value the speedup in incr
 ### Installation
 
 - Install Xcode and run `sudo xcode-select -s <path to Xcode>`
-- Checkout the [latest release](https://github.com/michaeleisel/zld/releases/latest) from master
+- Checkout the [latest release of zld](https://github.com/michaeleisel/zld/releases/latest) from master
 - Run `git clean -dfx && make`
 - See in the output where it built zld (probably `build/Build/Products/Release/zld`).
 
