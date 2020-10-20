@@ -39,6 +39,8 @@ build --linkopt=-fuse-ld=<path to zld>
 build --linkopt=-Wl,-zld_original_ld_path,__BAZEL_XCODE_DEVELOPER_DIR__/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
 ```
 
+Note that you will need to disable sandbox for this to work now. Additionally, to make the linking actions cacheable, the path to zld must be deterministic (e.g. `/tmp/zld-09ea158`, where `09ea158` is zld version).
+
 #### If using Rust:
 
 You can edit `~/.cargo/config` to add a linker flag, e.g.:
