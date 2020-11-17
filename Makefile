@@ -1,5 +1,6 @@
 
 build: fetch
+	misc/checks.rb
 	xcodebuild -project ld/zld.xcodeproj -scheme zld -derivedDataPath build -configuration Release build
 
 test: fetch
