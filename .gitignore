@@ -6,6 +6,8 @@
 /pstl/
 /tapi-1100.0.11/
 /tbb/
+/tbb_staticlib/
+/ld/libtbb.a
 
 .DS_Store
 *.xcscheme

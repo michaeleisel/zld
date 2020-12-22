@@ -1308,6 +1308,7 @@
 				SECTORDER_FLAGS = "";
 				STRIP_INSTALLED_PRODUCT = NO;
 				TOOLCHAINS = osx;
+				VALID_ARCHS = x86_64;
 				VERSIONING_SYSTEM = "apple-generic";
 				WARNING_CFLAGS = "-Wall";
 			};
@@ -1401,7 +1402,6 @@
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
 				TOOLCHAINS = osx;
-				VALID_ARCHS = "x86_64 i386 ppc";
 				VERSIONING_SYSTEM = "apple-generic";
 				WARNING_CFLAGS = "-Wall";
 			};
@@ -1441,6 +1441,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = ObjectDump;
 				SECTORDER_FLAGS = "";
+				VALID_ARCHS = x86_64;
 				WARNING_CFLAGS = (
 					"-Wmost",
 					"-Wno-four-char-constants",
@@ -1473,6 +1474,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = ObjectDump;
+				VALID_ARCHS = x86_64;
 				WARNING_CFLAGS = (
 					"-Wmost",
 					"-Wno-four-char-constants",
@@ -1831,6 +1833,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = ObjectDump;
+				VALID_ARCHS = x86_64;
 				WARNING_CFLAGS = (
 					"-Wmost",
 					"-Wno-four-char-constants",
