@@ -48,7 +48,6 @@ tbb:
 tbb_staticlib:
 	mkdir -p $@
 	curl -# -L https://github.com/intel/tbb/archive/v2020.1.tar.gz | tar xz -C $@ --strip-components=1
-	patch -p1 -d $@ < patches/tbb.patch
 	make -C $@ -j arch=intel64 extra_inc=big_iron.inc
 	make -C $@ -j arch=arm64 extra_inc=big_iron.inc
 	find $@/build -name libtbb.a | xargs lipo -create -output ld/libtbb.a
