@@ -39,9 +39,12 @@
 #include <unordered_set>
 
 #include "configure.h"
-#include <nmmintrin.h>
 #include "MapDefines.h"
 #include "PlatformSupport.h"
+
+#ifdef __x86_64__
+#include <nmmintrin.h>
+#endif /* __x86_64__ */
 
 //FIXME: Only needed until we move VersionSet into PlatformSupport
 class Options;
@@ -1253,32 +1256,48 @@ typedef struct {
 
 static inline size_t CRCHash(const char *__s, size_t len) {
 	if (Tweaks::reproEnabled()) {
-    	size_t __h = 0;
-    	for ( ; *__s; ++__s)
-    		__h = 5 * __h + *__s;
-    	return __h;
+		size_t __h = 0;
+		for ( ; *__s; ++__s)
+			__h = 5 * __h + *__s;
+		return __h;
 	}
 
 	uint32_t __h = 5183;
 	int curr = len;
 	uint64_t *chunks = (uint64_t *)__s;
 	while (curr >= 8) {
+#ifdef __x86_64__
 		__h = (uint32_t)_mm_crc32_u64((uint64_t)__h, *chunks);
+#else
+		__h = __builtin_arm_crc32d((uint64_t)__h, *chunks);
+#endif /* __x86_64__ */
 		chunks++;
 		curr -= 8;
 	}
 	if (curr >= 4) {
 		uint32_t *bits = (uint32_t *)(__s + len - curr);
+#ifdef __x86_64__
 		__h = _mm_crc32_u32(__h, *bits);
+#else
+		__h = __builtin_arm_crc32w(__h, *bits);
+#endif /* __x86_64__ */
 		curr -= 4;
 	}
 	if (curr >= 2) {
 		uint16_t *bits = (uint16_t *)(__s + len - curr);
+#ifdef __x86_64__
 		__h = _mm_crc32_u16(__h, *bits);
+#else
+		__h = __builtin_arm_crc32h(__h, *bits);
+#endif /* __x86_64__ */
 		curr -= 2;
 	}
 	if (curr >= 1) {
+#ifdef __x86_64__
 		__h = _mm_crc32_u8(__h, __s[len - 1]);
+#else
+		__h = __builtin_arm_crc32b(__h, __s[len - 1]);
+#endif /* __x86_64__ */
 	}
 	return (size_t)__h;
 }

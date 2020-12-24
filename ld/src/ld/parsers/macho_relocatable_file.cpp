@@ -5649,7 +5649,13 @@ template <typename A>
 unsigned long Literal16Section<A>::contentHash(const class Atom<A>* atom, const ld::IndirectBindingTable& ind) const
 {
 	const uint64_t* byteContent = (uint64_t *)atom->contentPointer();
-	return _mm_crc32_u64(5381, byteContent[0]) ^ _mm_crc32_u64(5381, byteContent[1]);
+	unsigned long hash = 5381;
+#ifdef __x86_64__
+	return _mm_crc32_u64(hash, byteContent[0]) ^ _mm_crc32_u64(hash, byteContent[1]);
+#endif /* __x86_64__ */
+#ifdef __aarch64__
+	return __builtin_arm_crc32d(hash, byteContent[0]) ^ __builtin_arm_crc32d(hash, byteContent[1]);
+#endif /* __aarch64__ */
 }
 
 template <typename A>
