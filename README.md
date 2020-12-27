@@ -27,7 +27,14 @@ It all depends on your risk tolerance and how much you value the speedup in incr
 
 ### Installation
 
-- Install Xcode and run `sudo xcode-select -s <path to Xcode>`
+Pre-built binary
+
+The pre-built binary for the latest release is [here](https://github.com/michaeleisel/zld/releases/latest).
+
+Building from source
+
+- Install Xcode 12.2+ and run `sudo xcode-select -s <path to Xcode>`
+- Install cmake
 - Checkout the [latest release of zld](https://github.com/michaeleisel/zld/releases/latest) from master
 - Run `make clean && make`
 - See in the output where it built zld (probably `build/Build/Products/Release/zld`).
