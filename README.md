@@ -27,11 +27,11 @@ It all depends on your risk tolerance and how much you value the speedup in incr
 
 ### Installation
 
-Pre-built binary
+#### Pre-built binary
 
 The pre-built binary for the latest release is [here](https://github.com/michaeleisel/zld/releases/latest).
 
-Building from source
+#### Building from source
 
 - Install Xcode 12.2+ and run `sudo xcode-select -s <path to Xcode>`
 - Install cmake
