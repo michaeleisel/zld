@@ -1,0 +1,25 @@
+on:
+  push:
+    tags:
+      - '*'
+name: Release
+jobs:
+  build:
+    name: Release
+    runs-on: macos-11.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Xcode select
+        run: sudo xcode-select -s /Applications/Xcode_12.3.app/Contents/Developer
+      - name: Build & Package
+        run: make github_release
+      - name: Upload
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: build/Build/Products/Release/zld.tar.xz
+          asset_name: zld.tar.xz
+          asset_content_type: application/x-xz
