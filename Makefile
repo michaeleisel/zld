@@ -37,6 +37,9 @@ package:
 	tar -C build/Build/Products/Release -cvJf build/Build/Products/Release/zld.$(HASH).tar.xz zld
 	tar -C build/Build/Products/Release -cvJf build/Build/Products/Release/zld.dSYM.$(HASH).tar.xz zld.dSYM
 
+github_release: build
+	tar -C build/Build/Products/Release -cvJf build/Build/Products/Release/zld.tar.xz zld
+
 tapi-1100.0.11:
 	mkdir -p $@
 	curl -# -L https://opensource.apple.com/tarballs/tapi/tapi-1100.0.11.tar.gz | tar xz -C $@ --strip-components=1
