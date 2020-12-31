@@ -14,12 +14,20 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode_12.3.app/Contents/Developer
       - name: Build & Package
         run: make github_release
-      - name: Upload
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+      - name: Upload Release Asset
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: build/Build/Products/Release/zld.tar.xz
           asset_name: zld.tar.xz
           asset_content_type: application/x-xz
