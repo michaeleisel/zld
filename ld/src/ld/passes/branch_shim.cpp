@@ -289,8 +289,8 @@ void doPass(const Options& opts, ld::Internal& state)
 	// scan all sections
 	for (std::vector<ld::Internal::FinalSection*>::iterator sit=state.sections.begin(); sit != state.sections.end(); ++sit) {
 		ld::Internal::FinalSection* sect = *sit;
-		LDOrderedMap<const Atom*, const Atom*> atomToThumbMap;
-		LDOrderedMap<const Atom*, const Atom*> thumbToAtomMap;
+		std::map<const Atom*, const Atom*> atomToThumbMap;
+		std::map<const Atom*, const Atom*> thumbToAtomMap;
 		std::vector<const Atom*> shims;
 		// scan section for branch instructions that need to switch mode
 		for (std::vector<const ld::Atom*>::iterator ait=sect->atoms.begin();  ait != sect->atoms.end(); ++ait) {
@@ -314,7 +314,7 @@ void doPass(const Options& opts, ld::Internal& state)
 							if ( is_b || (targetIsProxy && makingKextBundle) ) {
 								if ( _s_log ) fprintf(stderr, "need to add thumb->arm instr=0x%08X shim to %s for %s\n", instruction, target->name(), atom->name()); 
 								const Atom* shim = NULL;
-								LDOrderedMap<const Atom*, const Atom*>::iterator pos = thumbToAtomMap.find(target);
+								std::map<const Atom*, const Atom*>::iterator pos = thumbToAtomMap.find(target);
 								if ( pos == thumbToAtomMap.end() ) {
 									if ( opts.archSupportsThumb2() ) {
 										// <rdar://problem/9116044> make long-branch style shims for arm kexts
@@ -353,7 +353,7 @@ void doPass(const Options& opts, ld::Internal& state)
 							if ( is_b || (targetIsProxy && makingKextBundle) ) {
 								if ( _s_log ) fprintf(stderr, "need to add arm->thumb instr=0x%08X shim to %s for %s\n", instruction, target->name(), atom->name()); 
 								const Atom* shim = NULL;
-								LDOrderedMap<const Atom*, const Atom*>::iterator pos = atomToThumbMap.find(target);
+								std::map<const Atom*, const Atom*>::iterator pos = atomToThumbMap.find(target);
 								if ( pos == atomToThumbMap.end() ) {
 									// <rdar://problem/9116044> make long-branch style shims for arm kexts
 									if ( makingKextBundle && opts.allowTextRelocs() )

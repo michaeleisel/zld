@@ -41,7 +41,7 @@ namespace passes {
 namespace branch_island {
 
 
-static LDOrderedMap<const Atom*, uint64_t> sAtomToAddress;
+static std::map<const Atom*, uint64_t> sAtomToAddress;
 
 
 struct TargetAndOffset { const ld::Atom* atom; uint32_t offset; };
@@ -485,7 +485,7 @@ static void makeIslandsForSection(const Options& opts, ld::Internal& state, ld::
 	const int kIslandRegionsCount = branchIslandInsertionPoints.size();
 
 	if (_s_log) fprintf(stderr, "ld: will use %u branch island regions\n", kIslandRegionsCount);
-	typedef LDOrderedMap<TargetAndOffset,const ld::Atom*, TargetAndOffsetComparor> AtomToIsland;
+	typedef std::map<TargetAndOffset,const ld::Atom*, TargetAndOffsetComparor> AtomToIsland;
     AtomToIsland* regionsMap[kIslandRegionsCount];
 	uint64_t regionAddresses[kIslandRegionsCount];
 	std::vector<const ld::Atom*>* regionsIslands[kIslandRegionsCount];

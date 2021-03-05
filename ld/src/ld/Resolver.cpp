@@ -39,8 +39,6 @@
 #include <dlfcn.h>
 #include <mach-o/dyld.h>
 #include <mach-o/fat.h>
-#include <iostream>
-#include <fstream>
 
 #include <string>
 #include <map>
@@ -389,10 +387,10 @@ void Resolver::doFile(const ld::File& file)
 								   "You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target.", file.path());
 						}
 						else {
-								warning("all bitcode will be dropped because '%s' was built without bitcode. "
-										"You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target. ", file.path());
-								_internal.filesWithBitcode.clear();
-								_internal.dropAllBitcode = true;
+							warning("all bitcode will be dropped because '%s' was built without bitcode. "
+									"You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target. ", file.path());
+							_internal.filesWithBitcode.clear();
+							_internal.dropAllBitcode = true;
 						}
 					});
 				}
@@ -442,9 +440,9 @@ void Resolver::doFile(const ld::File& file)
 						throwf("not all .o files built with same Swift language version. Started with (%s), now found (%s) in",
 						       otherVersion, fileVersion);
 					}
-					}
 				}
 			}
+		}
 
 		// record minimums swift language version used
 		if ( file.swiftLanguageVersion() != 0 ) {
@@ -575,10 +573,10 @@ void Resolver::doFile(const ld::File& file)
 								   "You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target.", file.path());
 						}
 						else {
-								warning("all bitcode will be dropped because '%s' was built without bitcode. "
-										"You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target.", file.path());
-								_internal.filesWithBitcode.clear();
-								_internal.dropAllBitcode = true;
+							warning("all bitcode will be dropped because '%s' was built without bitcode. "
+									"You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target.", file.path());
+							_internal.filesWithBitcode.clear();
+							_internal.dropAllBitcode = true;
 						}
 					});
 				}
@@ -909,10 +907,10 @@ void Resolver::resolveUndefines()
 					}
 					else if ( strncmp(undef, "segment$", 8) == 0 ) {
 						if ( strncmp(undef, "segment$start$", 14) == 0 ) {
-							this->doAtom(*SegmentBoundaryAtom::makeSegmentBoundaryAtom(undef, true, &undef[14])); 
+							this->doAtom(*SegmentBoundaryAtom::makeSegmentBoundaryAtom(undef, true, &undef[14]));
 						}
 						else if ( strncmp(undef, "segment$end$", 12) == 0 ) {
-							this->doAtom(*SegmentBoundaryAtom::makeSegmentBoundaryAtom(undef, false, &undef[12])); 
+							this->doAtom(*SegmentBoundaryAtom::makeSegmentBoundaryAtom(undef, false, &undef[12]));
 						}
 					}
 					else if ( _options.outputKind() == Options::kPreload ) {
@@ -1188,9 +1186,9 @@ void Resolver::deadStripOptimize(bool force)
 			}
 		}
 	}
-	
+
 	// mark all roots as live, and all atoms they reference
-	for (LDOrderedSet<const ld::Atom*>::iterator it=_deadStripRoots.begin(); it != _deadStripRoots.end(); ++it) {
+	for (std::set<const ld::Atom*>::iterator it=_deadStripRoots.begin(); it != _deadStripRoots.end(); ++it) {
 		WhyLiveBackChain rootChain;
 		rootChain.previous = NULL;
 		rootChain.referer = *it;
@@ -1873,7 +1871,7 @@ void Resolver::linkTimeOptimize()
 		this->checkDylibSymbolCollisions();
 
 		// <rdar://problem/33853815> remove undefs from LTO objects that gets optimized away
-		LDSet<const ld::Atom*> mustPreserve;
+		std::unordered_set<const ld::Atom*> mustPreserve;
 		if ( _internal.classicBindingHelper != NULL )
 			mustPreserve.insert(_internal.classicBindingHelper);
 		if ( _internal.compressedFastBinderProxy != NULL )
@@ -1930,14 +1928,6 @@ void Resolver::buildArchivesList()
 	_inputFiles.archives(_internal);
 }
 
-void Resolver::dumpMembersParsed()
-{
-	std::ofstream stream;
-	stream.open(_options.cacheFilePath());
-	_inputFiles.dumpMembersParsed(stream);
-	stream.close();
-}
-
 void Resolver::dumpAtoms() 
 {
 	fprintf(stderr, "Resolver all atoms:\n");
@@ -1965,7 +1955,6 @@ void Resolver::resolve()
 	this->tweakWeakness();
     _symbolTable.checkDuplicateSymbols();
 	this->buildArchivesList();
-	this->dumpMembersParsed();
 }
 
 

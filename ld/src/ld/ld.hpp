@@ -34,17 +34,11 @@
 #include <set>
 #include <map>
 #include <vector>
-#include "Tweaks.hpp"
 #include <string>
 #include <unordered_set>
 
 #include "configure.h"
-#include "MapDefines.h"
 #include "PlatformSupport.h"
-
-#ifdef __x86_64__
-#include <nmmintrin.h>
-#endif /* __x86_64__ */
 
 //FIXME: Only needed until we move VersionSet into PlatformSupport
 class Options;
@@ -68,10 +62,10 @@ struct PlatformVersion {
 
 struct VersionSet {
 private:
-	LDOrderedSet<PlatformVersion> _versions;
+	std::set<PlatformVersion> _versions;
 public:
 	VersionSet() {}
-	VersionSet(const LDOrderedSet<PlatformVersion>& V) : _versions(V) {}
+	VersionSet(const std::set<PlatformVersion>& V) : _versions(V) {}
 	void insert(PlatformVersion platformVersion) {
 		assert(_versions.find(platformVersion) == _versions.end());
 		_versions.insert(platformVersion);
@@ -247,7 +241,7 @@ static const VersionSet version2010Fall ({mac10_7, iOS_4_3});
 static const VersionSet version2012 	({mac10_8, iOS_6_0});
 static const VersionSet version2013 	({mac10_9, iOS_7_0});
 static const VersionSet version2019Fall ({mac10_15, iOS_13_0, watchOS_6_0, tvOS_13_0, bridgeOS_4_0});
-	
+
 static const VersionSet supportsSplitSegV2 		({mac10_12, iOS_9_0, watchOS_2_0, tvOS_9_0});
 // FIXME: Use the comment out line instead.
 static const VersionSet supportsLCBuildVersion 	({mac10_14, iOS_12_0, watchOS_5_0, tvOS_12_0, bridgeOS_1_0});
@@ -367,7 +361,6 @@ public:
 	virtual uint32_t					cpuSubType() const		{ return 0; }
 	virtual uint32_t					subFileCount() const	{ return 1; }
 	virtual const VersionSet&			platforms() const		{ return _platforms; }
-	virtual void markSubFrameworksAsExported(const char *myLeaf) { }
     bool								fileExists() const     { return _modTime != 0; }
 	Type								type() const { return _type; }
 	virtual Bitcode*					getBitcode() const		{ return NULL; }
@@ -494,15 +487,6 @@ namespace dylib {
 				bool						willBeUpwardDylib() const		{ return _upward; }
 				void						setWillBeRemoved(bool value)	{ _dead = value; }
 				bool						willRemoved() const				{ return _dead; }
-		void markSubFrameworksAsExported(const char *myLeaf) {
-			const char* childParent = parentUmbrella();
-			if ( childParent != NULL ) {
-				if ( strcmp(childParent, &myLeaf[1]) == 0 ) {
-					// mark that this dylib will be re-exported
-					setWillBeReExported();
-				}
-			}
-		}
 				
 		virtual void						processIndirectLibraries(DylibHandler* handler, bool addImplicitDylibs) = 0;
 		virtual bool						providedExportAtom() const = 0;
@@ -550,9 +534,6 @@ namespace archive {
 												: ld::File(pth, modTime, ord, Archive) { }
 		virtual								~File() {}
 		virtual bool						justInTimeDataOnlyforEachAtom(const char* name, AtomHandler&) const = 0;
-    	virtual void dumpMembersParsed(std::ofstream &stream) const = 0;
-		virtual std::vector<void *> membersToParse(LDSet<std::string> &set) const = 0;
-		virtual void parseMember(void *member) const = 0;
 	};
 } // namespace archive 
 
@@ -1248,97 +1229,21 @@ public:
 
 
 
-typedef struct {
-	const char *str;
-	size_t length;
-	size_t hash;
-} LDString;
-
-static inline size_t CRCHash(const char *__s, size_t len) {
-	if (Tweaks::reproEnabled()) {
+// utility classes for using std::unordered_map with c-strings
+struct CStringHash {
+	size_t operator()(const char* __s) const {
 		size_t __h = 0;
 		for ( ; *__s; ++__s)
 			__h = 5 * __h + *__s;
 		return __h;
-	}
-
-	uint32_t __h = 5183;
-	int curr = len;
-	uint64_t *chunks = (uint64_t *)__s;
-	while (curr >= 8) {
-#ifdef __x86_64__
-		__h = (uint32_t)_mm_crc32_u64((uint64_t)__h, *chunks);
-#else
-		__h = __builtin_arm_crc32d((uint64_t)__h, *chunks);
-#endif /* __x86_64__ */
-		chunks++;
-		curr -= 8;
-	}
-	if (curr >= 4) {
-		uint32_t *bits = (uint32_t *)(__s + len - curr);
-#ifdef __x86_64__
-		__h = _mm_crc32_u32(__h, *bits);
-#else
-		__h = __builtin_arm_crc32w(__h, *bits);
-#endif /* __x86_64__ */
-		curr -= 4;
-	}
-	if (curr >= 2) {
-		uint16_t *bits = (uint16_t *)(__s + len - curr);
-#ifdef __x86_64__
-		__h = _mm_crc32_u16(__h, *bits);
-#else
-		__h = __builtin_arm_crc32h(__h, *bits);
-#endif /* __x86_64__ */
-		curr -= 2;
-	}
-	if (curr >= 1) {
-#ifdef __x86_64__
-		__h = _mm_crc32_u8(__h, __s[len - 1]);
-#else
-		__h = __builtin_arm_crc32b(__h, __s[len - 1]);
-#endif /* __x86_64__ */
-	}
-	return (size_t)__h;
-}
-
-static inline LDString LDStringCreate(const char *str) {
-	auto length = strlen(str);
-	return (LDString){
-		.str = str,
-		.length = length,
-		.hash = CRCHash(str, length),
-	};
-}
-
-struct CLDStringHash {
-	size_t operator()(LDString __s) const {
-		return __s.hash;
-	}
-};
-
-// utility classes for using LDMap with c-strings
-struct CStringHash {
-	size_t operator()(const char* __s) const {
-		int len = strlen(__s);
-		return CRCHash(__s, len);
 	};
 };
-
-struct CLDStringEquals
-{
-	bool operator()(LDString left, LDString right) const {
-		return left.hash == right.hash && left.length == right.length
-		  && (left.str == right.str || memcmp(left.str, right.str, left.length) == 0);
-    }
-};
-
 struct CStringEquals
 {
 	bool operator()(const char* left, const char* right) const { return (strcmp(left, right) == 0); }
 };
 
-typedef	LDSet<const char*, ld::CStringHash, ld::CStringEquals>  CStringSet;
+typedef	std::unordered_set<const char*, ld::CStringHash, ld::CStringEquals>  CStringSet;
 
 
 class Internal
@@ -1365,7 +1270,7 @@ public:
 		bool							hasExternalRelocs;
 	};
 	
-	typedef LDOrderedMap<const ld::Atom*, FinalSection*>	AtomToSection;		
+	typedef std::map<const ld::Atom*, FinalSection*>	AtomToSection;		
 
 	virtual uint64_t					assignFileOffsets() = 0;
 	virtual void						setSectionSizesAndAlignments() = 0;
@@ -1403,8 +1308,8 @@ public:
 	std::vector<const ld::relocatable::File*>	filesWithBitcode;
 	std::vector<const ld::relocatable::File*>	filesFromCompilerRT;
 	std::vector<const ld::Atom*>				deadAtoms;
-	LDSet<const char*>				allUndefProxies;
-	LDSet<uint64_t>				toolsVersions;
+	std::unordered_set<const char*>				allUndefProxies;
+	std::unordered_set<uint64_t>				toolsVersions;
 	const ld::dylib::File*						bundleLoader;
 	const Atom*									entryPoint;
 	const Atom*									classicBindingHelper;

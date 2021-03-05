@@ -46,7 +46,6 @@ extern "C" double log2 ( double );
 #include <mach-o/dyld.h>
 #include <dlfcn.h>
 #include <AvailabilityMacros.h>
-#include <tbb/global_control.h>
 
 #include <string>
 #include <map>
@@ -161,13 +160,13 @@ private:
 	struct SectionEquals {
 		bool operator()(const ld::Section* left, const ld::Section* right) const;
 	};
-	typedef LDMap<const ld::Section*, FinalSection*, SectionHash, SectionEquals> SectionInToOut;
+	typedef std::unordered_map<const ld::Section*, FinalSection*, SectionHash, SectionEquals> SectionInToOut;
 	
 
 	SectionInToOut			_sectionInToFinalMap;
 	const Options&			_options;
 	bool					_atomsOrderedInSections;
-	LDMap<const ld::Atom*, const char*> _pendingSegMove;
+	std::unordered_map<const ld::Atom*, const char*> _pendingSegMove;
 };
 
 ld::Section	InternalState::FinalSection::_s_DATA_data( "__DATA", "__data",  ld::Section::typeUnclassified);
@@ -321,7 +320,7 @@ uint32_t InternalState::FinalSection::segmentOrder(const ld::Section& sect, cons
 		if ( strcmp(sect.segmentName(), "__DATA_CONST") == 0 )
 			return ((options.outputKind() == Options::kKextBundle) || armCloseStubs) ? 5 : 3;
 		// in -r mode, want __DATA  last so zerofill sections are at end
-		if ( strcmp(sect.segmentName(), "__DATA") == 0 ) 
+		if ( strcmp(sect.segmentName(), "__DATA") == 0 )
 			return (options.outputKind() == Options::kObjectFile) ? 7 : 4;
 		if ( strcmp(sect.segmentName(), "__OBJC") == 0 ) 
 			return 5;
@@ -386,7 +385,7 @@ uint32_t InternalState::FinalSection::sectionOrder(const ld::Section& sect, uint
 					if ( (strcmp(sect.sectionName(), "__objc_methname") == 0) )
 						return INT_MAX - 1;
 					if ( (strcmp(sect.sectionName(), "__objc_methtype") == 0) )
-				return INT_MAX;
+						return INT_MAX;
 				}
 				return sectionsSeen+20;
 			default:
@@ -843,10 +842,9 @@ ld::Internal::FinalSection* InternalState::getFinalSection(const ld::Section& in
 				const ld::Section& outSect = FinalSection::outputSection(inputSection, _options.mergeZeroFill());
 				pos = _sectionInToFinalMap.find(&outSect);
 				if ( pos != _sectionInToFinalMap.end() ) {
-					auto value = pos->second;
-					_sectionInToFinalMap[&inputSection] = value;
+					_sectionInToFinalMap[&inputSection] = pos->second;
 					//fprintf(stderr, "_sectionInToFinalMap[%p] = %p\n", &inputSection, pos->second);
-					return value;
+					return pos->second;
 				}
 				else if ( outSect != inputSection ) {
 					// new output section created, but not in map
@@ -1305,12 +1303,11 @@ static void printTime(const char* msg, uint64_t partTime, uint64_t totalTime)
 		fprintf(stderr, "%24s: % 4d.%d milliseconds (% 4d.%d%%)\n", msg, milliSeconds, milliSecondsTimeTen-milliSeconds*10, percent, percentTimesTen-percent*10);
 	}
 	else {
-		double seconds = ((double)partTime)/sUnitsPerSecond;
-		fprintf(stderr, "%24s: %.2lf seconds\n", msg, seconds);
-		/*uint32_t seconds = secondsTimeTen/10;
+		uint32_t secondsTimeTen = (partTime*10)/sUnitsPerSecond;
+		uint32_t seconds = secondsTimeTen/10;
 		uint32_t percentTimesTen = (partTime*1000)/totalTime;
 		uint32_t percent = percentTimesTen/10;
-		fprintf(stderr, "%24s: % 4d.%d seconds (% 4d.%d%%)\n", msg, seconds, percent, percentTimesTen-percent*10);*/
+		fprintf(stderr, "%24s: % 4d.%d seconds (% 4d.%d%%)\n", msg, seconds, secondsTimeTen-seconds*10, percent, percentTimesTen-percent*10);
 	}
 }
 
@@ -1325,60 +1322,19 @@ static void getVMInfo(vm_statistics_data_t& info)
 	}
 }
 
-static const char *kOriginalPathFlag = "-zld_original_ld_path";
 
-void useFallbackLd(const char *fallbackPath, int argc, const char* argv[], const char *reason);
-void useFallbackLd(const char *fallbackPath, int argc, const char* argv[], const char *reason) {
-	fprintf(stderr, "note: zld does not fully support this invocation and will instead fall back to ld. Support will be added in the future. Reason: %s\n", reason);
-	argv[0] = fallbackPath;
-	for (int i = 0; i < argc; i++) {
-		if (strcmp(kOriginalPathFlag, argv[i]) == 0) {
-			for (int j = i; j < argc - 1 /* include null char * terminator */; j++) {
-				argv[j] = argv[j + 2];
-			}
-			break;
-		}
-	}
-	execv(fallbackPath, (char * const *)argv);
-}
+
 
 int main(int argc, const char* argv[])
 {
-	tbb::global_control c(tbb::global_control::thread_stack_size, 8 * 1024 * 1024);
 	const char* archName = NULL;
 	bool showArch = false;
 	try {
 		PerformanceStatistics statistics;
 		statistics.startTool = mach_absolute_time();
-
-		bool forceZld = false;
-		bool isArm64_32 = false;
-		const char *fallbackPath = NULL;
-		for (int i = 0; i < argc; i++) {
-			if (strcmp(argv[i], "-zld_force") == 0) {
-				forceZld = true;
-			} else if (strcmp(argv[i], "-arch") == 0 && i < argc - 1 && strcmp(argv[i + 1], "arm64_32") == 0) {
-				isArm64_32 = true;
-			} else if (strcmp(argv[i], kOriginalPathFlag) == 0 && i < argc - 1) {
-				const char *path = argv[i + 1];
-				assert(path[0] != '-');
-				fallbackPath = path;
-			}
-		}
-
-		// If a fallback path was not supplied, always use zld. While we could assume that /usr/bin/ld is the correct
-		// fallback and be right *most* of the time, this is not always the case, especially with people using Xcode beta
-		if (!fallbackPath) {
-			forceZld = true;
-		}
-
-		if (!forceZld && isArm64_32) {
-			useFallbackLd(fallbackPath, argc, argv, "WatchOS");
-		}
-
+		
 		// create object to track command line arguments
 		Options options(argc, argv);
-
 		InternalState state(options);
 		
 		// allow libLTO to be overridden by command line -lto_library
@@ -1519,4 +1475,5 @@ void __assert_rtn(const char* func, const char* file, int line, const char* fail
 	_exit(1);
 }
 #endif
+
 

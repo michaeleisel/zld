@@ -35,9 +35,6 @@
 #include "parsers/macho_relocatable_file.h"
 #include "parsers/lto_file.h"
 
-#define REPRO
-#include "MapDefines.h"
-
 const ld::VersionSet ld::File::_platforms;
 
 
@@ -56,7 +53,6 @@ static const char* sMatchName = NULL;
 static int sPrintRestrict;
 static int sPrintAlign;
 static int sPrintName;
-
 
  __attribute__((noreturn))
 void throwf(const char* format, ...) 

@@ -151,7 +151,7 @@ class MethodListAtom : public ld::Atom {
 public:
 											MethodListAtom(ld::Internal& state, const ld::Atom* baseMethodList, bool meta, 
 															const std::vector<const ld::Atom*>* categories, 
-															LDOrderedSet<const ld::Atom*>& deadAtoms);
+															std::set<const ld::Atom*>& deadAtoms);
 
 	virtual const ld::File*					file() const					{ return _file; }
 	virtual const char*						name() const					{ return "objc merged method list"; }
@@ -188,7 +188,7 @@ class ProtocolListAtom : public ld::Atom {
 public:
 											ProtocolListAtom(ld::Internal& state, const ld::Atom* baseProtocolList, 
 															const std::vector<const ld::Atom*>* categories, 
-															LDOrderedSet<const ld::Atom*>& deadAtoms);
+															std::set<const ld::Atom*>& deadAtoms);
 
 	virtual const ld::File*					file() const					{ return _file; }
 	virtual const char*						name() const					{ return "objc merged protocol list"; }
@@ -227,7 +227,7 @@ public:
 
 											PropertyListAtom(ld::Internal& state, const ld::Atom* baseProtocolList, 
 													 const std::vector<const ld::Atom*>* categories, 
-													 LDOrderedSet<const ld::Atom*>& deadAtoms, 
+													 std::set<const ld::Atom*>& deadAtoms, 
 													 PropertyKind kind);
 
 	virtual const ld::File*					file() const					{ return _file; }
@@ -427,17 +427,17 @@ public:
 	static const ld::Atom*	getClassProperties(ld::Internal& state, const ld::Atom* contentAtom);
 	// Setters
 	static const ld::Atom*	setName(ld::Internal& state, const ld::Atom* categoryAtom,
-									const ld::Atom* categoryNameAtom, LDOrderedSet<const ld::Atom*>& deadAtoms);
+									const ld::Atom* categoryNameAtom, std::set<const ld::Atom*>& deadAtoms);
 	static const ld::Atom*	setInstanceMethods(ld::Internal& state, const ld::Atom* categoryAtom,
-											   const ld::Atom* methodListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms);
+											   const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms);
 	static const ld::Atom*	setClassMethods(ld::Internal& state, const ld::Atom* categoryAtom,
-											const ld::Atom* methodListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms);
+											const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms);
 	static const ld::Atom*	setProtocols(ld::Internal& state, const ld::Atom* categoryAtom,
-										 const ld::Atom* protocolListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms);
+										 const ld::Atom* protocolListAtom, std::set<const ld::Atom*>& deadAtoms);
 	static const ld::Atom*	setInstanceProperties(ld::Internal& state, const ld::Atom* categoryAtom,
-												  const ld::Atom* propertyListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms);
+												  const ld::Atom* propertyListAtom, std::set<const ld::Atom*>& deadAtoms);
 	static const ld::Atom*	setClassProperties(ld::Internal& state, const ld::Atom* categoryAtom,
-											   const ld::Atom* propertyListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms);
+											   const ld::Atom* propertyListAtom, std::set<const ld::Atom*>& deadAtoms);
 	static uint32_t         size() { return 6*sizeof(pint_t); }
 
 	static bool				hasCategoryClassPropertiesField(const ld::Atom* categoryAtom);
@@ -519,7 +519,7 @@ bool Category<A>::hasCategoryClassPropertiesField(const ld::Atom* contentAtom)
 
 template <typename A>
 const ld::Atom* Category<A>::setName(ld::Internal &state, const ld::Atom *categoryAtom,
-									 const ld::Atom *categoryNameAtom, LDOrderedSet<const ld::Atom *> &deadAtoms)
+									 const ld::Atom *categoryNameAtom, std::set<const ld::Atom *> &deadAtoms)
 {
 	// if the base category does not already have a method list, we need to create an overlay
 	if ( getName(state, categoryAtom) == NULL ) {
@@ -535,7 +535,7 @@ const ld::Atom* Category<A>::setName(ld::Internal &state, const ld::Atom *catego
 
 template <typename A>
 const ld::Atom* Category<A>::setInstanceMethods(ld::Internal& state, const ld::Atom* categoryAtom,
-												const ld::Atom* methodListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms)
+												const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms)
 {
 	// if the base category does not already have a method list, we need to create an overlay
 	if ( getInstanceMethods(state, categoryAtom) == NULL ) {
@@ -551,7 +551,7 @@ const ld::Atom* Category<A>::setInstanceMethods(ld::Internal& state, const ld::A
 
 template <typename A>
 const ld::Atom* Category<A>::setClassMethods(ld::Internal& state, const ld::Atom* categoryAtom,
-											 const ld::Atom* methodListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms)
+											 const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms)
 {
 	// if the base category does not already have a method list, we need to create an overlay
 	if ( getClassMethods(state, categoryAtom) == NULL ) {
@@ -567,7 +567,7 @@ const ld::Atom* Category<A>::setClassMethods(ld::Internal& state, const ld::Atom
 
 template <typename A>
 const ld::Atom* Category<A>::setProtocols(ld::Internal& state, const ld::Atom* categoryAtom,
-										  const ld::Atom* protocolListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms)
+										  const ld::Atom* protocolListAtom, std::set<const ld::Atom*>& deadAtoms)
 {
 	// if the base category does not already have a protocol list, we need to create an overlay
 	if ( getProtocols(state, categoryAtom) == NULL ) {
@@ -583,7 +583,7 @@ const ld::Atom* Category<A>::setProtocols(ld::Internal& state, const ld::Atom* c
 
 template <typename A>
 const ld::Atom* Category<A>::setInstanceProperties(ld::Internal& state, const ld::Atom* categoryAtom,
-												   const ld::Atom* methodListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms)
+												   const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms)
 {
 	// if the base category does not already have a property list, we need to create an overlay
 	if ( getInstanceProperties(state, categoryAtom) == NULL ) {
@@ -599,7 +599,7 @@ const ld::Atom* Category<A>::setInstanceProperties(ld::Internal& state, const ld
 
 template <typename A>
 const ld::Atom* Category<A>::setClassProperties(ld::Internal& state, const ld::Atom* categoryAtom,
-												const ld::Atom* methodListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms)
+												const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms)
 {
 	// if the base category does not already have a property list, we need to create an overlay
 	if ( getClassProperties(state, categoryAtom) == NULL ) {
@@ -660,17 +660,17 @@ public:
 	static const ld::Atom*	getClassMethodList(ld::Internal& state, const ld::Atom* classAtom);
 	static const ld::Atom*	getClassPropertyList(ld::Internal& state, const ld::Atom* classAtom);
 	static const ld::Atom*	setInstanceMethodList(ld::Internal& state, const ld::Atom* classAtom, 
-												const ld::Atom* methodListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms);
+												const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms);
 	static const ld::Atom*	setInstanceProtocolList(ld::Internal& state, const ld::Atom* classAtom, 
-												const ld::Atom* protocolListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms);
+												const ld::Atom* protocolListAtom, std::set<const ld::Atom*>& deadAtoms);
 	static const ld::Atom*	setInstancePropertyList(ld::Internal& state, const ld::Atom* classAtom, 
-												const ld::Atom* propertyListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms);
+												const ld::Atom* propertyListAtom, std::set<const ld::Atom*>& deadAtoms);
 	static const ld::Atom*  setClassMethodList(ld::Internal& state, const ld::Atom* classAtom, 
-												const ld::Atom* methodListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms);
+												const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms);
 	static const ld::Atom*	setClassProtocolList(ld::Internal& state, const ld::Atom* classAtom, 
-												const ld::Atom* protocolListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms);
+												const ld::Atom* protocolListAtom, std::set<const ld::Atom*>& deadAtoms);
 	static const ld::Atom*	setClassPropertyList(ld::Internal& state, const ld::Atom* classAtom, 
-												const ld::Atom* propertyListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms);
+												const ld::Atom* propertyListAtom, std::set<const ld::Atom*>& deadAtoms);
 	static uint32_t         size() { return sizeof(Content); }
 
 private:
@@ -756,7 +756,7 @@ const ld::Atom*	Class<A>::getClassPropertyList(ld::Internal& state, const ld::At
 
 template <typename A>
 const ld::Atom* Class<A>::setInstanceMethodList(ld::Internal& state, const ld::Atom* classAtom, 
-												const ld::Atom* methodListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms)
+												const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms)
 {
 	// if the base class does not already have a method list, we need to create an overlay
 	if ( getInstanceMethodList(state, classAtom) == NULL ) {
@@ -775,7 +775,7 @@ const ld::Atom* Class<A>::setInstanceMethodList(ld::Internal& state, const ld::A
 
 template <typename A>
 const ld::Atom* Class<A>::setInstanceProtocolList(ld::Internal& state, const ld::Atom* classAtom, 
-									const ld::Atom* protocolListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms)
+									const ld::Atom* protocolListAtom, std::set<const ld::Atom*>& deadAtoms)
 {
 	// if the base class does not already have a protocol list, we need to create an overlay
 	if ( getInstanceProtocolList(state, classAtom) == NULL ) {
@@ -795,7 +795,7 @@ const ld::Atom* Class<A>::setInstanceProtocolList(ld::Internal& state, const ld:
 
 template <typename A>
 const ld::Atom* Class<A>::setClassProtocolList(ld::Internal& state, const ld::Atom* classAtom, 
-									const ld::Atom* protocolListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms)
+									const ld::Atom* protocolListAtom, std::set<const ld::Atom*>& deadAtoms)
 {
 	// meta class also points to same protocol list as class
 	const ld::Atom* metaClassAtom = getMetaClass(state, classAtom);
@@ -807,7 +807,7 @@ const ld::Atom* Class<A>::setClassProtocolList(ld::Internal& state, const ld::At
 
 template <typename A>
 const ld::Atom*  Class<A>::setInstancePropertyList(ld::Internal& state, const ld::Atom* classAtom, 
-												const ld::Atom* propertyListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms)
+												const ld::Atom* propertyListAtom, std::set<const ld::Atom*>& deadAtoms)
 {
 	// if the base class does not already have a property list, we need to create an overlay
 	if ( getInstancePropertyList(state, classAtom) == NULL ) {
@@ -826,7 +826,7 @@ const ld::Atom*  Class<A>::setInstancePropertyList(ld::Internal& state, const ld
 
 template <typename A>
 const ld::Atom* Class<A>::setClassMethodList(ld::Internal& state, const ld::Atom* classAtom, 
-											const ld::Atom* methodListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms)
+											const ld::Atom* methodListAtom, std::set<const ld::Atom*>& deadAtoms)
 {
 	// class methods is just instance methods of metaClass
 	return setInstanceMethodList(state, getMetaClass(state, classAtom), methodListAtom, deadAtoms);
@@ -834,7 +834,7 @@ const ld::Atom* Class<A>::setClassMethodList(ld::Internal& state, const ld::Atom
 
 template <typename A>
 const ld::Atom* Class<A>::setClassPropertyList(ld::Internal& state, const ld::Atom* classAtom, 
-											const ld::Atom* propertyListAtom, LDOrderedSet<const ld::Atom*>& deadAtoms)
+											const ld::Atom* propertyListAtom, std::set<const ld::Atom*>& deadAtoms)
 {
 	// class properties is just instance properties of metaClass
 	return setInstancePropertyList(state, getMetaClass(state, classAtom), propertyListAtom, deadAtoms);
@@ -1061,12 +1061,12 @@ static const ld::Atom* fixClassAliases(const ld::Atom* classAtom)
 //
 class OptimizedAway {
 public:
-	OptimizedAway(const LDOrderedSet<const ld::Atom*>& oa) : _dead(oa) {}
+	OptimizedAway(const std::set<const ld::Atom*>& oa) : _dead(oa) {}
 	bool operator()(const ld::Atom* atom) const {
 		return ( _dead.count(atom) != 0 );
 	}
 private:
-	const LDOrderedSet<const ld::Atom*>& _dead;
+	const std::set<const ld::Atom*>& _dead;
 };
 
 	struct AtomSorter
@@ -1108,7 +1108,7 @@ template <typename A>
 void OptimizeCategories<A>::doit(const Options& opts, ld::Internal& state, bool haveCategoriesWithoutClassPropertyStorage)
 {
 	// first find all categories referenced by __objc_nlcatlist section
-	LDOrderedSet<const ld::Atom*> nlcatListAtoms;
+	std::set<const ld::Atom*> nlcatListAtoms;
 	for (std::vector<ld::Internal::FinalSection*>::iterator sit=state.sections.begin(); sit != state.sections.end(); ++sit) {
 		ld::Internal::FinalSection* sect = *sit;
 		if ( (strcmp(sect->sectionName(), "__objc_nlcatlist") == 0) && (strncmp(sect->segmentName(), "__DATA", 6) == 0) ) {
@@ -1125,12 +1125,12 @@ void OptimizeCategories<A>::doit(const Options& opts, ld::Internal& state, bool 
 	}
 	
 	// build map of all classes in this image that have categories on them
-	typedef LDOrderedMap<const ld::Atom*, std::vector<const ld::Atom*>*> CatMap;
+	typedef std::map<const ld::Atom*, std::vector<const ld::Atom*>*> CatMap;
 	CatMap classToCategories;
 	std::vector<const ld::Atom*> classOrder;
-	LDOrderedSet<const ld::Atom*> deadAtoms;
+	std::set<const ld::Atom*> deadAtoms;
 	ld::Internal::FinalSection* methodListSection = NULL;
-	typedef LDOrderedMap<const ld::Atom*, std::pair<const ld::Atom*, std::vector<const ld::Atom*>*>> ExternalCatMap;
+	typedef std::map<const ld::Atom*, std::pair<const ld::Atom*, std::vector<const ld::Atom*>*>> ExternalCatMap;
 	ExternalCatMap externalClassToCategories;
 	std::vector<const ld::Atom*> externalClassOrder;
 	for (std::vector<ld::Internal::FinalSection*>::iterator sit=state.sections.begin(); sit != state.sections.end(); ++sit) {
@@ -1428,13 +1428,13 @@ CategoryNameAtom<A>::CategoryNameAtom(ld::Internal& state, const std::vector<con
 
 template <typename A> 
 MethodListAtom<A>::MethodListAtom(ld::Internal& state, const ld::Atom* baseMethodList, bool meta, 
-									const std::vector<const ld::Atom*>* categories, LDOrderedSet<const ld::Atom*>& deadAtoms)
+									const std::vector<const ld::Atom*>* categories, std::set<const ld::Atom*>& deadAtoms)
   : ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
 			ld::Atom::scopeLinkageUnit, ld::Atom::typeUnclassified, 
 			symbolTableNotIn, false, false, false, ld::Atom::Alignment(3)), _file(NULL), _methodCount(0) 
 {
 	unsigned int fixupCount = 0;
-	LDOrderedSet<const ld::Atom*> baseMethodListMethodNameAtoms;
+	std::set<const ld::Atom*> baseMethodListMethodNameAtoms;
 	// if base class has method list, then associate new method list with file defining class
 	if ( baseMethodList != NULL ) {
 		_file = baseMethodList->file();
@@ -1475,7 +1475,7 @@ MethodListAtom<A>::MethodListAtom(ld::Internal& state, const ld::Atom* baseMetho
 	// copy fixups and adjust offsets (in reverse order to simulator objc runtime)
 	_fixups.reserve(fixupCount);
 	uint32_t slide = 0;
-	LDOrderedSet<const ld::Atom*> categoryMethodNameAtoms;
+	std::set<const ld::Atom*> categoryMethodNameAtoms;
 	for (std::vector<const ld::Atom*>::const_reverse_iterator rit=categories->rbegin(); rit != categories->rend(); ++rit) {
 		const ld::Atom* categoryMethodListAtom;
 		if ( meta )
@@ -1522,7 +1522,7 @@ MethodListAtom<A>::MethodListAtom(ld::Internal& state, const ld::Atom* baseMetho
 
 template <typename A> 
 ProtocolListAtom<A>::ProtocolListAtom(ld::Internal& state, const ld::Atom* baseProtocolList, 
-									const std::vector<const ld::Atom*>* categories, LDOrderedSet<const ld::Atom*>& deadAtoms)
+									const std::vector<const ld::Atom*>* categories, std::set<const ld::Atom*>& deadAtoms)
   : ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
 			ld::Atom::scopeLinkageUnit, ld::Atom::typeUnclassified, 
 			symbolTableNotIn, false, false, false, ld::Atom::Alignment(3)), _file(NULL), _protocolCount(0) 
@@ -1579,7 +1579,7 @@ ProtocolListAtom<A>::ProtocolListAtom(ld::Internal& state, const ld::Atom* baseP
 
 template <typename A> 
 PropertyListAtom<A>::PropertyListAtom(ld::Internal& state, const ld::Atom* basePropertyList, 
-				      const std::vector<const ld::Atom*>* categories, LDOrderedSet<const ld::Atom*>& deadAtoms, PropertyKind kind)
+				      const std::vector<const ld::Atom*>* categories, std::set<const ld::Atom*>& deadAtoms, PropertyKind kind)
   : ld::Atom(_s_section, ld::Atom::definitionRegular, ld::Atom::combineNever,
 			ld::Atom::scopeLinkageUnit, ld::Atom::typeUnclassified, 
 			symbolTableNotIn, false, false, false, ld::Atom::Alignment(3)), _file(NULL), _propertyCount(0) 
