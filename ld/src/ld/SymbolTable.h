@@ -57,7 +57,7 @@ public:
 	typedef uint32_t IndirectBindingSlot;
 
 private:
-	typedef std::unordered_map<LDString, IndirectBindingSlot, CLDStringHash, CLDStringEquals> NameToSlot;
+	typedef std::unordered_map<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
 
 	class ContentFuncs {
 	public:
@@ -87,7 +87,7 @@ private:
 	};
 	typedef std::unordered_map<const ld::Atom*, IndirectBindingSlot, UTF16StringHashFuncs, UTF16StringHashFuncs> UTF16StringToSlot;
 
-	typedef std::vector<const char*> SlotToName;
+	typedef std::map<IndirectBindingSlot, const char*> SlotToName;
 	typedef std::unordered_map<const char*, CStringToSlot*, CStringHash, CStringEquals> NameToMap;
     
     typedef std::vector<const ld::Atom *> DuplicatedSymbolAtomList;
