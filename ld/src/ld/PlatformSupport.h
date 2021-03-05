@@ -53,7 +53,7 @@ enum class Platform
 
 const Platform basePlatform(Platform platform);
 
-typedef LDOrderedSet<Platform> PlatformSet;
+typedef std::set<Platform> PlatformSet;
 
 enum class PlatEnforce { allow, warning, error, warnBI, warnInternalErrorExternal };
 
