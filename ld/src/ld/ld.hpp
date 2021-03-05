@@ -68,10 +68,10 @@ struct PlatformVersion {
 
 struct VersionSet {
 private:
-	std::set<PlatformVersion> _versions;
+	LDOrderedSet<PlatformVersion> _versions;
 public:
 	VersionSet() {}
-	VersionSet(const std::set<PlatformVersion>& V) : _versions(V) {}
+	VersionSet(const LDOrderedSet<PlatformVersion>& V) : _versions(V) {}
 	void insert(PlatformVersion platformVersion) {
 		assert(_versions.find(platformVersion) == _versions.end());
 		_versions.insert(platformVersion);
@@ -562,7 +562,7 @@ namespace archive {
 		virtual								~File() {}
 		virtual bool						justInTimeDataOnlyforEachAtom(const char* name, AtomHandler&) const = 0;
     	virtual void dumpMembersParsed(std::ofstream &stream) const = 0;
-		virtual std::vector<void *> membersToParse(std::unordered_set<std::string> &set) const = 0;
+		virtual std::vector<void *> membersToParse(LDSet<std::string> &set) const = 0;
 		virtual void parseMember(void *member) const = 0;
 	};
 } // namespace archive 
@@ -1344,7 +1344,7 @@ struct CLDStringHash {
 	}
 };
 
-// utility classes for using std::unordered_map with c-strings
+// utility classes for using LDMap with c-strings
 struct CStringHash {
 	size_t operator()(const char* __s) const {
 		int len = strlen(__s);
@@ -1365,7 +1365,7 @@ struct CStringEquals
 	bool operator()(const char* left, const char* right) const { return (strcmp(left, right) == 0); }
 };
 
-typedef	std::unordered_set<const char*, ld::CStringHash, ld::CStringEquals>  CStringSet;
+typedef	LDSet<const char*, ld::CStringHash, ld::CStringEquals>  CStringSet;
 
 
 class Internal
@@ -1392,7 +1392,7 @@ public:
 		bool							hasExternalRelocs;
 	};
 	
-	typedef std::map<const ld::Atom*, FinalSection*>	AtomToSection;		
+	typedef LDOrderedMap<const ld::Atom*, FinalSection*>	AtomToSection;		
 
 	virtual uint64_t					assignFileOffsets() = 0;
 	virtual void						setSectionSizesAndAlignments() = 0;
@@ -1433,8 +1433,8 @@ public:
 	std::vector<const ld::relocatable::File*>	filesFromCompilerRT;
 	std::vector<const ld::relocatable::File*>	filesForLTO;
 	std::vector<const ld::Atom*>				deadAtoms;
-	std::unordered_set<const char*>				allUndefProxies;
-	std::unordered_set<uint64_t>				toolsVersions;
+	LDSet<const char*>				allUndefProxies;
+	LDSet<uint64_t>				toolsVersions;
 	const ld::dylib::File*						bundleLoader;
 	const Atom*									entryPoint;
 	const Atom*									classicBindingHelper;

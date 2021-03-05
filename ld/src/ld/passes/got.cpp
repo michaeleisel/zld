@@ -227,7 +227,7 @@ void doPass(const Options& opts, ld::Internal& internal)
 		return;
 
 	// pre-fill gotMap with existing non-lazy pointers
-	std::map<GotMapEntry, const ld::Atom*> gotMap;
+	LDOrderedMap<GotMapEntry, const ld::Atom*> gotMap;
 	for (ld::Internal::FinalSection* sect : internal.sections) {
 		if ( sect->type() != ld::Section::typeNonLazyPointer )
 			continue;
@@ -263,8 +263,8 @@ void doPass(const Options& opts, ld::Internal& internal)
 	// walk all atoms and fixups looking for GOT-able references
 	// don't create GOT atoms during this loop because that could invalidate the sections iterator
 	std::vector<const ld::Atom*> atomsReferencingGOT;
-	std::map<const ld::Atom*,bool>		weakImportMap;
-	std::map<const ld::Atom*,bool>		weakDefMap;
+	LDOrderedMap<const ld::Atom*,bool>		weakImportMap;
+	LDOrderedMap<const ld::Atom*,bool>		weakDefMap;
 	atomsReferencingGOT.reserve(128);
 	for (std::vector<ld::Internal::FinalSection*>::iterator sit=internal.sections.begin(); sit != internal.sections.end(); ++sit) {
 		ld::Internal::FinalSection* sect = *sit;
@@ -335,7 +335,7 @@ void doPass(const Options& opts, ld::Internal& internal)
 					// record if target is weak def
 					weakDefMap[targetOfGOT] = targetIsExternalWeakDef;
 					// record weak_import attribute
-					std::map<const ld::Atom*,bool>::iterator pos = weakImportMap.find(targetOfGOT);
+					LDOrderedMap<const ld::Atom*,bool>::iterator pos = weakImportMap.find(targetOfGOT);
 					if ( pos == weakImportMap.end() ) {
 						// target not in weakImportMap, so add
 						if ( log ) fprintf(stderr, "weakImportMap[%s] = %d\n", targetOfGOT->name(), targetIsWeakImport);

@@ -846,7 +846,7 @@ struct fileInfo
 // add archInfos to fileInfo for every slice of a fat file
 // for ppc, there may be duplicate architectures (with different sub-types)
 //
-static void setSizes(fileInfo& info, const std::set<cpu_type_t>& onlyArchs)
+static void setSizes(fileInfo& info, const LDOrderedSet<cpu_type_t>& onlyArchs)
 {
 	const MultiArchRebaser mar(info.path);
 	const std::vector<AbstractRebaser*>&	rebasers = mar.getArchs();
@@ -993,7 +993,7 @@ static void usage()
 int main(int argc, const char* argv[])
 {
 	std::vector<fileInfo> files;
-	std::set<cpu_type_t> onlyArchs;
+	LDOrderedSet<cpu_type_t> onlyArchs;
 	uint64_t lowAddress = 0;
 	uint64_t highAddress = 0;
 
@@ -1054,7 +1054,7 @@ int main(int argc, const char* argv[])
 		}
 				
 		// assign new base address for each arch
-		for(std::set<cpu_type_t>::iterator ait=onlyArchs.begin(); ait != onlyArchs.end(); ++ait) {
+		for(LDOrderedSet<cpu_type_t>::iterator ait=onlyArchs.begin(); ait != onlyArchs.end(); ++ait) {
 			cpu_type_t arch = *ait;
 			uint64_t baseAddress = startAddress(arch, files, lowAddress, highAddress);
 			for(std::vector<fileInfo>::iterator fit=files.begin(); fit != files.end(); ++fit) {

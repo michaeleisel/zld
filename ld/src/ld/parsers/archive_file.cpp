@@ -85,7 +85,7 @@ public:
 	virtual											~File() {}
 
 	virtual void dumpMembersParsed(std::ofstream &stream) const;
-	virtual std::vector<void *> membersToParse(std::unordered_set<std::string> &set) const;
+	virtual std::vector<void *> membersToParse(LDSet<std::string> &set) const;
 	virtual void parseMember(void *member) const;
 	// overrides of ld::File
 	virtual bool										forEachAtom(ld::File::AtomHandler&) const;
@@ -121,12 +121,12 @@ private:
 	struct MemberState { ld::relocatable::File* file; const Entry *entry; bool logged; bool loaded; uint32_t index;};
 	bool											loadMember(MemberState& state, ld::File::AtomHandler& handler, const char *format, ...) const;
 
-	typedef std::unordered_map<const char*, uint64_t, ld::CStringHash, ld::CStringEquals> NameToOffsetMap;
+	typedef LDMap<const char*, uint64_t, ld::CStringHash, ld::CStringEquals> NameToOffsetMap;
 
 	typedef typename A::P							P;
 	typedef typename A::P::E						E;
 
-	typedef std::map<const class Entry*, MemberState> MemberToStateMap;
+	typedef LDOrderedMap<const class Entry*, MemberState> MemberToStateMap;
 
 	MemberState&									makeObjectFileForMember(const Entry* member) const;
 	bool											memberHasObjCCategories(const Entry* member) const;
@@ -135,7 +135,7 @@ private:
 #ifdef SYMDEF_64
 	void											buildHashTable64();
 #endif
-	mutable std::unordered_set<std::string>						_membersParsed;
+	mutable LDSet<std::string>						_membersParsed;
 	const uint8_t*									_archiveFileContent;
 	uint64_t										_archiveFilelength;
 	const struct ranlib*							_tableOfContents;
@@ -559,8 +559,8 @@ void File<A>::parseMember(void *member) const {
 }
 
 template <typename A>
-std::vector<void *> File<A>::membersToParse(std::unordered_set<std::string> &set) const {
-	std::unordered_set<uint64_t> offsets;
+std::vector<void *> File<A>::membersToParse(LDSet<std::string> &set) const {
+	LDSet<uint64_t> offsets;
 	for (auto &[k, v] : _hashTable) {
 		offsets.insert(v);
 	}

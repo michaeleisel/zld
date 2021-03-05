@@ -1204,7 +1204,7 @@ void Resolver::deadStripOptimize(bool force)
 	}
 	
 	// mark all roots as live, and all atoms they reference
-	for (std::set<const ld::Atom*>::iterator it=_deadStripRoots.begin(); it != _deadStripRoots.end(); ++it) {
+	for (LDOrderedSet<const ld::Atom*>::iterator it=_deadStripRoots.begin(); it != _deadStripRoots.end(); ++it) {
 		const ld::Atom* anAtom = *it;
 		WhyLiveBackChain rootChain;
 		rootChain.previous = NULL;
@@ -1905,7 +1905,7 @@ void Resolver::linkTimeOptimize()
 	}
 	else {
 		// <rdar://problem/33853815> remove undefs from LTO objects that gets optimized away
-		std::unordered_set<const ld::Atom*> mustPreserve;
+		LDSet<const ld::Atom*> mustPreserve;
 		if ( _internal.classicBindingHelper != NULL )
 			mustPreserve.insert(_internal.classicBindingHelper);
 		if ( _internal.compressedFastBinderProxy != NULL )
