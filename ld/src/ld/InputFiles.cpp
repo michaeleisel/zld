@@ -771,7 +771,7 @@ void InputFiles::addLinkerOptionLibraries(ld::Internal& state, ld::File::AtomHan
     				dylibReader->setImplicitlyLinked();
     				dylibReader->setSpeculativelyLoaded();
     				this->addDylib(dylibReader, std::get<1>(triple));
-                                if ( state.linkerOptionNeededLibraries.count(libName) )
+                                if ( state.linkerOptionNeededLibraries.count(std::get<2>(triple)) )
                                         dylibReader->setNeededDylib();
     			}
     			else if ( archiveReader != NULL ) {

@@ -31,7 +31,7 @@
 #include <limits.h>
 #include <unistd.h>
 #include <CommonCrypto/CommonDigest.h>
-#include <CommonCrypto/CommonDigestSPI.h>
+// #include <CommonCrypto/CommonDigestSPI.h>
 
 #include <vector>
 #include <unordered_map>

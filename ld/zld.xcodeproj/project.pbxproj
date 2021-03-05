@@ -1512,6 +1512,7 @@
 					"$(SRCROOT)/../cfe-8.0.1.src/include",
 					"$(SRCROOT)/../abseil-cpp-20200225",
 					"$(SRCROOT)/src/ld",
+					"$(SRCROOT)/src/extra_include",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
@@ -1565,6 +1566,7 @@
 					"$(SRCROOT)/../cfe-8.0.1.src/include",
 					"$(SRCROOT)/../abseil-cpp-20200225",
 					"$(SRCROOT)/src/ld",
+					"$(SRCROOT)/src/extra_include",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
@@ -1635,6 +1637,7 @@
 					"$(SRCROOT)/../cfe-8.0.1.src/include",
 					"$(SRCROOT)/../abseil-cpp-20200225",
 					"$(SRCROOT)/src/ld",
+					"$(SRCROOT)/src/extra_include",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
