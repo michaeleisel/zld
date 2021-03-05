@@ -1292,7 +1292,7 @@
 					"$(SRCROOT)/../pstl/include",
 					"$(SRCROOT)/../pstl/stdlib",
 					"$(SRCROOT)/../tbb/include",
-					"$(SRCROOT)/include_extra",
+					"$(SRCROOT)/../corecrypto/include",
 				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LIBRARY_SEARCH_PATHS = (
@@ -1386,7 +1386,7 @@
 					"$(SRCROOT)/../pstl/include",
 					"$(SRCROOT)/../pstl/stdlib",
 					"$(SRCROOT)/../tbb/include",
-					"$(SRCROOT)/include_extra",
+					"$(SRCROOT)/../corecrypto/include",
 				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LIBRARY_SEARCH_PATHS = (
@@ -1742,7 +1742,7 @@
 					"$(SRCROOT)/../pstl/include",
 					"$(SRCROOT)/../pstl/stdlib",
 					"$(SRCROOT)/../tbb/include",
-					"$(SRCROOT)/include_extra",
+					"$(SRCROOT)/../corecrypto/include",
 				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LIBRARY_SEARCH_PATHS = (
