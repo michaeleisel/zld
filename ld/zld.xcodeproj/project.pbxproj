@@ -56,6 +56,9 @@
 		F307EBD4241AB309009AC4F3 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F307EBD2241AB2F3009AC4F3 /* CoreFoundation.framework */; };
 		F307EBD5241AB347009AC4F3 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F307EBD2241AB2F3009AC4F3 /* CoreFoundation.framework */; };
 		F3176404241011E300D68E7F /* libtbb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F3176402241011E300D68E7F /* libtbb.a */; };
+		F328A31D25F2B65700E439C0 /* generic_dylib_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F328A31C25F2B65700E439C0 /* generic_dylib_file.cpp */; };
+		F328A33325F2B68900E439C0 /* libcodedirectory.c in Sources */ = {isa = PBXBuildFile; fileRef = F328A33225F2B68900E439C0 /* libcodedirectory.c */; };
+		F328A34925F2B8B700E439C0 /* ResponseFiles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F328A34825F2B8B700E439C0 /* ResponseFiles.cpp */; };
 		F338085E2422DA520086B7E8 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
 		F33808602422DA6D0086B7E8 /* inits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085F2422DA6D0086B7E8 /* inits.cpp */; };
 		F34634572423BD3700F08C44 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
@@ -288,6 +291,9 @@
 		C1E27B591F6B1B70003B8FA6 /* thread_starts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = thread_starts.h; sourceTree = "<group>"; };
 		F307EBD2241AB2F3009AC4F3 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		F3176402241011E300D68E7F /* libtbb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libtbb.a; sourceTree = "<group>"; };
+		F328A31C25F2B65700E439C0 /* generic_dylib_file.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = generic_dylib_file.cpp; sourceTree = "<group>"; };
+		F328A33225F2B68900E439C0 /* libcodedirectory.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = libcodedirectory.c; path = src/ld/libcodedirectory.c; sourceTree = "<group>"; };
+		F328A34825F2B8B700E439C0 /* ResponseFiles.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ResponseFiles.cpp; path = src/ld/ResponseFiles.cpp; sourceTree = "<group>"; };
 		F338085D2422DA520086B7E8 /* PlatformSupport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PlatformSupport.cpp; path = src/ld/PlatformSupport.cpp; sourceTree = "<group>"; };
 		F338085F2422DA6D0086B7E8 /* inits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = inits.cpp; sourceTree = "<group>"; };
 		F33808612422DA830086B7E8 /* inits.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = inits.h; sourceTree = "<group>"; };
@@ -467,6 +473,7 @@
 		F9023C2C06D5A227001BBF46 = {
 			isa = PBXGroup;
 			children = (
+				F328A34825F2B8B700E439C0 /* ResponseFiles.cpp */,
 				4CFE4F80240481F60072BC3D /* ld.entitlements */,
 				F9B813A80EC27B6300F94C13 /* abstraction */,
 				F9B813AD0EC27B8500F94C13 /* ld */,
@@ -562,6 +569,7 @@
 		F9AA65861051E750003E3539 /* parsers */ = {
 			isa = PBXGroup;
 			children = (
+				F328A31C25F2B65700E439C0 /* generic_dylib_file.cpp */,
 				F91B7B0218987D5F0099486F /* libunwind */,
 				F9AA6784105700C2003E3539 /* opaque_section_file.cpp */,
 				F9AA6785105700C2003E3539 /* opaque_section_file.h */,
@@ -609,6 +617,7 @@
 				4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */,
 				4CDA2DA823FDD2CB00C6009D /* Tweaks.hpp */,
 				4C47258B23FD9E3C00AA02B2 /* MapDefines.h */,
+				F328A33225F2B68900E439C0 /* libcodedirectory.c */,
 				F9AA69BF10583E19003E3539 /* Resolver.cpp */,
 				F9AA69C010583E19003E3539 /* Resolver.h */,
 				F9AA69B410583C0C003E3539 /* SymbolTable.cpp */,
@@ -1004,8 +1013,11 @@
 				FA95D6141AB25CF400395811 /* textstub_dylib_file.cpp in Sources */,
 				F338085E2422DA520086B7E8 /* PlatformSupport.cpp in Sources */,
 				F9C0D4BD06DD28D2001C7193 /* Options.cpp in Sources */,
+				F328A34925F2B8B700E439C0 /* ResponseFiles.cpp in Sources */,
 				F9023C4E06D5A272001BBF46 /* ld.cpp in Sources */,
 				F9AA65891051E750003E3539 /* macho_relocatable_file.cpp in Sources */,
+				F328A33325F2B68900E439C0 /* libcodedirectory.c in Sources */,
+				F328A31D25F2B65700E439C0 /* generic_dylib_file.cpp in Sources */,
 				F9AA65DD1051EC4A003E3539 /* archive_file.cpp in Sources */,
 				F9AA65DE1051EC4A003E3539 /* lto_file.cpp in Sources */,
 				F9AA65DF1051EC4A003E3539 /* macho_dylib_file.cpp in Sources */,
@@ -1280,6 +1292,7 @@
 					"$(SRCROOT)/../pstl/include",
 					"$(SRCROOT)/../pstl/stdlib",
 					"$(SRCROOT)/../tbb/include",
+					"$(SRCROOT)/../corecrypto/include",
 				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LIBRARY_SEARCH_PATHS = (
@@ -1373,6 +1386,7 @@
 					"$(SRCROOT)/../pstl/include",
 					"$(SRCROOT)/../pstl/stdlib",
 					"$(SRCROOT)/../tbb/include",
+					"$(SRCROOT)/../corecrypto/include",
 				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LIBRARY_SEARCH_PATHS = (
@@ -1512,6 +1526,7 @@
 					"$(SRCROOT)/../cfe-8.0.1.src/include",
 					"$(SRCROOT)/../abseil-cpp-20200225",
 					"$(SRCROOT)/src/ld",
+					"$(SRCROOT)/src/extra_include",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
@@ -1565,6 +1580,7 @@
 					"$(SRCROOT)/../cfe-8.0.1.src/include",
 					"$(SRCROOT)/../abseil-cpp-20200225",
 					"$(SRCROOT)/src/ld",
+					"$(SRCROOT)/src/extra_include",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
@@ -1635,6 +1651,7 @@
 					"$(SRCROOT)/../cfe-8.0.1.src/include",
 					"$(SRCROOT)/../abseil-cpp-20200225",
 					"$(SRCROOT)/src/ld",
+					"$(SRCROOT)/src/extra_include",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
@@ -1725,6 +1742,7 @@
 					"$(SRCROOT)/../pstl/include",
 					"$(SRCROOT)/../pstl/stdlib",
 					"$(SRCROOT)/../tbb/include",
+					"$(SRCROOT)/../corecrypto/include",
 				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LIBRARY_SEARCH_PATHS = (

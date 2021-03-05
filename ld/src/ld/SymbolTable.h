@@ -57,7 +57,7 @@ public:
 	typedef uint32_t IndirectBindingSlot;
 
 private:
-	typedef LDMap<LDString, IndirectBindingSlot, CLDStringHash, CLDStringEquals> NameToSlot;
+	typedef LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
 
 	class ContentFuncs {
 	public:
@@ -87,7 +87,7 @@ private:
 	};
 	typedef LDMap<const ld::Atom*, IndirectBindingSlot, UTF16StringHashFuncs, UTF16StringHashFuncs> UTF16StringToSlot;
 
-	typedef std::vector<const char*> SlotToName;
+	typedef LDOrderedMap<IndirectBindingSlot, const char*> SlotToName;
 	typedef LDMap<const char*, CStringToSlot*, CStringHash, CStringEquals> NameToMap;
     
     typedef std::vector<const ld::Atom *> DuplicatedSymbolAtomList;

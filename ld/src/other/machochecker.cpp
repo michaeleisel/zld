@@ -93,7 +93,7 @@ static int64_t read_sleb128(const uint8_t*& p, const uint8_t* end)
 		bit += 7;
 	} while (byte & 0x80);
 	// sign extend negative numbers
-	if ( (byte & 0x40) != 0 )
+	if ( ((byte & 0x40) != 0) && (bit < 64) )
 		result |= (-1LL) << bit;
 	return result;
 }
@@ -269,6 +269,25 @@ bool MachOChecker<arm64>::validFile(const uint8_t* fileContent)
 }
 #endif
 
+#if SUPPORT_ARCH_arm64_32
+template <>
+bool MachOChecker<arm64_32>::validFile(const uint8_t* fileContent)
+{	
+	const macho_header<P>* header = (const macho_header<P>*)fileContent;
+	if ( header->magic() != MH_MAGIC )
+		return false;
+	if ( header->cputype() != CPU_TYPE_ARM64_32 )
+		return false;
+	switch (header->filetype()) {
+		case MH_EXECUTE:
+		case MH_DYLIB:
+		case MH_BUNDLE:
+		case MH_DYLINKER:
+			return true;
+	}
+	return false;
+}
+#endif
 
 template <> uint8_t MachOChecker<ppc>::loadCommandSizeMask()	{ return 0x03; }
 template <> uint8_t MachOChecker<ppc64>::loadCommandSizeMask()	{ return 0x07; }
@@ -276,6 +295,9 @@ template <> uint8_t MachOChecker<x86>::loadCommandSizeMask()	{ return 0x03; }
 template <> uint8_t MachOChecker<x86_64>::loadCommandSizeMask() { return 0x07; }
 template <> uint8_t MachOChecker<arm>::loadCommandSizeMask()	{ return 0x03; }
 template <> uint8_t MachOChecker<arm64>::loadCommandSizeMask()	{ return 0x07; }
+#if SUPPORT_ARCH_arm64_32
+template <> uint8_t MachOChecker<arm64_32>::loadCommandSizeMask()	{ return 0x03; }
+#endif
 
 
 template <>
@@ -302,6 +324,13 @@ arm64::P::uint_t MachOChecker<arm64>::getInitialStackPointer(const macho_thread_
 	throw "LC_UNIXTHREAD not supported for arm64";
 }
 
+#if SUPPORT_ARCH_arm64_32
+template <>
+arm64_32::P::uint_t MachOChecker<arm64_32>::getInitialStackPointer(const macho_thread_command<arm64_32::P>* threadInfo)
+{
+	throw "LC_UNIXTHREAD not supported for arm64_32";
+}
+#endif
 
 template <>
 ppc::P::uint_t MachOChecker<ppc>::getEntryPoint(const macho_thread_command<ppc::P>* threadInfo)
@@ -334,6 +363,13 @@ arm64::P::uint_t MachOChecker<arm64>::getEntryPoint(const macho_thread_command<a
 	throw "LC_UNIXTHREAD not supported for arm64";
 }
 
+#if SUPPORT_ARCH_arm64_32
+template <>
+arm64_32::P::uint_t MachOChecker<arm64_32>::getEntryPoint(const macho_thread_command<arm64_32::P>* threadInfo)
+{
+	throw "LC_UNIXTHREAD not supported for arm64_32";
+}
+#endif
 
 template <typename A>
 const char* MachOChecker<A>::archName()
@@ -358,6 +394,10 @@ const char* MachOChecker<A>::archName()
 			return "arm";
 		case CPU_TYPE_ARM64:
 			return "arm64";
+#if SUPPORT_ARCH_arm64_32
+		case CPU_TYPE_ARM64_32:
+			return "arm64_32";
+#endif
 	}
 	return "unknown";
 }
@@ -478,6 +518,8 @@ void MachOChecker<A>::checkLoadCommands()
 			case LC_SOURCE_VERSION:
 			case LC_NOTE:
 			case LC_BUILD_VERSION:
+			case LC_DYLD_CHAINED_FIXUPS:
+			case LC_DYLD_EXPORTS_TRIE:
 				break;
 			case LC_RPATH:
 				fHasLC_RPATH = true;
@@ -729,6 +771,8 @@ void MachOChecker<A>::checkLoadCommands()
 				{
 					const macho_symtab_command<P>* symtab = (macho_symtab_command<P>*)cmd;
 					fSymbolCount = symtab->nsyms();
+					fSymbols = nullptr;
+					if ( fSymbolCount != 0 ) {
 					fSymbols = (const macho_nlist<P>*)((char*)fHeader + symtab->symoff());
 					if ( symtab->symoff() < linkEditSegment->fileoff() )
 						throw "symbol table not in __LINKEDIT";
@@ -736,6 +780,7 @@ void MachOChecker<A>::checkLoadCommands()
 						throw "symbol table overlaps string pool";
 					if ( (symtab->symoff() % sizeof(pint_t)) != 0 )
 						throw "symbol table start not pointer aligned";
+					}
 					fStrings = (char*)fHeader + symtab->stroff();
 					fStringsEnd = fStrings + symtab->strsize();
 					if ( symtab->stroff() < linkEditSegment->fileoff() )
@@ -914,7 +959,7 @@ void MachOChecker<A>::verify()
 				strlcpy(fullerPath, mergeRoot, PATH_MAX);
 				strlcat(fullerPath, installLocationInDstRoot, PATH_MAX);
 				if ( sharedCacheEligiblePath(fullerPath) ) {
-					if ( !fIsDebugVariant && (strstr(fullerPath, ".app/") == NULL) ) {
+					if ( !fIsDebugVariant && (strstr(installLocationInDstRoot, ".app/") == NULL) ) {
 						verifyInstallName();
 						verifyNoRpaths();
 						verifyNoDylibMain();
@@ -935,6 +980,8 @@ void MachOChecker<A>::verifyInstallName()
 	// Don't allow @rpath to be used as -install_name for OS dylibs
 	if ( strncmp(fInstallName, "@rpath/", 7) == 0 ) {
 		printf("os_dylib_rpath_install_name\tfatal\t-install_name uses @rpath in arch %s\n", archName());
+	} else if ( strstr(fInstallName, "//") != NULL) {
+		printf("os_dylib_bad_install_name\twarn\t-install_name does not match install location in arch %s\n", archName());
 	}
 	else {
 		// Verify -install_name match actual path of dylib
@@ -1034,7 +1081,7 @@ void MachOChecker<A>::verifyiOSMac()
 					break;
 				case LC_BUILD_VERSION:
 					buildVersCmd = (macho_build_version_command<P>*)cmd;
-					if ( buildVersCmd->platform() != PLATFORM_IOSMAC )
+					if ( buildVersCmd->platform() != PLATFORM_MACCATALYST )
 						bad = true;
 					break;
 			}
@@ -1395,6 +1442,13 @@ arm64::P::uint_t MachOChecker<arm64>::relocBase()
 	return fFirstWritableSegment->vmaddr();
 }
 
+#if SUPPORT_ARCH_arm64_32
+template <>
+arm64_32::P::uint_t MachOChecker<arm64_32>::relocBase()
+{
+	return fFirstWritableSegment->vmaddr();
+}
+#endif
 
 template <typename A>
 bool MachOChecker<A>::addressInWritableSegment(pint_t address)
@@ -1486,6 +1540,13 @@ void MachOChecker<arm64>::checkExternalReloation(const macho_relocation_info<P>*
 }
 #endif
 
+#if SUPPORT_ARCH_arm64_32
+template <>
+void MachOChecker<arm64_32>::checkExternalReloation(const macho_relocation_info<P>* reloc)
+{
+  throw "external relocations not used for arm64_32";
+}
+#endif
 
 template <>
 void MachOChecker<x86>::checkLocalReloation(const macho_relocation_info<P>* reloc)
@@ -1539,6 +1600,13 @@ void MachOChecker<arm64>::checkLocalReloation(const macho_relocation_info<P>* re
 }
 #endif
 
+#if SUPPORT_ARCH_arm64_32
+template <>
+void MachOChecker<arm64_32>::checkLocalReloation(const macho_relocation_info<P>* reloc)
+{
+  throw "local relocations not used for arm64_32";
+}
+#endif
 
 template <typename A>
 void MachOChecker<A>::checkRelocations()
@@ -2073,6 +2141,14 @@ static void check(const char* path, const char* verifierDstRoot, const std::vect
 						throw "in universal file, arm64 slice does not contain arm mach-o";
 					break;
 #endif
+#if SUPPORT_ARCH_arm64_32
+				case CPU_TYPE_ARM64_32:
+					if ( MachOChecker<arm64_32>::validFile(p + offset) )
+						MachOChecker<arm64_32>::make(p + offset, size, path, verifierDstRoot, mergeRootPaths);
+					else
+						throw "in universal file, arm64_32 slice does not contain arm64_32 mach-o";
+					break;
+#endif
 				default:
 						throwf("in universal file, unknown architecture slice 0x%x\n", cputype);
 				}
@@ -2092,6 +2168,11 @@ static void check(const char* path, const char* verifierDstRoot, const std::vect
 #if SUPPORT_ARCH_arm64
 		else if ( MachOChecker<arm64>::validFile(p) ) {
 			MachOChecker<arm64>::make(p, length, path, verifierDstRoot, mergeRootPaths);
+		}
+#endif
+#if SUPPORT_ARCH_arm64_32
+		else if ( MachOChecker<arm64_32>::validFile(p) ) {
+			MachOChecker<arm64_32>::make(p, length, path, verifierDstRoot, mergeRootPaths);
 		}
 #endif
 		else {

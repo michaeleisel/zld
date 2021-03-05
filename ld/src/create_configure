@@ -11,12 +11,12 @@ else
 fi
 
 if [ -z "${RC_SUPPORTED_ARCHS}" ]; then
-	RC_SUPPORTED_ARCHS="i386 x86_64 x86_64h armv6 armv7 armv7s armv7m armv7k arm64"
+	RC_SUPPORTED_ARCHS="i386 x86_64 x86_64h armv6 armv7 armv7s armv7m armv7k arm64 arm64e arm64_32"
 fi
 
 for ANARCH in ${RC_SUPPORTED_ARCHS}
 do
-    KNOWN_ARCHS=",armv4t,armv5,armv6,armv7,armv7f,armv7k,armv7s,armv6m,armv7m,armv7em,armv8,arm64,arm64v8,i386,x86_64,x86_64h,"
+    KNOWN_ARCHS=",armv4t,armv5,armv6,armv7,armv7f,armv7k,armv7s,armv6m,armv7m,armv7em,armv8,arm64,arm64v8,i386,x86_64,x86_64h,arm64e,arm64_32,"
     FOUND=`echo "$KNOWN_ARCHS" | grep ",$ANARCH,"`
 	if [ $FOUND ]; then
 		echo "#define SUPPORT_ARCH_$ANARCH  1" >> ${DERIVED_FILE_DIR}/configure.h
