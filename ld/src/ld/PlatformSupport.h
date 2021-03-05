@@ -41,7 +41,7 @@ enum class Platform
     tvOS                = 3,    // PLATFORM_TVOS
     watchOS             = 4,    // PLATFORM_WATCHOS
     bridgeOS            = 5,    // PLATFORM_BRIDGEOS
-    iOSMac              = 6,    // PLATFORM_IOSMAC
+    iOSMac              = 6,    // PLATFORM_MACCATALYST
     iOS_simulator       = 7,    // PLATFORM_IOSSIMULATOR
     tvOS_simulator      = 8,    // PLATFORM_TVOSSIMULATOR
     watchOS_simulator   = 9,    // PLATFORM_WATCHOSSIMULATOR
@@ -81,6 +81,8 @@ void forEachSupportedPlatform(void (^handler)(const PlatformInfo& info, bool& st
 
 Platform platformForLoadCommand(uint32_t lc, const mach_header* mh);
 Platform platformFromBuildVersion(uint32_t plat, const mach_header* mh);
+Platform      platformFromName(const char* platformName);
+const char*   nameFromPlatform(Platform plat);
 
 
 } // namespace

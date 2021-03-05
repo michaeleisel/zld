@@ -291,6 +291,27 @@ bool DyldInfoPrinter<arm64>::validFile(const uint8_t* fileContent)
 }
 #endif
 
+#if SUPPORT_ARCH_arm64_32
+template <>
+bool DyldInfoPrinter<arm64_32>::validFile(const uint8_t* fileContent)
+{	
+	const macho_header<P>* header = (const macho_header<P>*)fileContent;
+	if ( header->magic() != MH_MAGIC )
+		return false;
+	if ( header->cputype() != CPU_TYPE_ARM64_32 )
+		return false;
+	switch (header->filetype()) {
+		case MH_EXECUTE:
+		case MH_DYLIB:
+		case MH_DYLIB_STUB:
+		case MH_BUNDLE:
+		case MH_DYLINKER:
+		case MH_KEXT_BUNDLE:
+			return true;
+	}
+	return false;
+}
+#endif
 
 template <typename A>
 DyldInfoPrinter<A>::DyldInfoPrinter(const uint8_t* fileContent, uint32_t fileLength, const char* path, bool printArch)
@@ -495,7 +516,7 @@ static int64_t read_sleb128(const uint8_t*& p, const uint8_t* end)
 		bit += 7;
 	} while (byte & 0x80);
 	// sign extend negative numbers
-	if ( (byte & 0x40) != 0 )
+	if ( ((byte & 0x40) != 0) && (bit < 64) )
 		result |= (-1LL) << bit;
 	return result;
 }
@@ -2255,6 +2276,15 @@ const char*	DyldInfoPrinter<arm64>::relocTypeName(uint8_t r_type)
 }
 #endif
 
+#if SUPPORT_ARCH_arm64_32
+template <>
+const char*	DyldInfoPrinter<arm64_32>::relocTypeName(uint8_t r_type)
+{
+	if ( r_type == ARM64_RELOC_UNSIGNED )
+		return "pointer";
+	return "??";
+}
+#endif
 
 template <typename A>
 void DyldInfoPrinter<A>::printRelocRebaseInfo()
@@ -2678,6 +2708,14 @@ static void dump(const char* path)
 							throw "in universal file, arm64 slice does not contain arm64 mach-o";
 						break;
 #endif
+#if SUPPORT_ARCH_arm64_32
+					case CPU_TYPE_ARM64_32:
+						if ( DyldInfoPrinter<arm64_32>::validFile(p + offset) )
+							DyldInfoPrinter<arm64_32>::make(p + offset, size, path, (sPreferredArch == 0));
+						else
+							throw "in universal file, arm64_32 slice does not contain arm64 mach-o";
+						break;
+#endif
 					default:
 							throwf("in universal file, unknown architecture slice 0x%x\n", cputype);
 					}
@@ -2704,6 +2742,11 @@ static void dump(const char* path)
 #if SUPPORT_ARCH_arm64
 		else if ( DyldInfoPrinter<arm64>::validFile(p) ) {
 			DyldInfoPrinter<arm64>::make(p, length, path, false);
+		}
+#endif
+#if SUPPORT_ARCH_arm64_32
+		else if ( DyldInfoPrinter<arm64_32>::validFile(p) ) {
+			DyldInfoPrinter<arm64_32>::make(p, length, path, false);
 		}
 #endif
 		else {

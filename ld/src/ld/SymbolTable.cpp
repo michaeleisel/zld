@@ -314,7 +314,7 @@ private:
 		switch ( _options.commonsMode() ) {
 			case Options::kCommonsIgnoreDylibs:
 				if ( _options.warnCommons() )
-					warning("using common symbol %s from %s and ignoring defintion from dylib %s",
+					warning("using common symbol %s from %s and ignoring definition from dylib %s",
 							proxy.name(), proxy.safeFilePath(), dylib.safeFilePath());
 				pickAtom(dylib);
 				break;
@@ -325,7 +325,7 @@ private:
 				pickAtom(proxy);
 				break;
 			case Options::kCommonsConflictsDylibsError:
-				throwf("common symbol %s from %s conflicts with defintion from dylib %s",
+				throwf("common symbol %s from %s conflicts with definition from dylib %s",
 					   proxy.name(), proxy.safeFilePath(), dylib.safeFilePath());
 		}
 	}
@@ -936,6 +936,13 @@ void SymbolTable::removeDeadUndefs(std::vector<const ld::Atom*>& allAtoms, const
 				auto string = LDStringCreate(name);
 				_byNameTable.erase(string);
 				allAtoms.erase(std::remove(allAtoms.begin(), allAtoms.end(), atom), allAtoms.end());
+			}
+			else if ( atom == nullptr ) {
+				if ( const char* undefName = _byNameReverseTable[slot] ) {
+					// <rdar://problem/55544746> Remove unused undef symbols from symbol table after LTO before doing final resolve
+					_byNameReverseTable.erase(slot);
+					_byNameTable.erase(undefName);
+				}
 			}
 		}
 	}

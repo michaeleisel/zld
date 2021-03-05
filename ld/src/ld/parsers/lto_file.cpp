@@ -107,6 +107,7 @@ public:
 																					{ return _debugInfoModTime; }
 	const std::vector<ld::relocatable::File::Stab>*	stabs()	const override			{ return NULL; }
 	bool										canScatterAtoms() const override		{ return true; }
+	void										forEachLtoSymbol(void (^handler)(const char*)) const override;
 	LinkerOptionsList*							linkerOptions() const override		{ return NULL; }
 	const ToolVersionList&						toolVersions() const override		{ return _toolVersions; }
 	bool												isThinLTO() const			{ return _isThinLTO; }
@@ -116,11 +117,13 @@ public:
 	lto_module_t										module()					{ return _module; }
 	class InternalAtom&									internalAtom()				{ return _internalAtom; }
 	void												setDebugInfo(ld::relocatable::File::DebugInfoKind k,
-																	const char* pth, time_t modTime, uint32_t subtype)
+																	const char* pth, time_t modTime, uint32_t subtype, uint8_t subtypeflags)
 																					{	_debugInfo = k; 
 																						_debugInfoPath = pth; 
 																						_debugInfoModTime = modTime; 
-																						_cpuSubType = subtype;}
+																						_cpuSubType = subtype;
+																						_cpuSubTypeFlags = subtypeflags;
+																					}
 
     static bool                                         sSupportsLocalContext;
     static bool                                         sHasTriedLocalContext;
@@ -148,6 +151,7 @@ private:
 	ld::Fixup								_fixupToInternal;
 	ld::relocatable::File::DebugInfoKind	_debugInfo; 
 	uint32_t								_cpuSubType;
+	uint8_t									_cpuSubTypeFlags;
 	ToolVersionList							_toolVersions;  // unused, may some day contain version of clang the created bitcode
 };
 
@@ -380,6 +384,8 @@ ld::relocatable::File* Parser::parseMachOFile(const uint8_t* p, size_t len, cons
 	objOpts.treateBitcodeAsData = false;
 	objOpts.usingBitcode		= options.bitcodeBundle;
 	objOpts.maxDefaultCommonAlignment = options.maxDefaultCommonAlignment;
+	objOpts.internalSDK			= options.internalSDK;
+	objOpts.forceHidden			= false;
 
 	const char *object_path = path.c_str();
 	if (path.empty())
@@ -490,7 +496,7 @@ File::File(const char* pth, time_t mTime, ld::File::Ordinal ordinal, const uint8
 				default:
 					throwf("unknown scope for symbol %s in bitcode file %s", name, pth);
 			}
-			// only make atoms for non-internal symbols 
+			// only make atoms for non-internal symbols
 			if ( scope == ld::Atom::scopeTranslationUnit )
 				continue;
 			uint8_t alignment = (attr & LTO_SYMBOL_ALIGNMENT_MASK);
@@ -516,6 +522,29 @@ File::File(const char* pth, time_t mTime, ld::File::Ordinal ordinal, const uint8
 File::~File()
 {
 	this->release();
+}
+
+// this is only called when generating a text map file, to better detail where code came from
+void File::forEachLtoSymbol(void (^handler)(const char*)) const
+{
+#if LTO_API_VERSION >= 11
+	if ( lto_module_t module = ::lto_module_create_in_local_context(_content, _contentLength, _path) ) {
+		uint32_t count = ::lto_module_get_num_symbols(module);
+		for (uint32_t i=0; i < count; ++i) {
+			lto_symbol_attributes attr = lto_module_get_symbol_attribute(module, i);
+			switch ( attr & LTO_SYMBOL_DEFINITION_MASK ) {
+				case LTO_SYMBOL_DEFINITION_REGULAR:
+				case LTO_SYMBOL_DEFINITION_TENTATIVE:
+				case LTO_SYMBOL_DEFINITION_WEAK:
+					handler(::lto_module_get_symbol_name(module, i));
+					break;
+				default:
+					break;
+			}
+		}
+		::lto_module_dispose(module);
+	}
+#endif
 }
 
 bool File::mergeIntoGenerator(lto_code_gen_t generator, bool useSetModule) {
@@ -983,9 +1012,19 @@ bool Parser::optimizeLTO(const std::vector<File*>				files,
 
 	// add any -mllvm command line options
 	if ( !_s_llvmOptionsProcessed ) {
+		bool shouldUseOldDebugOptions = true;
+#if LTO_API_VERSION >= 26
+		// Only use the _array version of the function if both the header and the dylib support it.
+		// Use the old debug_options version when the dylib version is older.
+		if (lto_api_version() >= 26) {
+			shouldUseOldDebugOptions = false;
+			lto_codegen_debug_options_array(generator, options.llvmOptions->data(), options.llvmOptions->size());
+		}
+#endif
 		for (const char* opt : *options.llvmOptions) {
 			if ( logExtraOptions ) fprintf(stderr, "passing option to llvm: %s\n", opt);
-			::lto_codegen_debug_options(generator, opt);
+			if (shouldUseOldDebugOptions)
+				::lto_codegen_debug_options(generator, opt);
 		}
 		_s_llvmOptionsProcessed = true;
 	}
@@ -1034,7 +1073,7 @@ bool Parser::optimizeLTO(const std::vector<File*>				files,
 
 	// if final mach-o file has debug info, update original bitcode files to match
 	for (auto *f : files) {
-		f->setDebugInfo(machoFile->debugInfo(), machoFile->path(), machoFile->modificationTime(), machoFile->cpuSubType());
+		f->setDebugInfo(machoFile->debugInfo(), machoFile->path(), machoFile->modificationTime(), machoFile->cpuSubType(), machoFile->cpuSubTypeFlags());
 	}
 
 	return true;
@@ -1455,6 +1494,7 @@ bool Parser::optimize(  const std::vector<const ld::Atom*>&	allAtoms,
 		} else {
 			theLTOFiles.push_back(file);
 		}
+		state.filesForLTO.push_back(file);
 	}
 
 	auto result =  optimizeThinLTO(theThinLTOFiles, allAtoms, state, options, handler, newAtoms, additionalUndefines) &&
@@ -1496,19 +1536,37 @@ void Parser::AtomSyncer::doAtom(const ld::Atom& machoAtom)
 	}
 	else {
 		// an atom of this name was not in the allAtoms list the linker gave us
-		auto llvmAtom = _deadllvmAtoms.find(name);
-		if ( llvmAtom != _deadllvmAtoms.end() ) {
+		auto llvmAtomPos = _deadllvmAtoms.find(name);
+		lto::Atom* llvmAtom = nullptr;
+		const lto::File* atomFile = nullptr;
+		if ( llvmAtomPos != _deadllvmAtoms.end() ) {
+			llvmAtom = llvmAtomPos->second;
+			atomFile = (lto::File*)llvmAtom->file();
+			if ( atomFile->isThinLTO() && (machoAtom.scope() == ld::Atom::scopeTranslationUnit) ) {
+				// <rdar://problem/55067439> don't conflate static symbols in lto output with dead hidden/global symbols
+				if (log) fprintf(stderr, "AtomSyncer, static mach-o atom %p not synced to dead lto name=%s\n", &machoAtom, name);
+				llvmAtom = nullptr;
+			}
+		}
+		if ( llvmAtom != nullptr ) {
 			// this corresponding to an atom that the linker coalesced away or marked not-live
 			if ( _options.linkerDeadStripping ) {
+				// Do not lose auto-hide optimization if the atom is added back.
+				if (llvmAtom->scope() == machoAtom.scope() &&
+					llvmAtom->combine() == machoAtom.combine() &&
+					llvmAtom->autoHide() && !machoAtom.autoHide()) {
+					if (log) fprintf(stderr, "set %s to auto hide after LTO\n", name);
+					(const_cast<ld::Atom*>(&machoAtom))->setAutoHide();
+				}
 				// llvm seems to want this atom and -dead_strip is enabled, so it will be deleted if not needed, so add back
-				llvmAtom->second->setCompiledAtom(machoAtom);
+				llvmAtom->setCompiledAtom(machoAtom);
 				_newAtoms.push_back(&machoAtom);
-				if (log) fprintf(stderr, "AtomSyncer, mach-o atom %p matches dead lto atom %p but adding back (name=%s)\n", &machoAtom, llvmAtom->second, machoAtom.name());
+				if (log) fprintf(stderr, "AtomSyncer, mach-o atom %p matches dead lto atom %p but adding back (name=%s)\n", &machoAtom, llvmAtom, machoAtom.name());
 			}
 			else {
 				// Don't pass it back as a new atom
-				if (log) fprintf(stderr, "AtomSyncer, mach-o atom %p matches dead lto atom %p (name=%s)\n", &machoAtom, llvmAtom->second, machoAtom.name());
-				if ( llvmAtom->second->coalescedAway() ) {
+				if (log) fprintf(stderr, "AtomSyncer, mach-o atom %p matches dead lto atom %p (name=%s)\n", &machoAtom, llvmAtom, machoAtom.name());
+				if ( llvmAtom->coalescedAway() ) {
 					if (log) fprintf(stderr, "AtomSyncer: dead coalesced atom %s\n", machoAtom.name());
 					// <rdar://problem/28269547>
 					// We told libLTO to keep a weak atom that will replaced by an native mach-o atom.
@@ -1699,7 +1757,6 @@ bool libLTOisLoaded()
 //
 const char* archName(const uint8_t* fileContent, uint64_t fileLength)
 {
-	Mutex lock;
 	return Parser::fileKind(fileContent, fileLength);
 }
 
@@ -1862,6 +1919,11 @@ WRAP_LTO_SYMBOL(void, lto_codegen_set_diagnostic_handler,
 WRAP_LTO_SYMBOL(lto_code_gen_t, lto_codegen_create, (void), ())
 WRAP_LTO_SYMBOL(void, lto_codegen_debug_options,
                 (lto_code_gen_t cg, const char *options), (cg, options))
+#if LTO_API_VERSION >= 26
+WRAP_LTO_SYMBOL(void, lto_codegen_debug_options_array,
+                (lto_code_gen_t cg, const char *const *options, int number),
+                (cg, options, number))
+#endif
 WRAP_LTO_SYMBOL(void, lto_codegen_dispose, (lto_code_gen_t cg), (cg))
 WRAP_LTO_SYMBOL(void, lto_codegen_set_assembler_path,
                 (lto_code_gen_t cg, const char *path), (cg, path))

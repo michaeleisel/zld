@@ -857,6 +857,11 @@ void dumper::dumpFixup(const ld::Fixup* ref)
 			printf(", then store as 32-bit delta to GOT entry");
 			break;
 #endif
+#if SUPPORT_ARCH_arm64_32
+		case ld::Fixup::kindStoreARM64PointerToGOT32:
+			printf(", then store as 32-bit pointer to GOT entry");
+			break;
+#endif
 		case ld::Fixup::kindDtraceExtra:
 			printf("dtrace static probe extra info");
 			break;
@@ -1013,6 +1018,9 @@ void dumper::dumpFixup(const ld::Fixup* ref)
 		case ld::Fixup::kindStoreTargetAddressARM64PageOff12:
 			printf("ARM64 store 12-bit page offset of %s", referenceTargetAtomName(ref));
 			break;
+		case ld::Fixup::kindStoreTargetAddressARM64PageOff12ConvertAddToLoad:
+			printf("ARM64 store 12-bit page offset of %s, then convert add to load", referenceTargetAtomName(ref));
+			break;
 		case ld::Fixup::kindStoreTargetAddressARM64GOTLoadPage21:
 			printf("ARM64 store 21-bit pcrel ADRP to GOT for %s", referenceTargetAtomName(ref));
 			break;
@@ -1036,6 +1044,17 @@ void dumper::dumpFixup(const ld::Fixup* ref)
 			break;
 		case ld::Fixup::kindStoreTargetAddressARM64TLVPLoadNowLeaPageOff12:
 			printf("ARM64 store 12-bit page offset of lea for TLV of %s", referenceTargetAtomName(ref));
+			break;
+#endif
+#if SUPPORT_ARCH_arm64e
+		case ld::Fixup::kindSetAuthData:
+			printf("(addrDiv=%d, diversity=0X%04X, key=%d) ", ref->u.authData.hasAddressDiversity, ref->u.authData.discriminator, ref->u.authData.key);
+			break;
+		case ld::Fixup::kindStoreLittleEndianAuth64:
+			printf(", then store auth 64-bit little endian");
+			break;
+		case ld::Fixup::kindStoreTargetAddressLittleEndianAuth64:
+			printf("store auth 64-bit little endian address of %s", referenceTargetAtomName(ref));
 			break;
 #endif
 		//default:
@@ -1267,13 +1286,13 @@ static ld::relocatable::File* createReader(const char* path)
 	objOpts.subType				= sPreferredSubArch;
 	objOpts.treateBitcodeAsData  = false;
 	objOpts.usingBitcode		= true;
+	objOpts.forceHidden			= false;
 #if 1
 	if ( ! foundFatSlice ) {
 		cpu_type_t archOfObj;
 		cpu_subtype_t subArchOfObj;
-		ld::Platform platform;
-		uint32_t minOS;
-		if ( mach_o::relocatable::isObjectFile(p, fileLen, &archOfObj, &subArchOfObj, &platform, &minOS) ) {
+		ld::VersionSet platformsFound;
+		if ( mach_o::relocatable::isObjectFile(p, fileLen, &archOfObj, &subArchOfObj, platformsFound) ) {
 			objOpts.architecture = archOfObj;
 			objOpts.subType = subArchOfObj;
 		}
@@ -1306,7 +1325,7 @@ usage()
 	fprintf(stderr, "ObjectDump options:\n"
 			"\t-no_content\tdon't dump contents\n"
 			"\t-no_section\tdon't dump section name\n"
-			"\t-no_defintion\tdon't dump definition kind\n"
+			"\t-no_definition\tdon't dump definition kind\n"
 			"\t-no_combine\tdon't dump combine mode\n"
 			"\t-stabs\t\tdump stabs\n"
 			"\t-arch aaa\tonly dump info about arch aaa\n"

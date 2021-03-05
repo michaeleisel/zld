@@ -93,7 +93,7 @@ public:
 
 private:
 	enum { kBufferSize = 0x01000000 };
-	typedef std::unordered_map<LDString, int32_t, CLDStringHash, CLDStringEquals> StringToOffset;
+	typedef std::unordered_map<std::string, int32_t> StringToOffset;
 
 	const uint32_t							_pointerSize;
 	std::vector<char*>						_fullBuffers;
@@ -171,13 +171,14 @@ uint32_t StringPoolAtom::currentOffset()
 
 int32_t StringPoolAtom::addUnique(const char* str)
 {
-	int32_t offset = getOffset();
-	auto string = LDStringCreate(str);
-	auto resultPair = _uniqueStrings.try_emplace(string, offset);
-	if (resultPair.second) {
-		return this->add(str);
-	} else {
-		return resultPair.first->second;
+	StringToOffset::iterator pos = _uniqueStrings.find(str);
+	if ( pos != _uniqueStrings.end() ) {
+		return pos->second;
+	}
+	else {
+		int32_t offset = this->add(str);
+		_uniqueStrings[str] = offset;
+		return offset;
 	}
 }
 
@@ -289,7 +290,8 @@ bool SymbolTableAtom<A>::addLocal(const ld::Atom* atom, StringPoolAtom* pool)
 	assert(atom->symbolTableInclusion() != ld::Atom::symbolTableNotIn);
 	 
 	// set n_strx
-	const char* symbolName = atom->name();
+	std::string nameStr = std::string(atom->getUserVisibleName());
+	const char* symbolName = nameStr.c_str();
 	char anonName[32];
 	if ( this->_options.outputKind() == Options::kObjectFile ) {
 		if ( atom->contentType() == ld::Atom::typeCString ) {
@@ -315,6 +317,7 @@ bool SymbolTableAtom<A>::addLocal(const ld::Atom* atom, StringPoolAtom* pool)
 			symbolName = anonName;
 		}
 	}
+
 	// <rdar://problem/43388350> ER: Coalesce the string pools for the symbol table when linking objects together
 	entry.set_n_strx(pool->addUnique(symbolName));
 
@@ -762,9 +765,10 @@ public:
 												RelocationsAtomAbstract(const Options& opts, ld::Internal& state, 
 																OutputFile& writer, const ld::Section& sect,
 																unsigned int pointerSize)
-													: ClassicLinkEditAtom(opts, state, writer, sect, pointerSize) { }
+													: ClassicLinkEditAtom(opts, state, writer, sect, pointerSize),
+													  _pointerSize(pointerSize) { }
 
-	virtual void							addPointerReloc(uint64_t addr, uint32_t symNum) = 0;
+	virtual void							addPointerReloc(uint64_t addr, uint32_t symNum, uint32_t length) = 0;
 	virtual void							addTextReloc(uint64_t addr, ld::Fixup::Kind k, uint64_t targetAddr, uint32_t symNum) = 0;
 	virtual void							addExternalPointerReloc(uint64_t addr, const ld::Atom*) = 0;
 	virtual void							addExternalCallSiteReloc(uint64_t addr, const ld::Atom*) = 0;
@@ -777,9 +781,16 @@ public:
 #endif
 															const ld::Atom* toTarget, uint64_t toAddend, 
 															const ld::Atom* fromTarget, uint64_t fromAddend) = 0;
+
+	uint32_t								pointerSize() const {
+		return _pointerSize;
+	}
+
 protected:
 	uint32_t								symbolIndex(const ld::Atom* atom) const;
 
+private:
+	uint32_t 								_pointerSize;
 };
 
 
@@ -811,7 +822,7 @@ public:
 	// overrides of ClassicLinkEditAtom
 	virtual void								encode() {}
 	// overrides of RelocationsAtomAbstract
-	virtual void								addPointerReloc(uint64_t addr, uint32_t symNum);
+	virtual void								addPointerReloc(uint64_t addr, uint32_t symNum, uint32_t length);
 	virtual void								addExternalPointerReloc(uint64_t addr, const ld::Atom*) {}
 	virtual void								addExternalCallSiteReloc(uint64_t addr, const ld::Atom*) {}
 	virtual uint64_t							relocBaseAddress(ld::Internal& state);
@@ -858,17 +869,26 @@ uint64_t LocalRelocationsAtom<x86_64>::relocBaseAddress(ld::Internal& state)
 template <typename A>
 uint64_t LocalRelocationsAtom<A>::relocBaseAddress(ld::Internal& state)
 {
+	// <rdar://35164406> in -preload, aligned atoms can cause baseAddress and first section address to be different
+	if ( _options.outputKind() == Options::kPreload ) {
+		for (ld::Internal::FinalSection* sect : state.sections) {
+			if ( !sect->isSectionHidden() )
+				return sect->address;
+		}
+	}
+	
 	return _options.baseAddress();
 }
 
 template <typename A>
-void LocalRelocationsAtom<A>::addPointerReloc(uint64_t addr, uint32_t symNum)
+void LocalRelocationsAtom<A>::addPointerReloc(uint64_t addr, uint32_t symNum, uint32_t length)
 {
+	assert(length == 4 || length == 8);
 	macho_relocation_info<P> reloc;
 	reloc.set_r_address(addr);
 	reloc.set_r_symbolnum(symNum);
 	reloc.set_r_pcrel(false);
-	reloc.set_r_length();
+	reloc.set_r_length(length == 4 ? 2 : 3);
 	reloc.set_r_extern(false);
 	reloc.set_r_type(GENERIC_RELOC_VANILLA);
 	_relocs.push_back(reloc);
@@ -911,7 +931,7 @@ public:
 	// overrides of ClassicLinkEditAtom
 	virtual void								encode() {}
 	// overrides of RelocationsAtomAbstract
-	virtual void								addPointerReloc(uint64_t addr, uint32_t symNum) {}
+	virtual void								addPointerReloc(uint64_t addr, uint32_t symNum, uint32_t length) {}
 	virtual void								addTextReloc(uint64_t addr, ld::Fixup::Kind k, uint64_t targetAddr, uint32_t symNum) {}
 	virtual void								addExternalPointerReloc(uint64_t addr, const ld::Atom*);
 	virtual void								addExternalCallSiteReloc(uint64_t addr, const ld::Atom*);
@@ -1004,6 +1024,9 @@ uint64_t ExternalRelocationsAtom<A>::size() const
 #if SUPPORT_ARCH_arm64
 template <> uint32_t ExternalRelocationsAtom<arm64>::pointerReloc() { return ARM64_RELOC_UNSIGNED; }
 #endif
+#if SUPPORT_ARCH_arm64_32
+template <> uint32_t ExternalRelocationsAtom<arm64_32>::pointerReloc() { return ARM64_RELOC_UNSIGNED; }
+#endif
 #if SUPPORT_ARCH_arm_any
 template <> uint32_t ExternalRelocationsAtom<arm>::pointerReloc() { return ARM_RELOC_VANILLA; }
 #endif
@@ -1015,6 +1038,9 @@ template <> uint32_t ExternalRelocationsAtom<x86_64>::callReloc() { return X86_6
 template <> uint32_t ExternalRelocationsAtom<x86>::callReloc() { return GENERIC_RELOC_VANILLA; }
 #if SUPPORT_ARCH_arm64
 template <> uint32_t ExternalRelocationsAtom<arm64>::callReloc() { return ARM64_RELOC_BRANCH26; }
+#endif
+#if SUPPORT_ARCH_arm64_32
+template <> uint32_t ExternalRelocationsAtom<arm64_32>::callReloc() { return ARM64_RELOC_BRANCH26; }
 #endif
 
 template <typename A> 
@@ -1073,7 +1099,7 @@ public:
 	// overrides of ClassicLinkEditAtom
 	virtual void								encode();
 	// overrides of RelocationsAtomAbstract
-	virtual void								addPointerReloc(uint64_t addr, uint32_t symNum) {}
+	virtual void								addPointerReloc(uint64_t addr, uint32_t symNum, uint32_t length) {}
 	virtual void								addTextReloc(uint64_t addr, ld::Fixup::Kind k, uint64_t targetAddr, uint32_t symNum) {}
 	virtual void								addExternalPointerReloc(uint64_t addr, const ld::Atom*) {}
 	virtual void								addExternalCallSiteReloc(uint64_t addr, const ld::Atom*) {}
@@ -1821,6 +1847,7 @@ void SectionRelocationsAtom<arm64>::encodeSectionReloc(ld::Internal::FinalSectio
 			}
 			// fall into next case
 		case ld::Fixup::kindStoreTargetAddressARM64PageOff12:
+		case ld::Fixup::kindStoreTargetAddressARM64PageOff12ConvertAddToLoad:
 			reloc1.set_r_address(address);
 			reloc1.set_r_symbolnum(symbolNum);
 			reloc1.set_r_pcrel(false);
@@ -1991,6 +2018,227 @@ void SectionRelocationsAtom<arm64>::encodeSectionReloc(ld::Internal::FinalSectio
 }
 #endif // SUPPORT_ARCH_arm64
 
+#if SUPPORT_ARCH_arm64_32
+template <>
+void SectionRelocationsAtom<arm64_32>::encodeSectionReloc(ld::Internal::FinalSection* sect, 
+													const Entry& entry, std::vector<macho_relocation_info<P> >& relocs)
+{
+	macho_relocation_info<P> reloc1;
+	macho_relocation_info<P> reloc2;
+	uint64_t address = entry.inAtom->finalAddress()+entry.offsetInAtom - sect->address;
+	bool external = entry.toTargetUsesExternalReloc;
+	uint32_t symbolNum = sectSymNum(external, entry.toTarget);
+	bool fromExternal = false;
+	uint32_t fromSymbolNum = 0;
+	if ( entry.fromTarget != NULL ) {
+		fromExternal = entry.fromTargetUsesExternalReloc;
+		fromSymbolNum = sectSymNum(fromExternal, entry.fromTarget);
+	}
+	
+	
+	switch ( entry.kind ) {
+		case ld::Fixup::kindStoreARM64Branch26:
+			if ( entry.toAddend != 0 ) {
+				assert(entry.toAddend < 0x400000);
+				reloc2.set_r_address(address);
+				reloc2.set_r_symbolnum(entry.toAddend);
+				reloc2.set_r_pcrel(false);
+				reloc2.set_r_length(2);
+				reloc2.set_r_extern(false);
+				reloc2.set_r_type(ARM64_RELOC_ADDEND);
+				relocs.push_back(reloc2);
+			}
+			// fall into next case
+		case ld::Fixup::kindStoreTargetAddressARM64Branch26:
+		case ld::Fixup::kindStoreARM64DtraceCallSiteNop:
+		case ld::Fixup::kindStoreARM64DtraceIsEnableSiteClear:
+			reloc1.set_r_address(address);
+			reloc1.set_r_symbolnum(symbolNum);
+			reloc1.set_r_pcrel(true);
+			reloc1.set_r_length(2);
+			reloc1.set_r_extern(external);
+			reloc1.set_r_type(ARM64_RELOC_BRANCH26);
+			relocs.push_back(reloc1);
+			break;
+			
+		case ld::Fixup::kindStoreARM64Page21:
+			if ( entry.toAddend != 0 ) {
+				assert(entry.toAddend < 0x400000);
+				reloc2.set_r_address(address);
+				reloc2.set_r_symbolnum(entry.toAddend);
+				reloc2.set_r_pcrel(false);
+				reloc2.set_r_length(2);
+				reloc2.set_r_extern(false);
+				reloc2.set_r_type(ARM64_RELOC_ADDEND);
+				relocs.push_back(reloc2);
+			}
+			// fall into next case
+		case ld::Fixup::kindStoreTargetAddressARM64Page21:
+			reloc1.set_r_address(address);
+			reloc1.set_r_symbolnum(symbolNum);
+			reloc1.set_r_pcrel(true);
+			reloc1.set_r_length(2);
+			reloc1.set_r_extern(external);
+			reloc1.set_r_type(ARM64_RELOC_PAGE21);
+			relocs.push_back(reloc1);
+			break;
+
+		case ld::Fixup::kindStoreARM64PageOff12:
+			if ( entry.toAddend != 0 ) {
+				assert(entry.toAddend < 0x400000);
+				reloc2.set_r_address(address);
+				reloc2.set_r_symbolnum(entry.toAddend);
+				reloc2.set_r_pcrel(false);
+				reloc2.set_r_length(2);
+				reloc2.set_r_extern(false);
+				reloc2.set_r_type(ARM64_RELOC_ADDEND);
+				relocs.push_back(reloc2);
+			}
+			// fall into next case
+		case ld::Fixup::kindStoreTargetAddressARM64PageOff12:
+		case ld::Fixup::kindStoreTargetAddressARM64PageOff12ConvertAddToLoad:
+			reloc1.set_r_address(address);
+			reloc1.set_r_symbolnum(symbolNum);
+			reloc1.set_r_pcrel(false);
+			reloc1.set_r_length(2);
+			reloc1.set_r_extern(external);
+			reloc1.set_r_type(ARM64_RELOC_PAGEOFF12);
+			relocs.push_back(reloc1);
+			break;
+
+		case ld::Fixup::kindStoreTargetAddressARM64GOTLoadPage21:
+		case ld::Fixup::kindStoreARM64GOTLoadPage21:
+			reloc1.set_r_address(address);
+			reloc1.set_r_symbolnum(symbolNum);
+			reloc1.set_r_pcrel(true);
+			reloc1.set_r_length(2);
+			reloc1.set_r_extern(external);
+			reloc1.set_r_type(ARM64_RELOC_GOT_LOAD_PAGE21);
+			relocs.push_back(reloc1);
+			break;
+
+		case ld::Fixup::kindStoreTargetAddressARM64GOTLoadPageOff12:
+		case ld::Fixup::kindStoreARM64GOTLoadPageOff12:
+			reloc1.set_r_address(address);
+			reloc1.set_r_symbolnum(symbolNum);
+			reloc1.set_r_pcrel(false);
+			reloc1.set_r_length(2);
+			reloc1.set_r_extern(external);
+			reloc1.set_r_type(ARM64_RELOC_GOT_LOAD_PAGEOFF12);
+			relocs.push_back(reloc1);
+			break;
+
+		case ld::Fixup::kindStoreARM64TLVPLoadPageOff12:
+		case ld::Fixup::kindStoreTargetAddressARM64TLVPLoadPageOff12:
+			reloc1.set_r_address(address);
+			reloc1.set_r_symbolnum(symbolNum);
+			reloc1.set_r_pcrel(false);
+			reloc1.set_r_length(2);
+			reloc1.set_r_extern(external);
+			reloc1.set_r_type(ARM64_RELOC_TLVP_LOAD_PAGEOFF12);
+			relocs.push_back(reloc1);
+			break;
+
+		case ld::Fixup::kindStoreARM64TLVPLoadPage21:
+		case ld::Fixup::kindStoreTargetAddressARM64TLVPLoadPage21:
+			reloc1.set_r_address(address);
+			reloc1.set_r_symbolnum(symbolNum);
+			reloc1.set_r_pcrel(true);
+			reloc1.set_r_length(2);
+			reloc1.set_r_extern(external);
+			reloc1.set_r_type(ARM64_RELOC_TLVP_LOAD_PAGE21);
+			relocs.push_back(reloc1);
+			break;
+
+		case ld::Fixup::kindStoreLittleEndian64:
+		case ld::Fixup::kindStoreTargetAddressLittleEndian64:
+			if ( entry.fromTarget != NULL ) {
+				// this is a pointer-diff
+				reloc1.set_r_address(address);
+				reloc1.set_r_symbolnum(symbolNum);
+				reloc1.set_r_pcrel(false);
+				reloc1.set_r_length(3);
+				reloc1.set_r_extern(external);
+				reloc1.set_r_type(ARM64_RELOC_UNSIGNED);
+				reloc2.set_r_address(address);
+				reloc2.set_r_symbolnum(fromSymbolNum);
+				reloc2.set_r_pcrel(false);
+				reloc2.set_r_length(3);
+				reloc2.set_r_extern(fromExternal);
+				reloc2.set_r_type(ARM64_RELOC_SUBTRACTOR);
+				relocs.push_back(reloc2);
+				relocs.push_back(reloc1);
+			}
+			else {
+				// regular pointer
+				reloc1.set_r_address(address);
+				reloc1.set_r_symbolnum(symbolNum);
+				reloc1.set_r_pcrel(false);
+				reloc1.set_r_length(3);
+				reloc1.set_r_extern(external);
+				reloc1.set_r_type(ARM64_RELOC_UNSIGNED);
+				relocs.push_back(reloc1);
+			}
+			break;
+
+		case ld::Fixup::kindStoreLittleEndian32:
+		case ld::Fixup::kindStoreTargetAddressLittleEndian32:
+			if ( entry.fromTarget != NULL ) {
+				// this is a pointer-diff
+				reloc1.set_r_address(address);
+				reloc1.set_r_symbolnum(symbolNum);
+				reloc1.set_r_pcrel(false);
+				reloc1.set_r_length(2);
+				reloc1.set_r_extern(external);
+				reloc1.set_r_type(ARM64_RELOC_UNSIGNED);
+				reloc2.set_r_address(address);
+				reloc2.set_r_symbolnum(fromSymbolNum);
+				reloc2.set_r_pcrel(false);
+				reloc2.set_r_length(2);
+				reloc2.set_r_extern(fromExternal);
+				reloc2.set_r_type(ARM64_RELOC_SUBTRACTOR);
+				relocs.push_back(reloc2);
+				relocs.push_back(reloc1);
+			}
+			else {
+				// regular pointer
+				reloc1.set_r_address(address);
+				reloc1.set_r_symbolnum(symbolNum);
+				reloc1.set_r_pcrel(false);
+				reloc1.set_r_length(2);
+				reloc1.set_r_extern(external);
+				reloc1.set_r_type(ARM64_RELOC_UNSIGNED);
+				relocs.push_back(reloc1);
+			}
+			break;
+
+		case ld::Fixup::kindStoreARM64PointerToGOT32:
+            reloc1.set_r_address(address);
+            reloc1.set_r_symbolnum(symbolNum);
+            reloc1.set_r_pcrel(false);
+            reloc1.set_r_length(2);
+            reloc1.set_r_extern(external);
+            reloc1.set_r_type(ARM64_RELOC_POINTER_TO_GOT);
+            relocs.push_back(reloc1);
+            break;
+
+		case ld::Fixup::kindStoreARM64PCRelToGOT:
+            reloc1.set_r_address(address);
+            reloc1.set_r_symbolnum(symbolNum);
+            reloc1.set_r_pcrel(true);
+            reloc1.set_r_length(2);
+            reloc1.set_r_extern(external);
+            reloc1.set_r_type(ARM64_RELOC_POINTER_TO_GOT);
+            relocs.push_back(reloc1);
+            break;
+
+		default:
+			assert(0 && "need to handle arm64 -r reloc");
+		
+	}
+
+}
+#endif // SUPPORT_ARCH_arm64_32
 
 template <typename A>
 void SectionRelocationsAtom<A>::addSectionReloc(ld::Internal::FinalSection*	sect, ld::Fixup::Kind kind, 
@@ -2216,11 +2464,6 @@ uint32_t IndirectSymbolTableAtom<A>::symIndexOfNonLazyPointerAtom(const ld::Atom
 				break;
 			case ld::Atom::definitionProxy:
 				// dyld needs to bind nlpointer to something in another dylib
-				{
-					const ld::dylib::File* dylib = dynamic_cast<const ld::dylib::File*>(target->file());
-					if ( (dylib != NULL) && dylib->willBeLazyLoadedDylib() )
-						throwf("illegal data reference to %s in lazy loaded dylib %s", target->name(), dylib->path());
-				}
 				return symbolIndex(target);
 		}
 	}

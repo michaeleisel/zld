@@ -104,6 +104,9 @@ template <>	 const char*	UnwindPrinter<arm>::archName()		{ return "arm"; }
 #if SUPPORT_ARCH_arm64
 template <>	 const char*	UnwindPrinter<arm64>::archName()	{ return "arm64"; }
 #endif
+#if SUPPORT_ARCH_arm64_32
+template <>	 const char*	UnwindPrinter<arm64_32>::archName()	{ return "arm64_32"; }
+#endif
 
 template <>
 bool UnwindPrinter<x86>::validFile(const uint8_t* fileContent)
@@ -165,6 +168,26 @@ bool UnwindPrinter<arm64>::validFile(const uint8_t* fileContent)
 }
 #endif
 
+#if SUPPORT_ARCH_arm64_32
+template <>
+bool UnwindPrinter<arm64_32>::validFile(const uint8_t* fileContent)
+{	
+	const macho_header<P>* header = (const macho_header<P>*)fileContent;
+	if ( header->magic() != MH_MAGIC )
+		return false;
+	if ( header->cputype() != CPU_TYPE_ARM64_32 )
+		return false;
+	switch (header->filetype()) {
+		case MH_EXECUTE:
+		case MH_DYLIB:
+		case MH_BUNDLE:
+		case MH_DYLINKER:
+		case MH_OBJECT:
+			return true;
+	}
+	return false;
+}
+#endif
 
 template <>
 bool UnwindPrinter<arm>::validFile(const uint8_t* fileContent)
@@ -757,6 +780,84 @@ void UnwindPrinter<arm64>::decode(uint32_t encoding, const uint8_t* funcStart, c
 }
 #endif
 
+#if SUPPORT_ARCH_arm64_32
+template <>
+void UnwindPrinter<arm64_32>::decode(uint32_t encoding, const uint8_t* funcStart, char* str)
+{
+	uint32_t stackSize;
+	switch ( encoding & UNWIND_ARM64_MODE_MASK ) {
+		case UNWIND_ARM64_MODE_FRAMELESS:
+			stackSize = EXTRACT_BITS(encoding, UNWIND_ARM64_FRAMELESS_STACK_SIZE_MASK);
+			if ( stackSize == 0 )
+				strcpy(str, "no frame, no saved registers ");
+			else
+				sprintf(str, "stack size=%d: ", 16 * stackSize);
+			if ( encoding & UNWIND_ARM64_FRAME_X19_X20_PAIR )
+				strcat(str, "x19/20 ");
+			if ( encoding & UNWIND_ARM64_FRAME_X21_X22_PAIR )
+				strcat(str, "x21/22 ");
+			if ( encoding & UNWIND_ARM64_FRAME_X23_X24_PAIR )
+				strcat(str, "x23/24 ");
+			if ( encoding & UNWIND_ARM64_FRAME_X25_X26_PAIR )
+				strcat(str, "x25/26 ");
+			if ( encoding & UNWIND_ARM64_FRAME_X27_X28_PAIR )
+				strcat(str, "x27/28 ");
+			if ( encoding & UNWIND_ARM64_FRAME_D8_D9_PAIR )
+				strcat(str, "d8/9 ");
+			if ( encoding & UNWIND_ARM64_FRAME_D10_D11_PAIR )
+				strcat(str, "d10/11 ");
+			if ( encoding & UNWIND_ARM64_FRAME_D12_D13_PAIR )
+				strcat(str, "d12/13 ");
+			if ( encoding & UNWIND_ARM64_FRAME_D14_D15_PAIR )
+				strcat(str, "d14/15 ");
+			break;
+			break;
+		case UNWIND_ARM64_MODE_DWARF:
+			sprintf(str, "dwarf offset 0x%08X, ", encoding & UNWIND_X86_64_DWARF_SECTION_OFFSET);
+			break;
+		case UNWIND_ARM64_MODE_FRAME:
+			strcpy(str, "std frame: ");
+			if ( encoding & UNWIND_ARM64_FRAME_X19_X20_PAIR )
+				strcat(str, "x19/20 ");
+			if ( encoding & UNWIND_ARM64_FRAME_X21_X22_PAIR )
+				strcat(str, "x21/22 ");
+			if ( encoding & UNWIND_ARM64_FRAME_X23_X24_PAIR )
+				strcat(str, "x23/24 ");
+			if ( encoding & UNWIND_ARM64_FRAME_X25_X26_PAIR )
+				strcat(str, "x25/26 ");
+			if ( encoding & UNWIND_ARM64_FRAME_X27_X28_PAIR )
+				strcat(str, "x27/28 ");
+			if ( encoding & UNWIND_ARM64_FRAME_D8_D9_PAIR )
+				strcat(str, "d8/9 ");
+			if ( encoding & UNWIND_ARM64_FRAME_D10_D11_PAIR )
+				strcat(str, "d10/11 ");
+			if ( encoding & UNWIND_ARM64_FRAME_D12_D13_PAIR )
+				strcat(str, "d12/13 ");
+			if ( encoding & UNWIND_ARM64_FRAME_D14_D15_PAIR )
+				strcat(str, "d14/15 ");
+			break;
+		case UNWIND_ARM64_MODE_FRAME_OLD:
+			strcpy(str, "old frame: ");
+			if ( encoding & UNWIND_ARM64_FRAME_X21_X22_PAIR_OLD )
+				strcat(str, "x21/22 ");
+			if ( encoding & UNWIND_ARM64_FRAME_X23_X24_PAIR_OLD )
+				strcat(str, "x23/24 ");
+			if ( encoding & UNWIND_ARM64_FRAME_X25_X26_PAIR_OLD )
+				strcat(str, "x25/26 ");
+			if ( encoding & UNWIND_ARM64_FRAME_X27_X28_PAIR_OLD )
+				strcat(str, "x27/28 ");
+			if ( encoding & UNWIND_ARM64_FRAME_D8_D9_PAIR_OLD )
+				strcat(str, "d8/9 ");
+			if ( encoding & UNWIND_ARM64_FRAME_D10_D11_PAIR_OLD )
+				strcat(str, "d10/11 ");
+			if ( encoding & UNWIND_ARM64_FRAME_D12_D13_PAIR_OLD )
+				strcat(str, "d12/13 ");
+			if ( encoding & UNWIND_ARM64_FRAME_D14_D15_PAIR_OLD )
+				strcat(str, "d14/15 ");
+			break;
+	}
+}
+#endif
 
 template <>
 void UnwindPrinter<arm>::decode(uint32_t encoding, const uint8_t* funcStart, char* str)
@@ -874,6 +975,16 @@ const char* UnwindPrinter<arm64>::personalityName(const macho_relocation_info<ar
 }
 #endif
 
+#if SUPPORT_ARCH_arm64_32
+template <>
+const char* UnwindPrinter<arm64_32>::personalityName(const macho_relocation_info<arm64_32::P>* reloc)
+{
+	//assert(reloc->r_extern() && "reloc not extern on personality column in __compact_unwind section");
+	//assert((reloc->r_type() == ARM64_RELOC_UNSIGNED) && "wrong reloc type on personality column in __compact_unwind section");
+	const macho_nlist<P>& sym = fSymbols[reloc->r_symbolnum()];
+	return &fStrings[sym.n_strx()];
+}
+#endif
 
 template <>
 const char* UnwindPrinter<arm>::personalityName(const macho_relocation_info<arm::P>* reloc)
@@ -1119,6 +1230,14 @@ static void dump(const char* path, const std::set<cpu_type_t>& onlyArchs, bool s
 							throw "in universal file, arm64 slice does not contain arm64 mach-o";
 						break;
 #endif
+#if SUPPORT_ARCH_arm64_32
+					case CPU_TYPE_ARM64_32:
+						if ( UnwindPrinter<arm64_32>::validFile(p + offset) )
+							UnwindPrinter<arm64_32>::make(p + offset, size, path, showFunctionNames);
+						else
+							throw "in universal file, arm64_32 slice does not contain arm64_32 mach-o";
+						break;
+#endif
 					case CPU_TYPE_ARM:
 						if ( UnwindPrinter<arm>::validFile(p + offset) )
 							UnwindPrinter<arm>::make(p + offset, size, path, showFunctionNames);
@@ -1140,6 +1259,11 @@ static void dump(const char* path, const std::set<cpu_type_t>& onlyArchs, bool s
 #if SUPPORT_ARCH_arm64
 		else if ( UnwindPrinter<arm64>::validFile(p) && onlyArchs.count(CPU_TYPE_ARM64) ) {
 			UnwindPrinter<arm64>::make(p, length, path, showFunctionNames);
+		}
+#endif
+#if SUPPORT_ARCH_arm64_32
+		else if ( UnwindPrinter<arm64_32>::validFile(p) && onlyArchs.count(CPU_TYPE_ARM64_32) ) {
+			UnwindPrinter<arm64_32>::make(p, length, path, showFunctionNames);
 		}
 #endif
 		else if ( UnwindPrinter<arm>::validFile(p) && onlyArchs.count(CPU_TYPE_ARM) ) {
@@ -1175,6 +1299,10 @@ int main(int argc, const char* argv[])
 					else if ( strcmp(arch, "arm64") == 0 )
 						onlyArchs.insert(CPU_TYPE_ARM64);
 #endif
+#if SUPPORT_ARCH_arm64_32
+					else if ( strcmp(arch, "arm64_32") == 0 )
+						onlyArchs.insert(CPU_TYPE_ARM64_32);
+#endif
 					else if ( strcmp(arch, "armv7k") == 0 )
 						onlyArchs.insert(CPU_TYPE_ARM);
 					else 
@@ -1198,6 +1326,9 @@ int main(int argc, const char* argv[])
 			onlyArchs.insert(CPU_TYPE_X86_64);
 #if SUPPORT_ARCH_arm64
 			onlyArchs.insert(CPU_TYPE_ARM64);
+#endif
+#if SUPPORT_ARCH_arm64_32
+			onlyArchs.insert(CPU_TYPE_ARM64_32);
 #endif
 			onlyArchs.insert(CPU_TYPE_ARM);
 		}

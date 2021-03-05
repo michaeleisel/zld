@@ -61,7 +61,15 @@ struct arm64
 	typedef Pointer64<LittleEndian>		P;
 };
 
+struct arm64e
+{
+	typedef Pointer64<LittleEndian>		P;
+};
 
+struct arm64_32
+{
+	typedef Pointer32<LittleEndian>	P;
+};
 
 #endif // __ARCHITECTURES__
 

@@ -290,7 +290,6 @@ BitcodeObfuscator::BitcodeObfuscator()
 #if LTO_API_VERSION < 11
     throwf("compile-time libLTO (%d) didn't support -bitcode_hide_symbols", LTO_API_VERSION);
 #else
-    // check if apple internal libLTO is used
     if ( ::lto_get_version() == NULL )
         throwf("libLTO is not loaded");
     _lto_hide_symbols = (lto_codegen_func_t) dlsym(RTLD_DEFAULT, "lto_codegen_hide_symbols");
@@ -328,20 +327,6 @@ void BitcodeObfuscator::addMustPreserveSymbols(const char* name)
 
 void BitcodeObfuscator::bitcodeHideSymbols(ld::Bitcode* bc, const char* filePath, const char* outputPath)
 {
-#if LTO_API_VERSION >= 13 && LTO_APPLE_INTERNAL
-    lto_module_t module = ::lto_module_create_in_codegen_context(bc->getContent(), bc->getSize(), filePath, _obfuscator);
-    if ( module == NULL )
-        throwf("could not reparse object file %s in bitcode bundle: '%s', using libLTO version '%s'",
-               filePath, ::lto_get_error_message(), ::lto_get_version());
-    ::lto_codegen_set_module(_obfuscator, module);
-    (*_lto_hide_symbols)(_obfuscator);
-#if LTO_API_VERSION >= 15
-    ::lto_codegen_set_should_embed_uselists(_obfuscator, true);
-#endif
-    ::lto_codegen_write_merged_modules(_obfuscator, outputPath);
-    (*_lto_reset_context)(_obfuscator);
-#endif
-    return;
 }
 
 void BitcodeObfuscator::writeSymbolMap(const char *outputPath)

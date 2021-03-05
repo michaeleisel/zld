@@ -174,17 +174,18 @@ public:
 		};
 
 		forEach(^(ld::Platform platform, uint32_t minVersion, uint32_t sdkVersion, bool &stop) {
-			appendPlatform(platformInfo(platform).printName);
+			appendPlatform(nameFromPlatform(platform));
 		});
 
 		return retval;
 	}
 
 	void checkObjectCrosslink(const VersionSet& objectPlatforms, const std::string& targetPath, bool internalSDK,
-							  bool bitcode) const;
+							  bool bitcode, bool platformMismatchesAreWarning) const;
 	void checkDylibCrosslink(const VersionSet& dylibPlatforms, const std::string& targetPath,
 										 const std::string& dylibType, bool internalSDK, bool indirectDylib,
-										 bool bitcode) const;
+										 bool bitcode, bool isUnzipperedTwin, const char* installName,
+										 bool fromSDK, bool platformMismatchesAreWarning) const;
 	bool operator==(const VersionSet& other) const { return _versions == other._versions; }
 	bool operator<(const VersionSet& other) const { return _versions < other._versions; }
 };
@@ -198,6 +199,7 @@ static const PlatformVersion mac10_9 		(Platform::macOS, 0x000A0900);
 static const PlatformVersion mac10_12 		(Platform::macOS, 0x000A0C00);
 static const PlatformVersion mac10_14 		(Platform::macOS, 0x000A0E00);
 static const PlatformVersion mac10_15		(Platform::macOS, 0x000A0F00);
+static const PlatformVersion mac10_16		(Platform::macOS, 0x000A1000);
 static const PlatformVersion mac10_Future 	(Platform::macOS, 0x10000000);
 
 static const PlatformVersion iOS_2_0 		(Platform::iOS, 0x00020000);
@@ -213,21 +215,25 @@ static const PlatformVersion iOS_10_0 		(Platform::iOS, 0x000A0000);
 static const PlatformVersion iOS_11_0 		(Platform::iOS, 0x000B0000);
 static const PlatformVersion iOS_12_0 		(Platform::iOS, 0x000C0000);
 static const PlatformVersion iOS_13_0 		(Platform::iOS, 0x000D0000);
+static const PlatformVersion iOS_14_0 		(Platform::iOS, 0x000E0000);
 static const PlatformVersion iOS_Future 	(Platform::iOS, 0x10000000);
 
 static const PlatformVersion watchOS_1_0 		(Platform::watchOS, 0x00010000);
 static const PlatformVersion watchOS_2_0 		(Platform::watchOS, 0x00020000);
 static const PlatformVersion watchOS_5_0 		(Platform::watchOS, 0x00050000);
 static const PlatformVersion watchOS_6_0 		(Platform::watchOS, 0x00060000);
+static const PlatformVersion watchOS_7_0 		(Platform::watchOS, 0x00070000);
 static const PlatformVersion watchOS_Future		(Platform::watchOS, 0x10000000);
 
 static const PlatformVersion tvOS_9_0 			(Platform::tvOS, 0x00090000);
 static const PlatformVersion tvOS_12_0 			(Platform::tvOS, 0x000C0000);
 static const PlatformVersion tvOS_13_0 			(Platform::tvOS, 0x000D0000);
+static const PlatformVersion tvOS_14_0 			(Platform::tvOS, 0x000E0000);
 static const PlatformVersion tvOS_Future		(Platform::tvOS, 0x10000000);
 
 static const PlatformVersion bridgeOS_1_0 			(Platform::bridgeOS, 0x00010000);
 static const PlatformVersion bridgeOS_4_0 			(Platform::bridgeOS, 0x00040000);
+static const PlatformVersion bridgeOS_5_0 			(Platform::bridgeOS, 0x00050000);
 static const PlatformVersion bridgeOS_Future		(Platform::bridgeOS, 0x10000000);
 
 
@@ -247,13 +253,14 @@ static const VersionSet version2010Fall ({mac10_7, iOS_4_3});
 static const VersionSet version2012 	({mac10_8, iOS_6_0});
 static const VersionSet version2013 	({mac10_9, iOS_7_0});
 static const VersionSet version2019Fall ({mac10_15, iOS_13_0, watchOS_6_0, tvOS_13_0, bridgeOS_4_0});
+static const VersionSet version2020Fall ({mac10_16, iOS_14_0, watchOS_7_0, tvOS_14_0, bridgeOS_5_0});
 	
 static const VersionSet supportsSplitSegV2 		({mac10_12, iOS_9_0, watchOS_2_0, tvOS_9_0});
 // FIXME: Use the comment out line instead.
 static const VersionSet supportsLCBuildVersion 	({mac10_14, iOS_12_0, watchOS_5_0, tvOS_12_0, bridgeOS_1_0});
 static const VersionSet supportsPIE				({mac10_5, iOS_4_2});
 static const VersionSet supportsTLV  			({mac10_7, iOS_9_0});
-static const VersionSet supportsChainedFixups 	({mac10_15, iOS_13_0, watchOS_6_0, tvOS_13_0, bridgeOS_Future});
+static const VersionSet supportsChainedFixups 	({mac10_16, iOS_14_0, watchOS_7_0, tvOS_14_0, bridgeOS_Future});
 
 // Forward declaration for bitcode support
 class Bitcode;
@@ -365,6 +372,7 @@ public:
 	virtual uint8_t						swiftVersion() const	{ return 0; }		// ABI version, now fixed
 	virtual uint16_t					swiftLanguageVersion() const	{ return 0; }	// language version in 4.4 format
 	virtual uint32_t					cpuSubType() const		{ return 0; }
+	virtual uint8_t						cpuSubTypeFlags() const	{ return 0; }
 	virtual uint32_t					subFileCount() const	{ return 1; }
 	virtual const VersionSet&			platforms() const		{ return _platforms; }
 	virtual void markSubFrameworksAsExported(const char *myLeaf) { }
@@ -443,6 +451,7 @@ namespace relocatable {
 		virtual SourceKind					sourceKind() const { return kSourceUnknown; }
 		virtual const uint8_t*				fileContent() const { return nullptr; }
 		virtual const std::vector<AstTimeAndPath>*	astFiles() const { return nullptr; }
+		virtual void						forEachLtoSymbol(void (^handler)(const char*)) const { }
 	};
 } // namespace relocatable
 
@@ -468,7 +477,7 @@ namespace dylib {
 												: ld::File(pth, modTime, ord, Dylib), _dylibInstallPath(NULL), _frameworkName(NULL),
 												_dylibTimeStamp(0), _dylibCurrentVersion(0), _dylibCompatibilityVersion(0),
 												_explicitlyLinked(false), _implicitlyLinked(false), _speculativelyLoaded(false),
-												_lazyLoadedDylib(false), _forcedWeakLinked(false), _reExported(false),
+												_forcedWeakLinked(false), _needed(false), _reExported(false),
 												_upward(false), _dead(false) { }
 				const char*					installPath() const			{ return _dylibInstallPath; }
 				const char*					frameworkName() const		{ return _frameworkName; }
@@ -483,10 +492,10 @@ namespace dylib {
 				bool						speculativelyLoaded() const	{ return _speculativelyLoaded; }
 
 				// attributes of how dylib will be used when linked
-				void						setWillBeLazyLoadedDylb()		{ _lazyLoadedDylib = true; }
-				bool						willBeLazyLoadedDylib() const	{ return _lazyLoadedDylib; }
 				void						setForcedWeakLinked()			{ _forcedWeakLinked = true; }
 				bool						forcedWeakLinked() const		{ return _forcedWeakLinked; }
+				void						setNeededDylib()				{ _needed = true; }
+				bool						neededDylib() const				{ return _needed; }
 															
 				void						setWillBeReExported()			{ _reExported = true; }
 				bool						willBeReExported() const		{ return _reExported; }
@@ -518,6 +527,8 @@ namespace dylib {
 		virtual bool						installPathVersionSpecific() const { return false; }
 		virtual bool						appExtensionSafe() const = 0;
 		virtual void						forEachExportedSymbol(void (^handler)(const char* symbolName, bool weakDef)) const = 0;
+		virtual bool						hasReExportedDependentsThatProvidedExportAtom() const { return false; }
+		virtual bool						isUnzipperedTwin() const { return false; }
 
 	public:
 		const char*							_dylibInstallPath;
@@ -528,8 +539,8 @@ namespace dylib {
 		bool								_explicitlyLinked;
 		bool								_implicitlyLinked;
 		bool								_speculativelyLoaded;
-		bool								_lazyLoadedDylib;
 		bool								_forcedWeakLinked;
+		bool								_needed;
 		bool								_reExported;
 		bool								_upward;
 		bool								_dead;
@@ -566,7 +577,7 @@ public:
 	enum Type { typeUnclassified, typeCode, typePageZero, typeImportProxies, typeLinkEdit, typeMachHeader, typeStack,
 				typeLiteral4, typeLiteral8, typeLiteral16, typeConstants, typeTempLTO, typeTempAlias,
 				typeCString, typeNonStdCString, typeCStringPointer, typeUTF16Strings, typeCFString, typeObjC1Classes,
-				typeCFI, typeLSDA, typeDtraceDOF, typeUnwindInfo, typeObjCClassRefs, typeObjC2CategoryList,
+				typeCFI, typeLSDA, typeDtraceDOF, typeUnwindInfo, typeObjCClassRefs, typeObjC2CategoryList, typeObjC2ClassList,
 				typeZeroFill, typeTentativeDefs, typeLazyPointer, typeStub, typeNonLazyPointer, typeDyldInfo, 
 				typeLazyDylibPointer, typeStubHelper, typeInitializerPointers, typeTerminatorPointers,
 				typeStubClose, typeLazyPointerClose, typeAbsoluteSymbols, typeThreadStarts, typeChainStarts,
@@ -667,6 +678,9 @@ struct Fixup
 					kindStoreARM64TLVPLoadNowLeaPage21, kindStoreARM64TLVPLoadNowLeaPageOff12,
 					kindStoreARM64PointerToGOT, kindStoreARM64PCRelToGOT,
 #endif
+#if SUPPORT_ARCH_arm64_32
+					kindStoreARM64PointerToGOT32,
+#endif
 					// dtrace probes
 					kindDtraceExtra,
 					kindStoreX86DtraceCallSiteNop, kindStoreX86DtraceIsEnableSiteClear,
@@ -707,6 +721,7 @@ struct Fixup
 					kindStoreTargetAddressARM64Branch26,		// kindSetTargetAddress + kindStoreARM64Branch26
 					kindStoreTargetAddressARM64Page21,			// kindSetTargetAddress + kindStoreARM64Page21
 					kindStoreTargetAddressARM64PageOff12,		// kindSetTargetAddress + kindStoreARM64PageOff12
+					kindStoreTargetAddressARM64PageOff12ConvertAddToLoad, // kindSetTargetAddress + kindStoreARM64PageOff12 and convert add to load
 					kindStoreTargetAddressARM64GOTLoadPage21,	// kindSetTargetAddress + kindStoreARM64GOTLoadPage21
 					kindStoreTargetAddressARM64GOTLoadPageOff12,// kindSetTargetAddress + kindStoreARM64GOTLoadPageOff12
 					kindStoreTargetAddressARM64GOTLeaPage21,	// kindSetTargetAddress + kindStoreARM64GOTLeaPage21
@@ -905,6 +920,7 @@ struct Fixup
 			case ld::Fixup::kindStoreTargetAddressARM64Branch26:
 			case ld::Fixup::kindStoreTargetAddressARM64Page21:
 			case ld::Fixup::kindStoreTargetAddressARM64PageOff12:
+			case ld::Fixup::kindStoreTargetAddressARM64PageOff12ConvertAddToLoad:
 			case ld::Fixup::kindStoreTargetAddressARM64GOTLoadPage21:
 			case ld::Fixup::kindStoreTargetAddressARM64GOTLoadPageOff12:
 			case ld::Fixup::kindStoreTargetAddressARM64GOTLeaPage21:
@@ -970,6 +986,7 @@ struct Fixup
 			case ld::Fixup::kindStoreARM64PCRelToGOT:
 			case ld::Fixup::kindStoreTargetAddressARM64Page21:
 			case ld::Fixup::kindStoreTargetAddressARM64PageOff12:
+			case ld::Fixup::kindStoreTargetAddressARM64PageOff12ConvertAddToLoad:
 			case ld::Fixup::kindStoreTargetAddressARM64GOTLoadPage21:
 			case ld::Fixup::kindStoreTargetAddressARM64GOTLoadPageOff12:
 			case ld::Fixup::kindStoreTargetAddressARM64GOTLeaPage21:
@@ -1028,7 +1045,7 @@ struct Fixup
 // to the C visibility of static, hidden, default.
 //
 // DefinitionKind:
-// An atom is one of five defintion kinds:
+// An atom is one of five definition kinds:
 //	regular			Most atoms.
 //	weak			C++ compiler makes some functions weak if there might be multiple copies
 //					that the linker needs to coalesce.
@@ -1162,6 +1179,16 @@ public:
 	virtual const ld::File*				    originalFile() const       { return file(); }
 	virtual const char*						translationUnitSource() const { return NULL; }
 	virtual const char*						name() const = 0;
+	std::string_view						getUserVisibleName() const {
+		auto* nm = name();
+		if (!nm)
+			return std::string_view();
+		std::string_view visibleName(nm);
+		auto pos = visibleName.rfind(".llvm.");
+		if (pos == std::string_view::npos)
+			return visibleName;
+		return visibleName.substr(0, pos);
+	}
 	virtual uint64_t						objectAddress() const = 0;
 	virtual uint64_t						size() const = 0;
 	virtual void							copyRawContent(uint8_t buffer[]) const = 0;
@@ -1375,7 +1402,7 @@ public:
 										Internal() : bundleLoader(NULL),
 											entryPoint(NULL), classicBindingHelper(NULL),
 											lazyBindingHelper(NULL), compressedFastBinderProxy(NULL),
-											hasObjC(false),
+											hasObjC(false), hasArm64eABIVersion(false), arm64eABIVersion(0),
 											swiftVersion(0), swiftLanguageVersion(0),
 											cpuSubType(0), minOSVersion(0),
 											objectFileFoundWithNoVersion(false),
@@ -1386,7 +1413,7 @@ public:
 											hasWeakExternalSymbols(false),
 											someObjectHasOptimizationHints(false),
 											dropAllBitcode(false), embedMarkerOnly(false),
-											forceLoadCompilerRT(false)	{ }
+											forceLoadCompilerRT(false), cantUseChainedFixups(false)	{ }
 
 	std::vector<FinalSection*>					sections;
 	std::vector<ld::dylib::File*>				dylibs;
@@ -1395,6 +1422,8 @@ public:
 	AtomToSection								atomToSection;		
 	CStringSet									unprocessedLinkerOptionLibraries;
 	CStringSet									unprocessedLinkerOptionFrameworks;
+	CStringSet									linkerOptionNeededLibraries;
+	CStringSet									linkerOptionNeededFrameworks;
 	CStringSet									linkerOptionLibraries;
 	CStringSet									linkerOptionFrameworks;
 	CStringSet									missingLinkerOptionLibraries;
@@ -1402,6 +1431,7 @@ public:
 	std::vector<const ld::Atom*>				indirectBindingTable;
 	std::vector<const ld::relocatable::File*>	filesWithBitcode;
 	std::vector<const ld::relocatable::File*>	filesFromCompilerRT;
+	std::vector<const ld::relocatable::File*>	filesForLTO;
 	std::vector<const ld::Atom*>				deadAtoms;
 	std::unordered_set<const char*>				allUndefProxies;
 	std::unordered_set<uint64_t>				toolsVersions;
@@ -1411,6 +1441,8 @@ public:
 	const Atom*									lazyBindingHelper;
 	const Atom*									compressedFastBinderProxy;
 	bool										hasObjC;
+	bool										hasArm64eABIVersion;
+	uint8_t										arm64eABIVersion;
 	uint8_t										swiftVersion;
 	uint16_t									swiftLanguageVersion;
 	uint32_t									cpuSubType;
@@ -1427,6 +1459,7 @@ public:
 	bool										dropAllBitcode;
 	bool										embedMarkerOnly;
 	bool										forceLoadCompilerRT;
+	bool										cantUseChainedFixups;
 	std::vector<std::string>					ltoBitcodePath;
 };
 
