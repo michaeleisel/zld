@@ -34,11 +34,11 @@ llvm-8.0.1.src:
 
 HASH := $(shell git rev-parse --short HEAD)
 package:
-	tar -C build/Build/Products/Release -cvf build/Build/Products/Release/zld.$(HASH).tar.gz zld
-	tar -C build/Build/Products/Release -cvf build/Build/Products/Release/zld.dSYM.$(HASH).tar.gz zld.dSYM
+	tar -C build/Build/Products/Release -czvf build/Build/Products/Release/zld.$(HASH).tar.gz zld
+	tar -C build/Build/Products/Release -czvf build/Build/Products/Release/zld.dSYM.$(HASH).tar.gz zld.dSYM
 
 github_release: build
-	tar -C build/Build/Products/Release -cvf build/Build/Products/Release/zld.tar.gz zld
+	tar -C build/Build/Products/Release -czvf build/Build/Products/Release/zld.tar.gz zld
 
 tapi-1100.0.11:
 	mkdir -p $@
