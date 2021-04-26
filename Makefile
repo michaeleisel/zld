@@ -21,7 +21,7 @@ cfe-8.0.1.src:
 	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz | tar xJ
 
 clean:
-	rm -rf abseil-cpp-20200225 build cfe-8.0.1.src dyld-733.6 llvm-8.0.1.src pstl tapi-1100.0.11 tbb tbb_staticlib corecrypto
+	rm -rf abseil-cpp-20200225 build cfe-8.0.1.src dyld-733.6 llvm-8.0.1.src pstl tapi-1100.0.11 tbb tbb_staticlib
 
 dyld-733.6:
 	curl -# -L https://opensource.apple.com/tarballs/dyld/dyld-733.6.tar.gz | tar xz
@@ -44,11 +44,6 @@ tapi-1100.0.11:
 	mkdir -p $@
 	curl -# -L https://opensource.apple.com/tarballs/tapi/tapi-1100.0.11.tar.gz | tar xz -C $@ --strip-components=1
 	patch -p1 -d $@ < patches/tapi.patch
-
-corecrypto:
-	mkdir -p xnu
-	mkdir -p corecrypto/include
-	curl -# -L https://opensource.apple.com/tarballs/xnu/xnu-7195.81.3.tar.gz | tar xz -C xnu --strip-components=1 && mv xnu/EXTERNAL_HEADERS/corecrypto corecrypto/include && rm -r xnu
 
 tbb:
 	curl -# -L https://github.com/intel/tbb/releases/download/v2020.1/tbb-2020.1-mac.tgz | tar xz
