@@ -3,6 +3,10 @@ build: fetch
 	misc/checks.rb
 	xcodebuild -project ld/zld.xcodeproj -scheme zld -derivedDataPath build -configuration Release build
 
+build_homebrew: fetch
+	misc/checks.rb
+	xcodebuild -project ld/zld.xcodeproj -scheme zld -derivedDataPath build -configuration Release build ONLY_ACTIVE_ARCH=YES
+
 test: fetch
 	xcodebuild -project ld/zld.xcodeproj -scheme unit-tests -derivedDataPath build -configuration Debug build
 
