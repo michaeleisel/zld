@@ -86,6 +86,7 @@ Whether you use this project or not, there are a number of things that can speed
 - For executables and xctest bundles, disable dyld exports trie creation with `-Wl,-exported_symbols_list,/dev/null` (cannot be used by test host apps that provide symbols to xctests)
 - `-Wl,-no_deduplicate`, which disables the deduplication pass. In Xcode, this flag is added by default for Debug builds.
 - `-Wl,-no_compact_unwind`, which disables the creation of compact unwind info. Note that Objective-C and C++ functions that have been linked without their compact unwind info can crash if an exception unwinds into them, rather than continuing the unwind. Swift functions, however, are not affected (even if an Objective-C/C++ exception unwinds into them). So, it's best for pure Swift projects. It can also break crash reporting.
+- `-Wl,-x`, which disables putting non-global symbols in the symbol table. This won't impact debugging as long as debug info is still enabled.
 - If you're not using `zld`, using `-Wl,-force_load` for libraries can sometimes speed things up
 - Linking with dynamic libraries instead of static ones
 
