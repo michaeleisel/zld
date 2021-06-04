@@ -1,0 +1,12 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: absl_hash
+Description: Abseil hash library
+URL: https://abseil.io/
+Version: 20210324
+Requires: absl_city = 20210324, absl_config = 20210324, absl_core_headers = 20210324, absl_endian = 20210324, absl_fixed_array = 20210324, absl_meta = 20210324, absl_int128 = 20210324, absl_strings = 20210324, absl_optional = 20210324, absl_variant = 20210324, absl_utility = 20210324, absl_wyhash = 20210324
+Libs: -L${libdir}  -labsl_hash
+Cflags: -I${includedir} -Wno-float-conversion -Wno-implicit-float-conversion -Wno-implicit-int-float-conversion -Wno-implicit-int-conversion -Wno-shorten-64-to-32 -Wno-sign-conversion -DNOMINMAX

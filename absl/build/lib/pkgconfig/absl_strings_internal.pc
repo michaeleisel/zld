@@ -1,0 +1,12 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: absl_strings_internal
+Description: Abseil strings_internal library
+URL: https://abseil.io/
+Version: 20210324
+Requires: absl_config = 20210324, absl_core_headers = 20210324, absl_endian = 20210324, absl_raw_logging_internal = 20210324, absl_type_traits = 20210324
+Libs: -L${libdir}  -labsl_strings_internal
+Cflags: -I${includedir} -Wno-float-conversion -Wno-implicit-float-conversion -Wno-implicit-int-float-conversion -Wno-implicit-int-conversion -Wno-shorten-64-to-32 -Wno-sign-conversion -DNOMINMAX

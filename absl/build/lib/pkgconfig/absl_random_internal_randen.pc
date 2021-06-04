@@ -1,0 +1,12 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: absl_random_internal_randen
+Description: Abseil random_internal_randen library
+URL: https://abseil.io/
+Version: 20210324
+Requires: absl_random_internal_platform = 20210324, absl_random_internal_randen_hwaes = 20210324, absl_random_internal_randen_slow = 20210324
+Libs: -L${libdir}  -labsl_random_internal_randen
+Cflags: -I${includedir} -Wno-float-conversion -Wno-implicit-float-conversion -Wno-implicit-int-float-conversion -Wno-implicit-int-conversion -Wno-shorten-64-to-32 -Wno-sign-conversion -DNOMINMAX

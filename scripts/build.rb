@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'fileutils'
+
 def sh!(cmd)
   raise unless system(cmd)
 end

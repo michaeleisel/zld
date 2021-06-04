@@ -1,0 +1,12 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: absl_leak_check
+Description: Abseil leak_check library
+URL: https://abseil.io/
+Version: 20210324
+Requires: absl_config = 20210324, absl_core_headers = 20210324
+Libs: -L${libdir}  -labsl_leak_check
+Cflags: -I${includedir} -Wno-float-conversion -Wno-implicit-float-conversion -Wno-implicit-int-float-conversion -Wno-implicit-int-conversion -Wno-shorten-64-to-32 -Wno-sign-conversion -DNOMINMAX

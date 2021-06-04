@@ -1,0 +1,12 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: absl_flags_parse
+Description: Abseil flags_parse library
+URL: https://abseil.io/
+Version: 20210324
+Requires: absl_config = 20210324, absl_core_headers = 20210324, absl_flags_config = 20210324, absl_flags = 20210324, absl_flags_commandlineflag = 20210324, absl_flags_commandlineflag_internal = 20210324, absl_flags_internal = 20210324, absl_flags_private_handle_accessor = 20210324, absl_flags_program_name = 20210324, absl_flags_reflection = 20210324, absl_flags_usage = 20210324, absl_strings = 20210324, absl_synchronization = 20210324
+Libs: -L${libdir}  -labsl_flags_parse
+Cflags: -I${includedir} -Wno-float-conversion -Wno-implicit-float-conversion -Wno-implicit-int-float-conversion -Wno-implicit-int-conversion -Wno-shorten-64-to-32 -Wno-sign-conversion -DNOMINMAX
