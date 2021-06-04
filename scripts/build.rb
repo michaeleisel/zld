@@ -30,7 +30,7 @@ def tbb(arch, target)
 end
 
 def build_libs(archs)
-  ["arm64", "x86_64"].each do |arch|
+  archs.each do |arch|
     abseil(arch, "absl/absl_#{arch}.a")
     tbb(arch, "tbb/tbb_#{arch}.a")
   end
@@ -70,4 +70,5 @@ def build(universal)
   end
 end
 
-build(true)
+universal = !ARGV.include?("--thin")
+build(universal)

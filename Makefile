@@ -1,6 +1,9 @@
 build:
 	scripts/build.rb
 
+build_homebrew:
+	scripts/build.rb --thin
+
 test: fetch
 	xcodebuild -project ld/zld.xcodeproj -scheme unit-tests -derivedDataPath build -configuration Debug build
 
