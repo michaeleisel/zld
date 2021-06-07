@@ -4094,7 +4094,7 @@ void Options::parse(int argc, const char* argv[])
 				fAliases.push_back(pair);
 			}
 			else {
-				throwf("unknown option: %s", arg);
+				throwf("unknown option: %s\n(zld note: if this option is working with normal ld, it's probably a newer option that needs a newer verion of zld. in that case, please upgrade)", arg);
 			}
             
             if (snapshotArgCount == -1)
