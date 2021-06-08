@@ -57,38 +57,38 @@ public:
 	typedef uint32_t IndirectBindingSlot;
 
 private:
-	typedef LDMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
+	typedef LDFastMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
 
 	class ContentFuncs {
 	public:
 		size_t	operator()(const ld::Atom*) const;
 		bool	operator()(const ld::Atom* left, const ld::Atom* right) const;
 	};
-	typedef LDMap<const ld::Atom*, IndirectBindingSlot, ContentFuncs, ContentFuncs> ContentToSlot;
+	typedef LDFastMap<const ld::Atom*, IndirectBindingSlot, ContentFuncs, ContentFuncs> ContentToSlot;
 
 	class ReferencesHashFuncs {
 	public:
 		size_t	operator()(const ld::Atom*) const;
 		bool	operator()(const ld::Atom* left, const ld::Atom* right) const;
 	};
-	typedef LDMap<const ld::Atom*, IndirectBindingSlot, ReferencesHashFuncs, ReferencesHashFuncs> ReferencesToSlot;
+	typedef LDFastMap<const ld::Atom*, IndirectBindingSlot, ReferencesHashFuncs, ReferencesHashFuncs> ReferencesToSlot;
 
 	class CStringHashFuncs {
 	public:
 		size_t	operator()(const ld::Atom*) const;
 		bool	operator()(const ld::Atom* left, const ld::Atom* right) const;
 	};
-	typedef LDMap<const ld::Atom*, IndirectBindingSlot, CStringHashFuncs, CStringHashFuncs> CStringToSlot;
+	typedef LDFastMap<const ld::Atom*, IndirectBindingSlot, CStringHashFuncs, CStringHashFuncs> CStringToSlot;
 
 	class UTF16StringHashFuncs {
 	public:
 		size_t	operator()(const ld::Atom*) const;
 		bool	operator()(const ld::Atom* left, const ld::Atom* right) const;
 	};
-	typedef LDMap<const ld::Atom*, IndirectBindingSlot, UTF16StringHashFuncs, UTF16StringHashFuncs> UTF16StringToSlot;
+	typedef LDFastMap<const ld::Atom*, IndirectBindingSlot, UTF16StringHashFuncs, UTF16StringHashFuncs> UTF16StringToSlot;
 
 	typedef LDOrderedMap<IndirectBindingSlot, const char*> SlotToName;
-	typedef LDMap<const char*, CStringToSlot*, CStringHash, CStringEquals> NameToMap;
+	typedef LDFastMap<const char*, CStringToSlot*, CStringHash, CStringEquals> NameToMap;
     
     typedef std::vector<const ld::Atom *> DuplicatedSymbolAtomList;
     typedef LDOrderedMap<const char *, DuplicatedSymbolAtomList * > DuplicateSymbols;
