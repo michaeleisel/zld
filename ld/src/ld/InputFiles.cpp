@@ -1338,9 +1338,7 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 
 	while (fileIndex < _inputFiles.size()) {
 		ld::File *file = _inputFiles[fileIndex];
-		if (file->type() != ld::File::Archive) {
-    		file->forEachAtom(handler);
-		}
+		file->forEachAtom(handler);
 		fileIndex++;
 	}
 
