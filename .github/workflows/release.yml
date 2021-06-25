@@ -28,6 +28,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/Build/Products/Release/zld.tar.xz
-          asset_name: zld.tar.xz
-          asset_content_type: application/x-xz
+          asset_path: build/Build/Products/Release/zld.tar.gz
+          asset_name: zld.tar.gz
+          asset_content_type: application/gzip
