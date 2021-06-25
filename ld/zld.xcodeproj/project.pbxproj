@@ -62,6 +62,7 @@
 		F338085E2422DA520086B7E8 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
 		F33808602422DA6D0086B7E8 /* inits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085F2422DA6D0086B7E8 /* inits.cpp */; };
 		F34634572423BD3700F08C44 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
+		F3CC0EB82730883D00531802 /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = F3CC0EB72730883D00531802 /* xxhash.c */; };
 		F3CF7591268BE74E00750B2F /* libjemalloc_pic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F366B08E2687813200B17E17 /* libjemalloc_pic.a */; };
 		F9023C4E06D5A272001BBF46 /* ld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9023C3F06D5A254001BBF46 /* ld.cpp */; };
 		F933E3D9092E855B0083EAC8 /* ObjectDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F971EED706D5AD240041D381 /* ObjectDump.cpp */; };
@@ -305,6 +306,8 @@
 		F366B06326868B6600B17E17 /* AsyncHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AsyncHelpers.h; sourceTree = "<group>"; };
 		F366B06426868B6600B17E17 /* AsyncHelpers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AsyncHelpers.cpp; sourceTree = "<group>"; };
 		F366B08E2687813200B17E17 /* libjemalloc_pic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libjemalloc_pic.a; sourceTree = "<group>"; };
+		F3CC0EB527307C6200531802 /* xxhash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xxhash.h; sourceTree = "<group>"; };
+		F3CC0EB72730883D00531802 /* xxhash.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = xxhash.c; sourceTree = "<group>"; };
 		F9023C3906D5A23E001BBF46 /* zld */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = zld; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9023C3F06D5A254001BBF46 /* ld.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ld.cpp; path = src/ld/ld.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F91B7B0318987D5F0099486F /* AddressSpace.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AddressSpace.hpp; sourceTree = "<group>"; };
@@ -479,6 +482,7 @@
 		F9023C2C06D5A227001BBF46 = {
 			isa = PBXGroup;
 			children = (
+				F3CC0EB72730883D00531802 /* xxhash.c */,
 				F328A34825F2B8B700E439C0 /* ResponseFiles.cpp */,
 				4CFE4F80240481F60072BC3D /* ld.entitlements */,
 				F9B813A80EC27B6300F94C13 /* abstraction */,
@@ -657,6 +661,7 @@
 				B3B672441406D44300A376BB /* Snapshot.h */,
 				F366B06326868B6600B17E17 /* AsyncHelpers.h */,
 				F366B06426868B6600B17E17 /* AsyncHelpers.cpp */,
+				F3CC0EB527307C6200531802 /* xxhash.h */,
 			);
 			name = ld;
 			sourceTree = "<group>";
@@ -1042,6 +1047,7 @@
 				F98498A310AE2159009E9878 /* compact_unwind.cpp in Sources */,
 				F98498A410AE2159009E9878 /* got.cpp in Sources */,
 				F9BA955E10A233000097A440 /* huge.cpp in Sources */,
+				F3CC0EB82730883D00531802 /* xxhash.c in Sources */,
 				F9849E3610B38EF5009E9878 /* order.cpp in Sources */,
 				F984A38210BB4B0D009E9878 /* branch_island.cpp in Sources */,
 				F9A4DB9110F816FF00BD8423 /* objc.cpp in Sources */,

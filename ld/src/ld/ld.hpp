@@ -46,12 +46,55 @@ void printTime(const char* msg, uint64_t partTime, uint64_t totalTime);
 
 #include "TimingHelpers.h"
 
+#include "absl/hash/internal/city.h"
+
 #ifdef __x86_64__
 #include <nmmintrin.h>
 #endif /* __x86_64__ */
 
 //FIXME: Only needed until we move VersionSet into PlatformSupport
 class Options;
+
+static inline int32_t CRC32(int32_t hash, uint64_t next) {
+#ifdef __x86_64__
+	   return _mm_crc32_u64(hash, next);
+#endif /* __x86_64__ */
+#ifdef __aarch64__
+	   return __builtin_arm_crc32d(hash, next);
+#endif /* __aarch64__ */
+}
+
+extern "C" {
+__attribute__((always_inline)) size_t hashString(const char *__s, size_t len);
+}
+
+struct LDString {
+public:
+	   const char *str;
+	   size_t hash;
+	   LDString(const char *string) {
+			   str = string;
+			   size_t stringLength = strlen(string);
+			   hash = hashString(string, stringLength);
+	   }
+	   bool operator==(const LDString &other) const
+	   {
+			   return hash == other.hash
+				 && (str == other.str || strcmp(str, other.str) == 0);
+	   }
+};
+
+namespace std
+{
+	   template <> struct hash<LDString>
+	   {
+			   size_t operator()( const LDString& string) const
+			   {
+					   return string.hash;
+			   }
+	   };
+}
+
 
 namespace ld {
 
@@ -1279,94 +1322,17 @@ public:
 
 
 
-typedef struct {
-	const char *str;
-	size_t length;
-	size_t hash;
-} LDString;
-
-static inline size_t CRCHash(const char *__s, size_t len) {
-	if (tweaksReproEnabled()) {
-		size_t __h = 0;
-		for ( ; *__s; ++__s)
-			__h = 5 * __h + *__s;
-		return __h;
-	}
-
-	uint32_t __h = 5183;
-	int curr = len;
-	uint64_t *chunks = (uint64_t *)__s;
-	while (curr >= 8) {
-#ifdef __x86_64__
-		__h = (uint32_t)_mm_crc32_u64((uint64_t)__h, *chunks);
-#else
-		__h = __builtin_arm_crc32d((uint64_t)__h, *chunks);
-#endif /* __x86_64__ */
-		chunks++;
-		curr -= 8;
-	}
-	if (curr >= 4) {
-		uint32_t *bits = (uint32_t *)(__s + len - curr);
-#ifdef __x86_64__
-		__h = _mm_crc32_u32(__h, *bits);
-#else
-		__h = __builtin_arm_crc32w(__h, *bits);
-#endif /* __x86_64__ */
-		curr -= 4;
-	}
-	if (curr >= 2) {
-		uint16_t *bits = (uint16_t *)(__s + len - curr);
-#ifdef __x86_64__
-		__h = _mm_crc32_u16(__h, *bits);
-#else
-		__h = __builtin_arm_crc32h(__h, *bits);
-#endif /* __x86_64__ */
-		curr -= 2;
-	}
-	if (curr >= 1) {
-#ifdef __x86_64__
-		__h = _mm_crc32_u8(__h, __s[len - 1]);
-#else
-		__h = __builtin_arm_crc32b(__h, __s[len - 1]);
-#endif /* __x86_64__ */
-	}
-	return (size_t)__h;
-}
-
-static inline LDString LDStringCreate(const char *str) {
-	auto length = strlen(str);
-	return (LDString){
-		.str = str,
-		.length = length,
-		.hash = CRCHash(str, length),
-	};
-}
-
-struct CLDStringHash {
-	size_t operator()(LDString __s) const {
-		return __s.hash;
-	}
-};
-
 // utility classes for using LDMap with c-strings
 struct CStringHash {
 	size_t operator()(const char* __s) const {
 		int len = strlen(__s);
-		return CRCHash(__s, len);
+		return hashString(__s, len);
 	};
-};
-
-struct CLDStringEquals
-{
-	bool operator()(LDString left, LDString right) const {
-		return left.hash == right.hash && left.length == right.length
-		  && (left.str == right.str || memcmp(left.str, right.str, left.length) == 0);
-    }
 };
 
 struct CStringEquals
 {
-	bool operator()(const char* left, const char* right) const { return (strcmp(left, right) == 0); }
+	bool operator()(const char* left, const char* right) const { return left == right || (strcmp(left, right) == 0); }
 };
 
 typedef	LDSet<const char*, ld::CStringHash, ld::CStringEquals>  CStringSet;
