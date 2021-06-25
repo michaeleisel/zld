@@ -1543,7 +1543,7 @@
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
 					"-Wl,-all_load",
-					"-Wl,$(SRCROOT)/libabsl.a",
+					"-Wl,$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
 				);
 				SDKROOT = macosx;
 			};
@@ -1600,7 +1600,7 @@
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
 					"-Wl,-all_load",
-					"-Wl,$(SRCROOT)/libabsl.a",
+					"-Wl,$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
 				);
 				SDKROOT = macosx;
 			};
@@ -1675,7 +1675,7 @@
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
 					"-Wl,-all_load",
-					"-Wl,$(SRCROOT)/libabsl.a",
+					"-Wl,$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
 				);
 				SDKROOT = macosx;
 			};
