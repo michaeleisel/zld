@@ -48,6 +48,7 @@
 #include <dispatch/dispatch.h>
 #include <algorithm>
 #include <Foundation/Foundation.h>
+#include "AsyncHelpers.h"
 
 #include <string>
 #include <map>
@@ -3168,27 +3169,16 @@ void OutputFile::writeAtoms(ld::Internal& state, uint8_t* wholeBuffer)
 			}
 		}
 	}
-	NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-	queue.qualityOfService = NSQualityOfServiceUserInteractive;
-	queue.maxConcurrentOperationCount = 8;
-	int stepSize = buffer.size() / queue.maxConcurrentOperationCount + 1;
-	for (size_t i = 0; i < (size_t)queue.maxConcurrentOperationCount; i++) {
-		std::vector<AtomOperation> &bufferCopy = buffer;
-		[queue addOperationWithBlock:^{
-			for (auto bufIter = bufferCopy.begin() + i * stepSize; bufIter < bufferCopy.begin() + std::min(bufferCopy.size(), (i + 1) * stepSize); bufIter++) {
-				auto op = *bufIter;
-				// check for alignment padding between atoms
-				if ( (op.fileOffset != op.fileOffsetOfEndOfLastAtom) && op.lastAtomUsesNoOps ) {
-					this->copyNoOps(&wholeBuffer[op.fileOffsetOfEndOfLastAtom], &wholeBuffer[op.fileOffset], op.lastAtomWasThumb);
-				}
-				// copy atom content
-				op.atom->copyRawContent(&wholeBuffer[op.fileOffset]);
-				// apply fix ups
-				this->applyFixUps(state, op.mhAddress, op.atom, &wholeBuffer[op.fileOffset]);
-			}
-		}];
-	}
-	[queue waitUntilAllOperationsAreFinished];
+	processAsync(buffer.begin(), buffer.end(), [&](const AtomOperation &op) {
+		// check for alignment padding between atoms
+		if ( (op.fileOffset != op.fileOffsetOfEndOfLastAtom) && op.lastAtomUsesNoOps ) {
+			this->copyNoOps(&wholeBuffer[op.fileOffsetOfEndOfLastAtom], &wholeBuffer[op.fileOffset], op.lastAtomWasThumb);
+		}
+		// copy atom content
+		op.atom->copyRawContent(&wholeBuffer[op.fileOffset]);
+		// apply fix ups
+		this->applyFixUps(state, op.mhAddress, op.atom, &wholeBuffer[op.fileOffset]);
+	});
 
 	if ( _options.verboseOptimizationHints() ) {
 		//fprintf(stderr, "ADRP optimized away:   %d\n", sAdrpNA);

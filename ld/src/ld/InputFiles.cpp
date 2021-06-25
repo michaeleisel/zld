@@ -45,6 +45,7 @@
 #include <Foundation/Foundation.h>
 #include "pstl/algorithm"
 #include "pstl/execution"
+#include "AsyncHelpers.h"
 
 #include <fstream>
 #include <string>
@@ -756,7 +757,7 @@ void InputFiles::addLinkerOptionLibraries(ld::Internal& state, ld::File::AtomHan
 		for (size_t i = 0; i < infosToParse.size(); i++) {
 			iz.push_back(i);
 		}
-		std::for_each(pstl::execution::par, iz.begin(), iz.end(), [&](auto &&idx) {
+		processAsync(iz.begin(), iz.end(), [&](size_t idx) {
 			auto &pair = infosToParse[idx];
 			auto triple = Triple(this->makeFile(pair.first, true), pair.first, pair.second);
 			readers[idx] = triple;
@@ -1433,11 +1434,9 @@ void InputFiles::preParseLibraries() const {
 			}
 		}
 	}
-	const tbb::blocked_range<size_t> range(0, ops.size());
-	tbb::parallel_for(range, [=](const tbb::blocked_range<size_t>& subrange) {
-		for (auto i = subrange.begin(); i != subrange.end(); i++) {
-			ops[i]._file->parseMember(ops[i]._member);
-		}
+
+	processAsync(ops.begin(), ops.end(), [=](const Operation &op) {
+		op._file->parseMember(op._member);
 	});
 }
 

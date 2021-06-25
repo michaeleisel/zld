@@ -300,6 +300,8 @@
 		F33808622422DA8B0086B7E8 /* PlatformSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PlatformSupport.h; path = src/ld/PlatformSupport.h; sourceTree = "<group>"; };
 		F33808632422DAB40086B7E8 /* stub_arm64_32.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = stub_arm64_32.hpp; sourceTree = "<group>"; };
 		F33808642422DAB40086B7E8 /* stub_arm64e.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = stub_arm64e.hpp; sourceTree = "<group>"; };
+		F366B06326868B6600B17E17 /* AsyncHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AsyncHelpers.h; sourceTree = "<group>"; };
+		F366B06426868B6600B17E17 /* AsyncHelpers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AsyncHelpers.m; sourceTree = "<group>"; };
 		F9023C3906D5A23E001BBF46 /* zld */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = zld; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9023C3F06D5A254001BBF46 /* ld.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ld.cpp; path = src/ld/ld.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F91B7B0318987D5F0099486F /* AddressSpace.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AddressSpace.hpp; sourceTree = "<group>"; };
@@ -647,6 +649,8 @@
 				F98565241E98090F00528B1C /* dwarf2.h */,
 				B3B672411406D42800A376BB /* Snapshot.cpp */,
 				B3B672441406D44300A376BB /* Snapshot.h */,
+				F366B06326868B6600B17E17 /* AsyncHelpers.h */,
+				F366B06426868B6600B17E17 /* AsyncHelpers.m */,
 			);
 			name = ld;
 			sourceTree = "<group>";
