@@ -62,6 +62,7 @@
 		F338085E2422DA520086B7E8 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
 		F33808602422DA6D0086B7E8 /* inits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085F2422DA6D0086B7E8 /* inits.cpp */; };
 		F34634572423BD3700F08C44 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
+		F3CF7591268BE74E00750B2F /* libjemalloc_pic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F366B08E2687813200B17E17 /* libjemalloc_pic.a */; };
 		F9023C4E06D5A272001BBF46 /* ld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9023C3F06D5A254001BBF46 /* ld.cpp */; };
 		F933E3D9092E855B0083EAC8 /* ObjectDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F971EED706D5AD240041D381 /* ObjectDump.cpp */; };
 		F93CB248116E69EB003233B8 /* tlvp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F93CB246116E69EB003233B8 /* tlvp.cpp */; };
@@ -302,6 +303,7 @@
 		F33808642422DAB40086B7E8 /* stub_arm64e.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = stub_arm64e.hpp; sourceTree = "<group>"; };
 		F366B06326868B6600B17E17 /* AsyncHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AsyncHelpers.h; sourceTree = "<group>"; };
 		F366B06426868B6600B17E17 /* AsyncHelpers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AsyncHelpers.m; sourceTree = "<group>"; };
+		F366B08E2687813200B17E17 /* libjemalloc_pic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libjemalloc_pic.a; sourceTree = "<group>"; };
 		F9023C3906D5A23E001BBF46 /* zld */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = zld; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9023C3F06D5A254001BBF46 /* ld.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ld.cpp; path = src/ld/ld.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F91B7B0318987D5F0099486F /* AddressSpace.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AddressSpace.hpp; sourceTree = "<group>"; };
@@ -414,6 +416,7 @@
 			files = (
 				4C8D9C99240587690040CE7C /* libLTO.dylib in Frameworks */,
 				F3176404241011E300D68E7F /* libtbb.a in Frameworks */,
+				F3CF7591268BE74E00750B2F /* libjemalloc_pic.a in Frameworks */,
 				41F71C50240F5814006DCEF9 /* libswiftDemangle.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -617,6 +620,7 @@
 			children = (
 				F3176402241011E300D68E7F /* libtbb.a */,
 				4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */,
+				F366B08E2687813200B17E17 /* libjemalloc_pic.a */,
 				4CDA2DA823FDD2CB00C6009D /* Tweaks.hpp */,
 				4C47258B23FD9E3C00AA02B2 /* MapDefines.h */,
 				F328A33225F2B68900E439C0 /* libcodedirectory.c */,
@@ -1809,7 +1813,7 @@
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-Wno-deprecated-declarations",
@@ -1817,7 +1821,6 @@
 				);
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
-					"-Wl,-t",
 					"-Wl,-U,_fnd_get_demangled_name",
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
@@ -1878,14 +1881,13 @@
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				OTHER_CFLAGS = (
 					"-Wno-deprecated-declarations",
 					"-Wno-unknown-pragmas",
 				);
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
-					"-Wl,-t",
 					"-Wl,-U,_fnd_get_demangled_name",
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
@@ -1964,14 +1966,13 @@
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				OTHER_CFLAGS = (
 					"-Wno-deprecated-declarations",
 					"-Wno-unknown-pragmas",
 				);
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
-					"-Wl,-t",
 					"-Wl,-U,_fnd_get_demangled_name",
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
