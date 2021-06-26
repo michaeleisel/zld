@@ -57,7 +57,7 @@ public:
 	typedef uint32_t IndirectBindingSlot;
 
 private:
-	typedef LDFastMap<const char*, IndirectBindingSlot, CStringHash, CStringEquals> NameToSlot;
+	typedef LDFastMap<LDString, IndirectBindingSlot> NameToSlot;
 
 	class ContentFuncs {
 	public:
