@@ -264,7 +264,7 @@ void doPass(const Options& opts, ld::Internal& internal)
 	// don't create GOT atoms during this loop because that could invalidate the sections iterator
 	std::vector<const ld::Atom*> atomsReferencingGOT;
 	LDOrderedMap<const ld::Atom*,bool>		weakImportMap;
-	LDOrderedMap<const ld::Atom*,bool>		weakDefMap;
+	LDMap<const ld::Atom*,bool>		weakDefMap;
 	atomsReferencingGOT.reserve(128);
 	for (std::vector<ld::Internal::FinalSection*>::iterator sit=internal.sections.begin(); sit != internal.sections.end(); ++sit) {
 		ld::Internal::FinalSection* sect = *sit;

@@ -87,7 +87,7 @@ private:
 	};
 	typedef LDFastMap<const ld::Atom*, IndirectBindingSlot, UTF16StringHashFuncs, UTF16StringHashFuncs> UTF16StringToSlot;
 
-	typedef LDOrderedMap<IndirectBindingSlot, const char*> SlotToName;
+	typedef LDFastMap<IndirectBindingSlot, const char*> SlotToName;
 	typedef LDFastMap<const char*, CStringToSlot*, CStringHash, CStringEquals> NameToMap;
     
     typedef std::vector<const ld::Atom *> DuplicatedSymbolAtomList;
