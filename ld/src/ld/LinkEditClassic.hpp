@@ -93,7 +93,7 @@ public:
 
 private:
 	enum { kBufferSize = 0x01000000 };
-	typedef LDMap<std::string, int32_t> StringToOffset;
+	typedef LDFastMap<std::string, int32_t> StringToOffset;
 
 	const uint32_t							_pointerSize;
 	std::vector<char*>						_fullBuffers;
@@ -171,15 +171,11 @@ uint32_t StringPoolAtom::currentOffset()
 
 int32_t StringPoolAtom::addUnique(const char* str)
 {
-	StringToOffset::iterator pos = _uniqueStrings.find(str);
-	if ( pos != _uniqueStrings.end() ) {
-		return pos->second;
+	const auto pos = _uniqueStrings.emplace(str, 0);
+	if ( pos.second ) {
+		pos.first->second = this->add(str);
 	}
-	else {
-		int32_t offset = this->add(str);
-		_uniqueStrings[str] = offset;
-		return offset;
-	}
+	return pos.first->second;
 }
 
 
