@@ -48,7 +48,8 @@
 #include "InputFiles.h"
 #include "SymbolTable.h"
 
-
+#include "pstl/algorithm"
+#include "pstl/execution"
 
 namespace ld {
 namespace tool {
@@ -580,7 +581,7 @@ void SymbolTable::undefines(std::vector<const char*>& undefs)
 	}
 	// sort so that undefines are in a stable order (not dependent on hashing functions)
 	struct StrcmpSorter strcmpSorter;
-	std::sort(undefs.begin(), undefs.end(), strcmpSorter);
+	std::sort(pstl::execution::par_unseq, undefs.begin(), undefs.end(), strcmpSorter);
 }
 
 
