@@ -7203,7 +7203,7 @@ void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 	const char* filename = NULL;
 	bool wroteStartSO = false;
 	state.stabs.reserve(atomsNeedingDebugNotes.size()*4);
-	LDSet<LDString>  seenFiles;
+	LDFastSet<const char *, CStringHash, CStringEquals>  seenFiles;
 	for (std::vector<const ld::Atom*>::iterator it=atomsNeedingDebugNotes.begin(); it != atomsNeedingDebugNotes.end(); it++) {
 		const ld::Atom* atom = *it;
 		const ld::File* atomFile = atom->file();
@@ -7275,11 +7275,11 @@ void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 				state.stabs.push_back(objStab);
 				wroteStartSO = true;
 				// add the source file path to seenFiles so it does not show up in SOLs
-				seenFiles.insert(LDString(newFilename));
+				seenFiles.insert(newFilename);
 				char* fullFilePath;
 				asprintf(&fullFilePath, "%s%s", newDirPath, newFilename);
 				// add both leaf path and full path
-				seenFiles.insert(LDString(fullFilePath));
+				seenFiles.insert(fullFilePath);
 
 				// <rdar://problem/34121435> Add linker support for propagating N_AST debug notes from .o files to linked image
 				if ( const std::vector<relocatable::File::AstTimeAndPath>* asts = atomObjFile->astFiles() ) {
@@ -7324,9 +7324,8 @@ void OutputFile::synthesizeDebugNotes(ld::Internal& state)
 				const char* curFile = NULL;
 				for (ld::Atom::LineInfo::iterator lit = atom->beginLineInfo(); lit != atom->endLineInfo(); ++lit) {
 					if ( lit->fileName != curFile ) {
-                		auto ldFileName = LDString(lit->fileName);
-						if ( seenFiles.count(ldFileName) == 0 ) {
-							seenFiles.insert(ldFileName);
+						auto emplaceResult = seenFiles.emplace(lit->fileName);
+						if ( emplaceResult.second ) {
 							ld::relocatable::File::Stab sol;
 							sol.atom		= 0;
 							sol.type		= N_SOL;
