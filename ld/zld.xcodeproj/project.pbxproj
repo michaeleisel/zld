@@ -299,6 +299,7 @@
 		F338085F2422DA6D0086B7E8 /* inits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = inits.cpp; sourceTree = "<group>"; };
 		F33808612422DA830086B7E8 /* inits.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = inits.h; sourceTree = "<group>"; };
 		F33808622422DA8B0086B7E8 /* PlatformSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PlatformSupport.h; path = src/ld/PlatformSupport.h; sourceTree = "<group>"; };
+		F38899A3282ACC970070FCEE /* TimingHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TimingHelpers.h; sourceTree = "<group>"; };
 		F33808632422DAB40086B7E8 /* stub_arm64_32.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = stub_arm64_32.hpp; sourceTree = "<group>"; };
 		F33808642422DAB40086B7E8 /* stub_arm64e.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = stub_arm64e.hpp; sourceTree = "<group>"; };
 		F366B06326868B6600B17E17 /* AsyncHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AsyncHelpers.h; sourceTree = "<group>"; };
@@ -624,6 +625,7 @@
 				4CDA2DA823FDD2CB00C6009D /* Tweaks.h */,
 				4C47258B23FD9E3C00AA02B2 /* MapDefines.h */,
 				F328A33225F2B68900E439C0 /* libcodedirectory.c */,
+				F38899A3282ACC970070FCEE /* TimingHelpers.h */,
 				F9AA69BF10583E19003E3539 /* Resolver.cpp */,
 				F9AA69C010583E19003E3539 /* Resolver.h */,
 				F9AA69B410583C0C003E3539 /* SymbolTable.cpp */,

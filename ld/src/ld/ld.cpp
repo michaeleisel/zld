@@ -1443,7 +1443,7 @@ static char* commatize(uint64_t in, char* out)
 	return result;
 }
 
-static void printTime(const char* msg, uint64_t partTime, uint64_t totalTime)
+void printTime(const char* msg, uint64_t partTime, uint64_t totalTime)
 {
 	static uint64_t sUnitsPerSecond = 0;
 	if ( sUnitsPerSecond == 0 ) {

@@ -42,6 +42,10 @@
 #include "MapDefines.h"
 #include "PlatformSupport.h"
 
+void printTime(const char* msg, uint64_t partTime, uint64_t totalTime);
+
+#include "TimingHelpers.h"
+
 #ifdef __x86_64__
 #include <nmmintrin.h>
 #endif /* __x86_64__ */
