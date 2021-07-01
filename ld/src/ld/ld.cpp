@@ -163,7 +163,7 @@ private:
 	struct SectionEquals {
 		bool operator()(const ld::Section* left, const ld::Section* right) const;
 	};
-	typedef LDMap<const ld::Section*, FinalSection*, SectionHash, SectionEquals> SectionInToOut;
+	typedef LDFastMap<const ld::Section*, FinalSection*, SectionHash, SectionEquals> SectionInToOut;
 	
 
 	SectionInToOut			_sectionInToFinalMap;
@@ -1013,9 +1013,10 @@ ld::Internal::FinalSection* InternalState::getFinalSection(const ld::Section& in
 			baseForFinalSection = &FinalSection::objectOutputSection(inputSection, _options);
 			pos = _sectionInToFinalMap.find(baseForFinalSection);
 			if ( pos != _sectionInToFinalMap.end() ) {
-				_sectionInToFinalMap[&inputSection] = pos->second;
+				auto value = pos->second;
+				_sectionInToFinalMap[&inputSection] = value;
 				//fprintf(stderr, "_sectionInToFinalMap[%p] = %p\n", &inputSection, pos->second);
-				return pos->second;
+				return value;
 			}
 			break;
 	}
