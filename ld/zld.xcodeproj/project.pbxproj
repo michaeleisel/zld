@@ -1265,12 +1265,16 @@
 					"$(DT_TOOLCHAIN_DIR)/usr/local/include",
 					"$(TOOLCHAIN_DIR)/usr/local/include",
 					"$(SRCROOT)/../tapi-1100.0.11/include",
-					"$(SRCROOT)/../dyld-733.6/include",
-					"$(SRCROOT)/../llvm-8.0.1.src/include",
-					"$(SRCROOT)/../cfe-8.0.1.src/include",
-					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/../dyld-940/include",
+					"$(SRCROOT)/../llvm-13.0.1.src/include",
+					"$(SRCROOT)/../tapi-1100.0.11/include",
+					"$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4",
 					"$(SRCROOT)/src/ld",
 					"$(SRCROOT)/src/extra_include",
+					"$(SRCROOT)/../corecrypto/include",
+					"$(SRCROOT)/../pstl/include",
+					"$(SRCROOT)/../pstl/stdlib",
+					"$(SRCROOT)/../tbb/include",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
@@ -1286,7 +1290,6 @@
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
 					"-Wl,-all_load",
-					"-Wl,$(SRCROOT)/libabsl.a",
 					"-Wl,-stack_size,0x10000000",
 					"-ltapi",
 					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
@@ -1360,19 +1363,6 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(DT_TOOLCHAIN_DIR)/usr/local/include",
-					"$(TOOLCHAIN_DIR)/usr/local/include",
-					"$(SRCROOT)/../tapi-1100.0.11/include",
-					"$(SRCROOT)/../dyld-733.6/include",
-					"$(SRCROOT)/../llvm-8.0.1.src/include",
-					"$(SRCROOT)/../cfe-8.0.1.src/include",
-					"$(SRCROOT)/../abseil-cpp-20200225",
-					"$(SRCROOT)/../pstl/include",
-					"$(SRCROOT)/../pstl/stdlib",
-					"$(SRCROOT)/../tbb/include",
-					"$(SRCROOT)/../corecrypto/include",
-				);
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
 				LD_GENERATE_MAP_FILE = YES;
 				LIBRARY_SEARCH_PATHS = (
@@ -1576,7 +1566,6 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
-				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = G5;
@@ -1608,22 +1597,13 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
+				LD_GENERATE_MAP_FILE = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
 				);
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
 				LLVM_LTO = NO;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-stdlib=libc++",
-					"-lxar",
-					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
-					"-Wl,-exported_symbol,__mh_execute_header",
-					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
-					"-ltapi",
-					"-Wl,-stack_size,0x10000000",
-				);
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
 				PRODUCT_NAME = zld;
@@ -1653,7 +1633,6 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
-				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -1689,23 +1668,14 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
+				LD_GENERATE_MAP_FILE = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
 				);
 				LLVM_LTO = NO;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-stdlib=libc++",
-					"-lxar",
-					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
-					"-Wl,-exported_symbol,__mh_execute_header",
-					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
-					"-ltapi",
-					"-Wl,-stack_size,0x01000000",
-				);
-				PREBINDING = NO;
 				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
 				PRODUCT_NAME = zld;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1849,6 +1819,13 @@
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
 					"-Wl,-all_load",
 					"-Wl,$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4/build/libabsl.a",
+					"-Wl,-stack_size,0x10000000",
+					"-ltapi",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
+					"-Wl,-exported_symbol,__mh_execute_header",
+					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
+					"-lxar",
+					"-stdlib=libc++",
 				);
 				SDKROOT = macosx;
 			};
@@ -1910,6 +1887,13 @@
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
 					"-Wl,-all_load",
 					"-Wl,$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4/build/libabsl.a",
+					"-Wl,-stack_size,0x10000000",
+					"-ltapi",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
+					"-Wl,-exported_symbol,__mh_execute_header",
+					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
+					"-lxar",
+					"-stdlib=libc++",
 				);
 				SDKROOT = macosx;
 			};
@@ -1989,6 +1973,13 @@
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
 					"-Wl,-all_load",
 					"-Wl,$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4/build/libabsl.a",
+					"-Wl,-stack_size,0x10000000",
+					"-ltapi",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
+					"-Wl,-exported_symbol,__mh_execute_header",
+					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
+					"-lxar",
+					"-stdlib=libc++",
 				);
 				SDKROOT = macosx;
 			};
@@ -2018,10 +2009,9 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = "$(RC_ProjectSourceVersion)";
 				DEAD_CODE_STRIPPING = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
-				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -2056,21 +2046,13 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
+				LD_GENERATE_MAP_FILE = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
 				);
 				LLVM_LTO = NO;
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-stdlib=libc++",
-					"-lxar",
-					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
-					"-Wl,-exported_symbol,__mh_execute_header",
-					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
-					"-ltapi",
-				);
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
 				PRODUCT_NAME = zld;
