@@ -1158,7 +1158,7 @@ public:
  
 											Atom(const Section& sect, Definition d, Combine c, Scope s, ContentType ct, 
 												SymbolTableInclusion i, bool dds, bool thumb, bool al, Alignment a, bool cold=false) :
-													_section(&sect), _address(0), _alignmentModulus(a.modulus), 
+													_finalSection(NULL), _section(&sect), _address(0), _alignmentModulus(a.modulus),
 													_alignmentPowerOf2(a.powerOf2), _definition(d), _combine(c),   
 													_dontDeadStrip(dds), _thumb(thumb), _alias(al), _autoHide(false), 
 													_contentType(ct), _symbolTableInclusion(i),
@@ -1284,10 +1284,17 @@ public:
 												else
 													return "<internal>";
 											}
+	void *finalSectionUncasted() const {
+		return _finalSection;
+	}
+	void setFinalSection(void *finalSection) {
+		_finalSection = finalSection;
+	}
 
 protected:
 	enum AddressMode { modeSectionOffset, modeFinalAddress };
 
+	void*						_finalSection;
 	const Section *						_section;
 	uint64_t							_address;
 	uint16_t							_alignmentModulus;
@@ -1362,8 +1369,6 @@ public:
 		bool							hasExternalRelocs;
 	};
 	
-	typedef LDMap<const ld::Atom*, FinalSection*>	AtomToSection;
-
 	virtual uint64_t					assignFileOffsets() = 0;
 	virtual void						setSectionSizesAndAlignments() = 0;
 	virtual ld::Internal::FinalSection*	addAtom(const Atom&) = 0;
@@ -1389,7 +1394,6 @@ public:
 	std::vector<ld::dylib::File*>				dylibs;
 	std::vector<std::string>					archivePaths;
 	std::vector<ld::relocatable::File::Stab>	stabs;
-	AtomToSection								atomToSection;		
 	CStringSet									unprocessedLinkerOptionLibraries;
 	CStringSet									unprocessedLinkerOptionFrameworks;
 	CStringSet									linkerOptionNeededLibraries;
@@ -1439,6 +1443,10 @@ public:
 
 
 
-} // namespace ld 
+} // namespace ld
+
+static ld::Internal::FinalSection *getFinalSection(const ld::Atom &atom) {
+	return (ld::Internal::FinalSection *)atom.finalSectionUncasted();
+}
 
 #endif // __LD_HPP__

@@ -741,8 +741,6 @@ bool InternalState::inMoveAuthChain(const ld::Atom& atom, bool followedBackBranc
 #endif
 
 
-
-
 ld::Internal::FinalSection* InternalState::addAtom(const ld::Atom& atom)
 {
 	//fprintf(stderr, "addAtom: %s\n", atom.name());
@@ -959,7 +957,7 @@ ld::Internal::FinalSection* InternalState::addAtom(const ld::Atom& atom)
 		// normal case
 		fs->atoms.push_back(&atom);
 	}
-	this->atomToSection[&atom] = fs;
+	const_cast<ld::Atom &>(atom).setFinalSection(fs);
 	return fs;
 }
 

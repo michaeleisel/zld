@@ -603,7 +603,7 @@ void Layout::buildOrdinalOverrideMap()
 			}
 			// update atom-to-section map
 			for (LDOrderedSet<const ld::Atom*>::iterator it=moveToData.begin(); it != moveToData.end(); ++it) {
-				_state.atomToSection[*it] = dataSect;
+				const_cast<Atom *>(*it)->setFinalSection(dataSect);
 			}
 		}
 	}

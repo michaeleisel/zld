@@ -6556,7 +6556,7 @@ void OutputFile::makeSplitSegInfoV2(ld::Internal& state)
 					thumbTarget = targetIsThumb(state, fit);
 					if ( thumbTarget ) 
 						accumulator |= 1;
-					toOffset = accumulator - state.atomToSection[target]->address;
+					toOffset = accumulator - getFinalSection(*target)->address;
 					if ( target->definition() != ld::Atom::definitionProxy ) {
 						if ( target->section().type() == ld::Section::typeMachHeader )
 							toSectionIndex = 0;
@@ -6686,7 +6686,7 @@ void OutputFile::makeSplitSegInfoV2(ld::Internal& state)
 						accumulator = addressAndTarget(state, fit, &target);
 						assert(target != NULL);
 						toSectionIndex = target->machoSection();
-						toOffset = accumulator - state.atomToSection[target]->address;
+						toOffset = accumulator - getFinalSection(*target)->address;
 						hadSubtract = true;
 						break;
 					default:
@@ -6698,7 +6698,7 @@ void OutputFile::makeSplitSegInfoV2(ld::Internal& state)
 							toOffset += addend;
 						assert(toSectionIndex != 255);
 						if (log) fprintf(stderr, "from (%d.%s + 0x%llX) to (%d.%s + 0x%llX), kind=%d, atomAddr=0x%llX, sectAddr=0x%llx\n",
-										fromSectionIndex, sect->sectionName(), fromOffset, toSectionIndex, state.atomToSection[target]->sectionName(),
+										fromSectionIndex, sect->sectionName(), fromOffset, toSectionIndex, getFinalSection(*target)->sectionName(),
 										toOffset, kind, atom->finalAddress(), sect->address);
 						_splitSegV2Infos.push_back(SplitSegInfoV2Entry(fromSectionIndex, fromOffset, toSectionIndex, toOffset, kind));
 					}

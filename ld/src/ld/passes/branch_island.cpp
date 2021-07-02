@@ -575,7 +575,7 @@ static void makeIslandsForSection(const Options& opts, ld::Internal& state, ld::
 												island, island->name(), displacement);
 						++islandCount;
 						regionsIslands[0]->push_back(island);
-						state.atomToSection[island] = textSection;
+						const_cast<ld::Atom *>(island)->setFinalSection(textSection);
 					}
 					else {
 						island = pos->second;
@@ -599,7 +599,7 @@ static void makeIslandsForSection(const Options& opts, ld::Internal& state, ld::
 								(*region)[finalTargetAndOffset] = island;
 								if (_s_log) fprintf(stderr, "added forward branching island %p %s to region %d for %s\n", island, island->name(), i, atom->name());
 								regionsIslands[i]->push_back(island);
-								state.atomToSection[island] = textSection;
+								const_cast<ld::Atom *>(island)->setFinalSection(textSection);
 								++islandCount;
 								nextTarget = island;
 							}
@@ -626,7 +626,7 @@ static void makeIslandsForSection(const Options& opts, ld::Internal& state, ld::
 								(*region)[finalTargetAndOffset] = island;
 								if (_s_log) fprintf(stderr, "added back branching island %p %s to region %d for %s\n", island, island->name(), i, atom->name());
 								regionsIslands[i]->push_back(island);
-								state.atomToSection[island] = textSection;
+								const_cast<ld::Atom *>(island)->setFinalSection(textSection);
 								++islandCount;
 								prevTarget = island;
 							}
