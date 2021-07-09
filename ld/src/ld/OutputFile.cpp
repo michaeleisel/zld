@@ -47,7 +47,6 @@
 #include <mach-o/fat.h>
 #include <dispatch/dispatch.h>
 #include <algorithm>
-#include <Foundation/Foundation.h>
 #include "AsyncHelpers.h"
 
 #include <string>
@@ -170,14 +169,12 @@ void OutputFile::write(ld::Internal& state)
 	this->assignAtomAddresses(state);
 	dispatch_group_t group = dispatch_group_create();
 	auto queue = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0);
-	//dispatch_queue_attr_t attr = DISPATCH_QUEUE_SERIAL;
-	//auto queue = dispatch_queue_create("asdf", attr);
 	dispatch_group_async(group, queue, ^{
-    	this->synthesizeDebugNotes(state);
+		this->synthesizeDebugNotes(state);
 	});
 	dispatch_group_async(group, queue, ^{
 		this->buildSymbolTable(state);
-    	this->generateLinkEditInfo(state);
+		this->generateLinkEditInfo(state);
 	});
 	dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 	if ( _options.sharedRegionEncodingV2() )
@@ -250,23 +247,10 @@ void OutputFile::assignAtomAddresses(ld::Internal& state)
 
 void OutputFile::updateLINKEDITAddresses(ld::Internal& state)
 {
-	auto queue = [[NSOperationQueue alloc] init];
-	queue.qualityOfService = NSQualityOfServiceUserInteractive;
-	// initialize info for parsing input files on worker threads
-	unsigned int ncpus;
-	int mib[2];
-	size_t len = sizeof(ncpus);
-	mib[0] = CTL_HW;
-	mib[1] = HW_NCPU;
-	auto res = sysctl(mib, 2, &ncpus, &len, NULL, 0);
-	if (res != 0) {
-		ncpus = 1;
-	}
-	queue.maxConcurrentOperationCount = ncpus;
 	if ( _options.makeChainedFixups() && !state.cantUseChainedFixups && _options.dyldOrKernelLoadsOutput() ) {
 		if ( _hasExportsTrie ) {
 		assert(_exportInfoAtom != NULL);
-		_exportInfoAtom->encode();
+			_exportInfoAtom->encode();
 		}
 
 		assert(_chainedInfoAtom != NULL);
@@ -318,17 +302,12 @@ void OutputFile::updateLINKEDITAddresses(ld::Internal& state)
 	if (_options.makeCompressedDyldInfo()) {
     	// build dyld export info
     	assert(_exportInfoAtom != NULL);
-    	[queue addOperationWithBlock:^{
-    		_exportInfoAtom->encode();
-    	}];
+		_exportInfoAtom->encode();
 	}
 	
 	// build classic symbol table
 	assert(_symbolTableAtom != NULL);
-	[queue addOperationWithBlock:^{
-		_symbolTableAtom->encode();
-	}];
-	[queue waitUntilAllOperationsAreFinished];
+	_symbolTableAtom->encode();
 	assert(_indirectSymbolTableAtom != NULL);
 	_indirectSymbolTableAtom->encode();
 

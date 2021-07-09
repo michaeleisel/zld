@@ -42,7 +42,6 @@
 #include <mach-o/fat.h>
 #include <sys/sysctl.h>
 #include <libkern/OSAtomic.h>
-#include <Foundation/Foundation.h>
 #include "pstl/algorithm"
 #include "pstl/execution"
 #include "AsyncHelpers.h"
