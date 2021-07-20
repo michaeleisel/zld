@@ -3957,6 +3957,7 @@ void OutputFile::writeOutputFile(ld::Internal& state)
 			unlink(tmpOutput);
 			throwf("can't move output file in place, errno=%d", errno);
 		}
+		// ::truncate(_options.outputFilePath(), _fileSize);
 	} 
 	else {
 		if ( ::write(fd, wholeBuffer, _fileSize) == -1 ) {
