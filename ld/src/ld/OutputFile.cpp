@@ -3961,8 +3961,17 @@ void OutputFile::writeOutputFile(ld::Internal& state)
 		}
 	} 
 	else {
-		if ( ::write(fd, wholeBuffer, _fileSize) == -1 ) {
-			throwf("can't write to output file: %s, errno=%d", _options.outputFilePath(), errno);
+		int64_t bytesLeft = (int64_t)_fileSize;
+		uint8_t *currentPosition = wholeBuffer;
+		// write(2) fails if given a size larger than INT32_MAX, so break it into chunks that don't exceed that
+		while (bytesLeft > 0) {
+			uint64_t chunkSize = MIN(bytesLeft, INT32_MAX);
+			ssize_t bytesWritten = ::write(fd, currentPosition, chunkSize);
+			if ( bytesWritten == -1 ) {
+				throwf("can't write to output file: %s, errno=%d", _options.outputFilePath(), errno);
+			}
+			bytesLeft -= bytesWritten;
+			currentPosition += bytesWritten;
 		}
 		sDescriptorOfPathToRemove = -1;
 		::close(fd);
