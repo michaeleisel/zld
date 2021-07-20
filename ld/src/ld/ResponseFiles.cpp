@@ -230,7 +230,7 @@ struct string_list* at_paths, int *hint_p)
       // set result to EXPAND_CONTINUE to request additional expansion.
       if (addr) {
 	char* p = addr;
-	for (char* arg = get_option(&p); arg; arg = get_option(&p)) {
+	for (char* arg = get_option(&p); arg && (p - addr) < sb.st_size; arg = get_option(&p)) {
 	  string_list_add(&newargs, arg);
 	  if ('@' == arg[0])
 	    result = EXPAND_CONTINUE;
