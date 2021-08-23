@@ -43,6 +43,7 @@ package:
 
 github_release: build
 	tar -C build/Build/Products/Release -czvf build/Build/Products/Release/zld.tar.gz zld
+	cd build/Build/Products/Release && zip -r zld.zip zld
 
 tapi-1100.0.11:
 	mkdir -p $@
