@@ -286,14 +286,21 @@ bool SymbolTableAtom<A>::addLocal(const ld::Atom* atom, StringPoolAtom* pool)
 	assert(atom->symbolTableInclusion() != ld::Atom::symbolTableNotIn);
 	 
 	// set n_strx
-	std::string_view nameStrView = atom->getUserVisibleName();
-	const char* symbolName;
-	char buffer[nameStrView.size() + 1];
-	if (nameStrView.data()[nameStrView.size()] != '\0') {
-		strcpy(buffer, nameStrView.data());
+	const char *atomName = atom->name();
+	const char *symbolName;
+	int length = -1;
+	if (!atomName) {
+		symbolName = "";
+	} else if (strchr(atomName, '.') && strstr(atomName, ".llvm.")) {
+		length = std::string_view(atomName).rfind(".llvm.");
+	}
+	char buffer[length == -1 ? 0 : length + 1];
+	if (length != -1) {
+		memcpy(buffer, symbolName, length);
+		buffer[length] = '\0';
 		symbolName = buffer;
 	} else {
-		symbolName = nameStrView.data();
+		symbolName = atomName;
 	}
 	char anonName[32];
 	if ( this->_options.outputKind() == Options::kObjectFile ) {

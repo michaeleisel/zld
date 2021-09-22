@@ -1226,6 +1226,19 @@ public:
 	virtual const ld::File*				    originalFile() const       { return file(); }
 	virtual const char*						translationUnitSource() const { return NULL; }
 	virtual const char*						name() const = 0;
+	const char *						getFastName(size_t *length, bool *isFullString) const {
+		*isFullString = true;
+		auto* nm = name();
+		if (!nm)
+			return NULL;
+		if (!strstr(nm, ".llvm.")) {
+			return nm;
+		}
+		*isFullString = false;
+		std::string_view visibleName(nm);
+		*length = visibleName.rfind(".llvm.");
+		return nm;
+	}
 	std::string_view						getUserVisibleName() const {
 		auto* nm = name();
 		if (!nm)
