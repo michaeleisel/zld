@@ -335,7 +335,7 @@ void Pass::process(ld::Internal& state)
 	// don't create stubs inline because that could invalidate the sections iterator
 	std::vector<const ld::Atom*> atomsCallingStubs;
 	LDOrderedMap<const ld::Atom*,ld::Atom*> stubFor;
-	LDOrderedMap<const ld::Atom*,bool>		weakImportMap;
+	LDMap<const ld::Atom*,bool>		weakImportMap;
 	atomsCallingStubs.reserve(128);
 	uint64_t codeSize = 0;
 	for (std::vector<ld::Internal::FinalSection*>::iterator sit=state.sections.begin(); sit != state.sections.end(); ++sit) {
@@ -353,7 +353,7 @@ void Pass::process(ld::Internal& state)
 					}
 					stubFor[stubableTargetOfFixup] = NULL;	
 					// record weak_import attribute
-					LDOrderedMap<const ld::Atom*,bool>::iterator pos = weakImportMap.find(stubableTargetOfFixup);
+					LDMap<const ld::Atom*,bool>::iterator pos = weakImportMap.find(stubableTargetOfFixup);
 					if ( pos == weakImportMap.end() ) {
 						// target not in weakImportMap, so add
 						weakImportMap[stubableTargetOfFixup] = fit->weakImport;
