@@ -17,7 +17,7 @@ cfe-8.0.1.src:
 	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz | tar xJ
 
 clean:
-	rm -rf abseil-cpp-20200225 build cfe-8.0.1.src dyld-733.6 llvm-8.0.1.src pstl tapi-1100.0.11 tbb tbb_staticlib ld/libtbb.a
+	rm -rf abseil-cpp-20200225 build cfe-8.0.1.src dyld-733.6 llvm-8.0.1.src pstl tapi-1100.0.11 tbb tbb_staticlib
 
 dyld-733.6:
 	curl -# -L https://opensource.apple.com/tarballs/dyld/dyld-733.6.tar.gz | tar xz
