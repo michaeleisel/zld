@@ -5690,7 +5690,11 @@ void Options::reconfigureDefaults()
 	}
 
 	// <rdar://problem/51911409> codesign all userland arm64 macOS binaries
-	if ( dyldLoadsOutput() && (fArchitecture == CPU_TYPE_ARM64) && platforms().contains(ld::Platform::macOS) )
+	if ( dyldLoadsOutput() && (fArchitecture == CPU_TYPE_ARM64)
+		&& (platforms().contains(ld::Platform::macOS)
+			|| platforms().contains(ld::Platform::iOS_simulator)
+			|| platforms().contains(ld::Platform::tvOS_simulator)
+			|| platforms().contains(ld::Platform::watchOS_simulator)))
 		fAdHocSign = true;
 
 }
