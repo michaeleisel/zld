@@ -10,8 +10,8 @@ build_homebrew: fetch
 test: fetch
 	xcodebuild -project ld/zld.xcodeproj -scheme unit-tests -derivedDataPath build -configuration Debug build
 
-abseil-cpp-20200225:
-	curl -# -L https://github.com/abseil/abseil-cpp/archive/20200225.tar.gz | tar xz
+abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4:
+	curl -# -L https://github.com/abseil/abseil-cpp/archive/78f9680225b9792c26dfdd99d0bd26c96de53dd4.tar.gz | tar xz
 	mkdir $@/build $@/build_x86_64 $@/build_arm64
 	cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.14 -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -S $@ -B $@/build_x86_64
 	make -C $@/build_x86_64 -j
@@ -25,13 +25,13 @@ cfe-8.0.1.src:
 	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz | tar xJ
 
 clean:
-	rm -rf abseil-cpp-20200225 build cfe-8.0.1.src dyld-733.6 llvm-8.0.1.src pstl tapi-1100.0.11 tbb tbb_staticlib ld/libtbb.a
+	rm -rf abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 build cfe-8.0.1.src dyld-733.6 llvm-8.0.1.src pstl tapi-1100.0.11 tbb tbb_staticlib ld/libtbb.a
 
 dyld-733.6:
 	curl -# -L https://opensource.apple.com/tarballs/dyld/dyld-733.6.tar.gz | tar xz
 	patch -p1 -d dyld-733.6 < patches/dyld.patch
 
-fetch: abseil-cpp-20200225 cfe-8.0.1.src dyld-733.6 llvm-8.0.1.src tapi-1100.0.11 tbb tbb_staticlib
+fetch: abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 cfe-8.0.1.src dyld-733.6 llvm-8.0.1.src tapi-1100.0.11 tbb tbb_staticlib
 
 llvm-8.0.1.src:
 	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz | tar xJ

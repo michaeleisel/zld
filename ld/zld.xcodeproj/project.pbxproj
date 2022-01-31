@@ -1288,7 +1288,7 @@
 					"$(SRCROOT)/../dyld-733.6/include",
 					"$(SRCROOT)/../llvm-8.0.1.src/include",
 					"$(SRCROOT)/../cfe-8.0.1.src/include",
-					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4",
 					"$(SRCROOT)/../pstl/include",
 					"$(SRCROOT)/../pstl/stdlib",
 					"$(SRCROOT)/../tbb/include",
@@ -1382,7 +1382,7 @@
 					"$(SRCROOT)/../dyld-733.6/include",
 					"$(SRCROOT)/../llvm-8.0.1.src/include",
 					"$(SRCROOT)/../cfe-8.0.1.src/include",
-					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4",
 					"$(SRCROOT)/../pstl/include",
 					"$(SRCROOT)/../pstl/stdlib",
 					"$(SRCROOT)/../tbb/include",
@@ -1524,7 +1524,7 @@
 					"$(SRCROOT)/../dyld-733.6/include",
 					"$(SRCROOT)/../llvm-8.0.1.src/include",
 					"$(SRCROOT)/../cfe-8.0.1.src/include",
-					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4",
 					"$(SRCROOT)/src/ld",
 					"$(SRCROOT)/src/extra_include",
 				);
@@ -1543,7 +1543,7 @@
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
 					"-Wl,-all_load",
-					"-Wl,$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
+					"-Wl,$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4/build/libabsl.a",
 				);
 				SDKROOT = macosx;
 			};
@@ -1582,7 +1582,7 @@
 					"$(SRCROOT)/../dyld-733.6/include",
 					"$(SRCROOT)/../llvm-8.0.1.src/include",
 					"$(SRCROOT)/../cfe-8.0.1.src/include",
-					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4",
 					"$(SRCROOT)/src/ld",
 					"$(SRCROOT)/src/extra_include",
 				);
@@ -1600,7 +1600,7 @@
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
 					"-Wl,-all_load",
-					"-Wl,$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
+					"-Wl,$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4/build/libabsl.a",
 				);
 				SDKROOT = macosx;
 			};
@@ -1657,7 +1657,7 @@
 					"$(SRCROOT)/../dyld-733.6/include",
 					"$(SRCROOT)/../llvm-8.0.1.src/include",
 					"$(SRCROOT)/../cfe-8.0.1.src/include",
-					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4",
 					"$(SRCROOT)/src/ld",
 					"$(SRCROOT)/src/extra_include",
 				);
@@ -1675,7 +1675,7 @@
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
 					"-Wl,-all_load",
-					"-Wl,$(SRCROOT)/../abseil-cpp-20200225/build/libabsl.a",
+					"-Wl,$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4/build/libabsl.a",
 				);
 				SDKROOT = macosx;
 			};
@@ -1749,7 +1749,7 @@
 					"$(SRCROOT)/../dyld-733.6/include",
 					"$(SRCROOT)/../llvm-8.0.1.src/include",
 					"$(SRCROOT)/../cfe-8.0.1.src/include",
-					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4",
 					"$(SRCROOT)/../pstl/include",
 					"$(SRCROOT)/../pstl/stdlib",
 					"$(SRCROOT)/../tbb/include",
