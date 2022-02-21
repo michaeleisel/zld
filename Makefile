@@ -50,11 +50,11 @@ tapi-1100.0.11:
 	patch -p1 -d $@ < patches/tapi.patch
 
 tbb:
-	curl -# -L https://github.com/intel/tbb/releases/download/v2020.1/tbb-2020.1-mac.tgz | tar xz
+	curl -# -L https://github.com/oneapi-src/oneTBB/releases/download/v2020.3/tbb-2020.3-mac.tgz | tar xz
 
 tbb_staticlib:
 	mkdir -p $@
-	curl -# -L https://github.com/intel/tbb/archive/v2020.1.tar.gz | tar xz -C $@ --strip-components=1
+	curl -# -L https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2020.3.tar.gz | tar xz -C $@ --strip-components=1
 	make -C $@ -j arch=intel64 extra_inc=big_iron.inc
 	make -C $@ -j arch=arm64 extra_inc=big_iron.inc
 	find $@/build -name libtbb.a | xargs lipo -create -output ld/libtbb.a
