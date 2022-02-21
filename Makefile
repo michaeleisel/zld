@@ -25,13 +25,13 @@ cfe-8.0.1.src:
 	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz | tar xJ
 
 clean:
-	rm -rf abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 build cfe-8.0.1.src dyld-733.6 llvm-8.0.1.src pstl tapi-1100.0.11 tbb tbb_staticlib ld/libtbb.a
+	rm -rf abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 build cfe-8.0.1.src dyld-733.6 dyld-940 llvm-8.0.1.src pstl tapi-1100.0.11 tbb tbb_staticlib ld/libtbb.a
 
-dyld-733.6:
-	curl -# -L https://opensource.apple.com/tarballs/dyld/dyld-733.6.tar.gz | tar xz
-	patch -p1 -d dyld-733.6 < patches/dyld.patch
+dyld-940:
+	git clone --depth=1 git@github.com:apple-oss-distributions/dyld.git $@
+	patch -p1 -d $@ < patches/dyld.patch
 
-fetch: abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 cfe-8.0.1.src dyld-733.6 llvm-8.0.1.src tapi-1100.0.11 tbb tbb_staticlib
+fetch: abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 cfe-8.0.1.src dyld-940 llvm-8.0.1.src tapi-1100.0.11 tbb tbb_staticlib
 
 llvm-8.0.1.src:
 	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz | tar xJ
