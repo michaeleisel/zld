@@ -35,6 +35,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <set>
 
 #include <libunwind.h>
 #include <mach-o/compact_unwind_encoding.h>
@@ -186,6 +187,11 @@ const char* DwarfInstructions<A,R>::parseCFIs(A& addressSpace, pint_t ehSectionS
                                       bool keepDwarfWhichHasCU,  bool forceDwarfConversion, bool neverConvertToCU,
                                       CFI_Atom_Info<A>* infos, uint32_t& infosCount, void* ref, WarnFunc warn)
 {
+    std::set<int> cuStartsSet;
+    for (uint32_t i = 0; i < cuCount; i++) {
+        cuStartsSet.insert(cuStarts[i]);
+    }
+
 	typename CFI_Parser<A>::CIE_Info cieInfo;
 	CFI_Atom_Info<A>* entry = infos;
 	CFI_Atom_Info<A>* end = &infos[infosCount];
@@ -268,13 +274,8 @@ const char* DwarfInstructions<A,R>::parseCFIs(A& addressSpace, pint_t ehSectionS
 				p = endOfAug;
 			}
 			// See if already is a compact unwind for this address.  
-			bool alreadyHaveCU = false;
-			for (uint32_t i=0; i < cuCount; ++i) {
-				if (cuStarts[i] == entry->u.fdeInfo.function.targetAddress) {
-				  alreadyHaveCU = true;
-				  break;
-				}
-			}
+            bool alreadyHaveCU = cuStartsSet.find(entry->u.fdeInfo.function.targetAddress) != cuStartsSet.end();
+
             if ( pcRange == 0 ) {
                 warn(ref, pcStart, "FDE found for zero size function");
                 break;
