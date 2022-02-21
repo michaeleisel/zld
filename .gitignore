@@ -2,9 +2,9 @@
 /build/
 /cfe-8.0.1.src/
 /dyld-*
-/llvm-8.0.1.src/
+/llvm-*
 /pstl/
-/tapi-1100.0.11/
+/tapi-*
 /tbb/
 /tbb_staticlib/
 /ld/libtbb.a

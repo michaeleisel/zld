@@ -22,16 +22,16 @@ abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4:
 	lipo -create $@/build/libabsl_x86_64.a $@/build/libabsl_arm64.a -output $@/build/libabsl.a
 
 clean:
-	rm -rf abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 build cfe-8.0.1.src dyld-733.6 dyld-940 llvm-8.0.1.src pstl tapi-1100.0.11 tbb tbb_staticlib ld/libtbb.a
+	rm -rf abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 build cfe-8.0.1.src dyld-733.6 dyld-940 llvm-8.0.1.src pstl llvm-13.0.1.src tapi-1100.0.11 tbb tbb_staticlib ld/libtbb.a
 
 dyld-940:
 	git clone --depth=1 git@github.com:apple-oss-distributions/dyld.git $@
 	patch -p1 -d $@ < patches/dyld.patch
 
-fetch: abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 dyld-940 llvm-8.0.1.src tapi-1100.0.11 tbb tbb_staticlib
+fetch: abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 dyld-940 llvm-13.0.1.src tapi-1100.0.11 tbb tbb_staticlib
 
-llvm-8.0.1.src:
-	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz | tar xJ
+llvm-13.0.1.src:
+	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.1/llvm-13.0.1.src.tar.xz | tar xJ
 
 HASH := $(shell git rev-parse --short HEAD)
 package:
