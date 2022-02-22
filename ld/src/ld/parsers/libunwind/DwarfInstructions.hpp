@@ -35,7 +35,7 @@
 
 #include <algorithm>
 #include <vector>
-#include <set>
+#include <unordered_set>
 
 #include <libunwind.h>
 #include <mach-o/compact_unwind_encoding.h>
@@ -187,9 +187,12 @@ const char* DwarfInstructions<A,R>::parseCFIs(A& addressSpace, pint_t ehSectionS
                                       bool keepDwarfWhichHasCU,  bool forceDwarfConversion, bool neverConvertToCU,
                                       CFI_Atom_Info<A>* infos, uint32_t& infosCount, void* ref, WarnFunc warn)
 {
-    std::set<int> cuStartsSet;
+    std::unordered_set<int> cuStartsSet;
+    cuStartsSet.reserve(cuCount);
     for (uint32_t i = 0; i < cuCount; i++) {
-        cuStartsSet.insert(cuStarts[i]);
+        if (cuStartsSet.find(cuStarts[i]) == cuStartsSet.end()) {
+            cuStartsSet.insert(cuStarts[i]);
+        }
     }
 
 	typename CFI_Parser<A>::CIE_Info cieInfo;
