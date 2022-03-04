@@ -31,7 +31,7 @@ Below are the installation methods. Note that, if you someday install a newer ve
 
 #### Pre-built binary
 
-The pre-built binary for the latest release is [here](https://github.com/michaeleisel/zld/releases/latest).
+The pre-built binary for the latest release is [here](https://github.com/michaeleisel/zld/releases/latest). Note that Xcode is required to be installed for the dynamic libraries it provides to zld.
 
 #### Building from source (only supported for non-ARM macs)
 
