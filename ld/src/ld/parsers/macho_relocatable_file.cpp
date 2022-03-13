@@ -31,7 +31,7 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-#include <MapDefines.h>
+#include "MapDefines.h"
 
 #include "MachOFileAbstraction.hpp"
 
@@ -3127,10 +3127,13 @@ const char* Parser<A>::scanSymbolTableForAddress(uint64_t addr)
 	uint64_t closestSymAddr = 0;
 	const char* closestSymName = NULL;
 
-	const macho_nlist<P>& sym =	_symbolsMap[addr];
-	if ((sym.n_type() & N_STAB) == 0 && (sym.n_type() & N_TYPE) == N_SECT ) {
-		const char* name = nameFromSymbol(sym);
-		if (strncmp(name, "ltmp", 4) != 0 ) return name;
+	auto pair = _symbolsMap.find(addr);
+	if (pair != _symbolsMap.end()) {
+		const macho_nlist<P>& sym = pair->second;
+		if ((sym.n_type() & N_STAB) == 0 && (sym.n_type() & N_TYPE) == N_SECT ) {
+			const char* name = nameFromSymbol(sym);
+			if (strncmp(name, "ltmp", 4) != 0 ) return name;
+		}
 	}
 
 	for (uint32_t i=0; i < this->_symbolCount; ++i) {

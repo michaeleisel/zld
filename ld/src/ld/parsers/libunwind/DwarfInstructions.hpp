@@ -32,7 +32,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <MapDefines.h>
+#include "MapDefines.h"
 
 #include <algorithm>
 #include <vector>
