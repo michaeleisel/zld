@@ -31,7 +31,7 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-#include <unordered_map>
+#include <MapDefines.h>
 
 #include "MachOFileAbstraction.hpp"
 
@@ -1283,7 +1283,7 @@ private:
 	// filled in by parseLoadCommands()
 	File<A>*									_file;
 	const macho_nlist<P>*						_symbols;
-	std::unordered_map<uint64_t, macho_nlist<P>>	_symbolsMap;
+	LDMap<uint64_t, macho_nlist<P>>	            _symbolsMap;
 	uint32_t									_symbolCount;
 	uint32_t									_indirectSymbolCount;
 	const char*									_strings;
@@ -2236,10 +2236,8 @@ bool Parser<A>::parseLoadCommands(const ld::VersionSet& cmdLinePlatforms, bool i
 	}
 
 	_symbolsMap.reserve(_symbolCount);
-	for (u_int64_t i = 0; i < _symbolCount; i++) {
-		if(_symbolsMap.find(_symbols[i].n_value()) == _symbolsMap.end()) {
-			_symbolsMap[_symbols[i].n_value()] = _symbols[i];
-		}
+	for (uint64_t i = 0; i < _symbolCount; i++) {
+		_symbolsMap.emplace(_symbols[i].n_value(),  _symbols[i]);
 	}
 
 	// Check platform cross-linking.
