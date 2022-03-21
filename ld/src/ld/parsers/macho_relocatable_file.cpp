@@ -31,6 +31,7 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
+#include "MapDefines.h"
 
 #include "MachOFileAbstraction.hpp"
 
@@ -1282,6 +1283,7 @@ private:
 	// filled in by parseLoadCommands()
 	File<A>*									_file;
 	const macho_nlist<P>*						_symbols;
+	LDMap<uint64_t, macho_nlist<P>>	            _symbolsMap;
 	uint32_t									_symbolCount;
 	uint32_t									_indirectSymbolCount;
 	const char*									_strings;
@@ -2233,6 +2235,11 @@ bool Parser<A>::parseLoadCommands(const ld::VersionSet& cmdLinePlatforms, bool i
 			throwf("malformed mach-o file, load command #%d is outside size of load commands", i);
 	}
 
+	_symbolsMap.reserve(_symbolCount);
+	for (uint64_t i = 0; i < _symbolCount; i++) {
+		_symbolsMap.emplace(_symbols[i].n_value(),  _symbols[i]);
+	}
+
 	// Check platform cross-linking.
 	cmdLinePlatforms.checkObjectCrosslink(lcPlatforms, path(), internalSDK, _usingBitcode, _platformMismatchesAreWarning);
 
@@ -3119,6 +3126,16 @@ const char* Parser<A>::scanSymbolTableForAddress(uint64_t addr)
 {
 	uint64_t closestSymAddr = 0;
 	const char* closestSymName = NULL;
+
+	auto pair = _symbolsMap.find(addr);
+	if (pair != _symbolsMap.end()) {
+		const macho_nlist<P>& sym = pair->second;
+		if ((sym.n_type() & N_STAB) == 0 && (sym.n_type() & N_TYPE) == N_SECT ) {
+			const char* name = nameFromSymbol(sym);
+			if (strncmp(name, "ltmp", 4) != 0 ) return name;
+		}
+	}
+
 	for (uint32_t i=0; i < this->_symbolCount; ++i) {
 		const macho_nlist<P>& sym =	symbolFromIndex(i);
 		// ignore stabs

@@ -21,20 +21,17 @@ abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4:
 	find $@/build_arm64/absl -name '*.a' | xargs libtool -static -o $@/build/libabsl_arm64.a
 	lipo -create $@/build/libabsl_x86_64.a $@/build/libabsl_arm64.a -output $@/build/libabsl.a
 
-cfe-8.0.1.src:
-	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz | tar xJ
-
 clean:
-	rm -rf abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 build cfe-8.0.1.src dyld-733.6 llvm-8.0.1.src pstl tapi-1100.0.11 tbb tbb_staticlib ld/libtbb.a
+	rm -rf abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 build cfe-8.0.1.src dyld-733.6 dyld-940 llvm-8.0.1.src pstl llvm-13.0.1.src tapi-1100.0.11 tbb tbb_staticlib ld/libtbb.a
 
-dyld-733.6:
-	curl -# -L https://opensource.apple.com/tarballs/dyld/dyld-733.6.tar.gz | tar xz
-	patch -p1 -d dyld-733.6 < patches/dyld.patch
+dyld-940:
+	git clone --depth=1 git@github.com:apple-oss-distributions/dyld.git $@
+	patch -p1 -d $@ < patches/dyld.patch
 
-fetch: abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 cfe-8.0.1.src dyld-733.6 llvm-8.0.1.src tapi-1100.0.11 tbb tbb_staticlib
+fetch: abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 dyld-940 llvm-13.0.1.src tapi-1100.0.11 tbb tbb_staticlib
 
-llvm-8.0.1.src:
-	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz | tar xJ
+llvm-13.0.1.src:
+	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.1/llvm-13.0.1.src.tar.xz | tar xJ
 
 HASH := $(shell git rev-parse --short HEAD)
 package:
@@ -50,11 +47,11 @@ tapi-1100.0.11:
 	patch -p1 -d $@ < patches/tapi.patch
 
 tbb:
-	curl -# -L https://github.com/intel/tbb/releases/download/v2020.1/tbb-2020.1-mac.tgz | tar xz
+	curl -# -L https://github.com/oneapi-src/oneTBB/releases/download/v2020.3/tbb-2020.3-mac.tgz | tar xz
 
 tbb_staticlib:
 	mkdir -p $@
-	curl -# -L https://github.com/intel/tbb/archive/v2020.1.tar.gz | tar xz -C $@ --strip-components=1
+	curl -# -L https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2020.3.tar.gz | tar xz -C $@ --strip-components=1
 	make -C $@ -j arch=intel64 extra_inc=big_iron.inc
 	make -C $@ -j arch=arm64 extra_inc=big_iron.inc
 	find $@/build -name libtbb.a | xargs lipo -create -output ld/libtbb.a
