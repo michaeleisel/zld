@@ -1,7 +1,7 @@
 /abseil-cpp-*/
 /build/
 /cfe-8.0.1.src/
-/dyld-*
+/dyld/
 /llvm-*
 /pstl/
 /tapi-*
