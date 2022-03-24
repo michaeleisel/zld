@@ -1,0 +1,14 @@
+module MachO_Private.dyld [system] [extern_c] {
+  header "dyld_priv.h"
+  export *
+
+  explicit module process_info {
+    header "dyld_process_info.h"
+    export *
+  }
+
+  explicit module interposing {
+    header "dyld-interposing.h"
+    export *
+  }
+}

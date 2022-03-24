@@ -1,0 +1,5 @@
+#include "<DEVELOPER_DIR>/AppleInternal/XcodeConfig/PlatformSupportHost.xcconfig"
+#include "base.xcconfig"
+
+INSTALL_PATH = $(SIMULATOR_RUNTIME_BUNDLE_INSTALL_DIR)/Contents/Resources
+
