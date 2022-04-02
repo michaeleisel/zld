@@ -18,3 +18,4 @@ llvm-integration
 objc-category-class-property-mismatch
 objc-category-optimize
 demangle
+merge_zero_fill_sections
