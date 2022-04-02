@@ -87,3 +87,4 @@ weak-def-hidden-and-global
 weak_import-addend
 weak_import-disable
 zero-fill3
+merge_zero_fill_sections

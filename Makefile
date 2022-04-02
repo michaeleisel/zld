@@ -22,13 +22,13 @@ abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4:
 	lipo -create $@/build/libabsl_x86_64.a $@/build/libabsl_arm64.a -output $@/build/libabsl.a
 
 clean:
-	rm -rf abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 build cfe-8.0.1.src dyld-733.6 dyld-940 llvm-8.0.1.src pstl llvm-13.0.1.src tapi-1100.0.11 tbb tbb_staticlib ld/libtbb.a
+	rm -rf abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 build cfe-8.0.1.src dyld-733.6 dyld-940 llvm-8.0.1.src pstl llvm-13.0.1.src tapi-1100.0.11 tbb
 
 dyld-940:
-	git clone --depth=1 git@github.com:apple-oss-distributions/dyld.git $@
+	git clone --depth=1 https://github.com/apple-oss-distributions/dyld.git $@
 	patch -p1 -d $@ < patches/dyld.patch
 
-fetch: abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 dyld-940 llvm-13.0.1.src tapi-1100.0.11 tbb tbb_staticlib
+fetch: abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 dyld-940 llvm-13.0.1.src tapi-1100.0.11 tbb
 
 llvm-13.0.1.src:
 	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.1/llvm-13.0.1.src.tar.xz | tar xJ
@@ -48,13 +48,6 @@ tapi-1100.0.11:
 
 tbb:
 	curl -# -L https://github.com/oneapi-src/oneTBB/releases/download/v2020.3/tbb-2020.3-mac.tgz | tar xz
-
-tbb_staticlib:
-	mkdir -p $@
-	curl -# -L https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2020.3.tar.gz | tar xz -C $@ --strip-components=1
-	make -C $@ -j arch=intel64 extra_inc=big_iron.inc
-	make -C $@ -j arch=arm64 extra_inc=big_iron.inc
-	find $@/build -name libtbb.a | xargs lipo -create -output ld/libtbb.a
 
 install: build
 	mkdir -p "/usr/local/bin"
