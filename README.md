@@ -29,13 +29,15 @@ It all depends on your risk tolerance and how much you value the speedup in incr
 
 Below are the installation methods. Note that, if you someday install a newer version of Xcode and zld doesn't work with it, it may be that your version of zld is now too far behind that of the linker shipped in Xcode. In that case, check back here for the latest zld release to fix the problem.
 
+***Note***: The Xcode app must be installed for zld to work (not just the Xcode command line tools)
+
 #### Pre-built binary
 
-The pre-built binary for the latest release is [here](https://github.com/michaeleisel/zld/releases/latest). Note that Xcode is required to be installed for the dynamic libraries it provides to zld.
+The pre-built binary for the latest release is [here](https://github.com/michaeleisel/zld/releases/latest).
 
 #### Building from source
 
-- Install Xcode 12.2+ and run `sudo xcode-select -s <path to Xcode>`
+- `sudo xcode-select -s <path to Xcode>`
 - Install cmake
 - Checkout the [latest release of zld](https://github.com/michaeleisel/zld/releases/latest) from master
 - Run `make clean && make`
