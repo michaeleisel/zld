@@ -33,7 +33,7 @@ Below are the installation methods. Note that, if you someday install a newer ve
 
 The pre-built binary for the latest release is [here](https://github.com/michaeleisel/zld/releases/latest). Note that Xcode is required to be installed for the dynamic libraries it provides to zld.
 
-#### Building from source (only supported for non-ARM macs)
+#### Building from source
 
 - Install Xcode 12.2+ and run `sudo xcode-select -s <path to Xcode>`
 - Install cmake
