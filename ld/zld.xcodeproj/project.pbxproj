@@ -1506,7 +1506,7 @@
 					"$(SRCROOT)/../pstl/stdlib",
 					"$(SRCROOT)/../tbb/include",
 				);
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib /Library/Developer/CommandLineTools/usr/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1568,7 +1568,7 @@
 					"$(SRCROOT)/../pstl/stdlib",
 					"$(SRCROOT)/../tbb/include",
 				);
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib /Library/Developer/CommandLineTools/usr/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_CFLAGS = (
@@ -1647,7 +1647,7 @@
 					"$(SRCROOT)/../pstl/stdlib",
 					"$(SRCROOT)/../tbb/include",
 				);
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib /Library/Developer/CommandLineTools/usr/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_CFLAGS = (
