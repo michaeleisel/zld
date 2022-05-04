@@ -3956,6 +3956,7 @@ void OutputFile::writeOutputFile(ld::Internal& state)
 			unlink(tmpOutput);
 			throwf("can't set permissions on output file: %s, errno=%d", tmpOutput, errno);
 		}
+		// For whatever reason, clonefile seems to fix the signing issue
 		if ( ::clonefile(tmpOutput, _options.outputFilePath(), 0) == -1 && strcmp(tmpOutput, _options.outputFilePath()) != 0) {
 			unlink(tmpOutput);
 			throwf("can't move output file in place, errno=%d", errno);
