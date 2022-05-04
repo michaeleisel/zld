@@ -32,6 +32,7 @@
 #include <sys/sysctl.h>
 #include <sys/param.h>
 #include <sys/mount.h>
+#include <sys/clonefile.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <limits.h>
@@ -3851,10 +3852,10 @@ void OutputFile::writeOutputFile(ld::Internal& state)
 			struct statfs fsInfo;
 			if ( statfs(_options.outputFilePath(), &fsInfo) != -1 ) {
                                 // Avoid mmap due to odd signing bug
-				/*if ( (strcmp(fsInfo.f_fstypename, "hfs") == 0) || (strcmp(fsInfo.f_fstypename, "apfs") == 0) ) {
+				if ( (strcmp(fsInfo.f_fstypename, "hfs") == 0) || (strcmp(fsInfo.f_fstypename, "apfs") == 0) ) {
 					(void)unlink(_options.outputFilePath());
 					outputIsMappableFile = true;
-				}*/
+				}
 			}
 			else {
 				outputIsMappableFile = false;
@@ -3876,9 +3877,9 @@ void OutputFile::writeOutputFile(ld::Internal& state)
 			struct statfs fsInfo;
 			if ( statfs(dirPath, &fsInfo) != -1 ) {
                                 // Avoid mmap due to odd signing bug
-				/*if ( (strcmp(fsInfo.f_fstypename, "hfs") == 0) || (strcmp(fsInfo.f_fstypename, "apfs") == 0) ) {
+				if ( (strcmp(fsInfo.f_fstypename, "hfs") == 0) || (strcmp(fsInfo.f_fstypename, "apfs") == 0) ) {
 					outputIsMappableFile = true;
-				}*/
+				}
 			}
 		}
 	}
@@ -3955,10 +3956,11 @@ void OutputFile::writeOutputFile(ld::Internal& state)
 			unlink(tmpOutput);
 			throwf("can't set permissions on output file: %s, errno=%d", tmpOutput, errno);
 		}
-		if ( ::rename(tmpOutput, _options.outputFilePath()) == -1 && strcmp(tmpOutput, _options.outputFilePath()) != 0) {
+		if ( ::clonefile(tmpOutput, _options.outputFilePath(), 0) == -1 && strcmp(tmpOutput, _options.outputFilePath()) != 0) {
 			unlink(tmpOutput);
 			throwf("can't move output file in place, errno=%d", errno);
 		}
+		unlink(tmpOutput);
 	} 
 	else {
 		int64_t bytesLeft = (int64_t)_fileSize;
