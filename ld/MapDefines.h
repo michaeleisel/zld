@@ -25,6 +25,7 @@
 #define LDMap std::unordered_map
 #define LDFastMap std::unordered_map
 #define LDSet std::unordered_set
+#define LDFastSet std::unordered_set
 #define LDOrderedSet std::set
 
 #else
