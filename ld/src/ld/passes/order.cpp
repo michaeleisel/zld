@@ -45,7 +45,7 @@
 
 #include "ld.hpp"
 #include "order.h"
-#include "Tweaks.hpp"
+#include "Tweaks.h"
 
 namespace ld {
 namespace passes {

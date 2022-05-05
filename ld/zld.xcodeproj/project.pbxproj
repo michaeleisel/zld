@@ -46,9 +46,9 @@
 /* Begin PBXBuildFile section */
 		41F71C50240F5814006DCEF9 /* libswiftDemangle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41F71C4F240F5814006DCEF9 /* libswiftDemangle.dylib */; };
 		4C8D9C99240587690040CE7C /* libLTO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8D9C98240587690040CE7C /* libLTO.dylib */; };
-		4C8D9C9B240597220040CE7C /* Tweaks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */; };
+		4C8D9C9B240597220040CE7C /* Tweaks.c in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA2DA723FDD2CB00C6009D /* Tweaks.c */; };
 		4C8D9CA0240597C10040CE7C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8D9C9F240597C10040CE7C /* Foundation.framework */; };
-		4CDA2DA923FDD2CB00C6009D /* Tweaks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */; };
+		4CDA2DA923FDD2CB00C6009D /* Tweaks.c in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA2DA723FDD2CB00C6009D /* Tweaks.c */; };
 		83046A851C8FF2F700024A7E /* objcimageinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83046A841C8FF2D000024A7E /* objcimageinfo.cpp */; };
 		B028FCF21A9E7C3F00E3584B /* bitcode_bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B028FCF11A9E7C3F00E3584B /* bitcode_bundle.cpp */; };
 		B3B672421406D42800A376BB /* Snapshot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3B672411406D42800A376BB /* Snapshot.cpp */; };
@@ -274,8 +274,8 @@
 		4C5E360823FB61DC0073E2F5 /* compile_stubs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = compile_stubs.h; sourceTree = "<group>"; };
 		4C8D9C98240587690040CE7C /* libLTO.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libLTO.dylib; path = Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib; sourceTree = DEVELOPER_DIR; };
 		4C8D9C9F240597C10040CE7C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tweaks.cpp; sourceTree = "<group>"; };
-		4CDA2DA823FDD2CB00C6009D /* Tweaks.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Tweaks.hpp; sourceTree = "<group>"; };
+		4CDA2DA723FDD2CB00C6009D /* Tweaks.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Tweaks.c; sourceTree = "<group>"; };
+		4CDA2DA823FDD2CB00C6009D /* Tweaks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tweaks.h; sourceTree = "<group>"; };
 		4CF05E8E23EB005B009C0C95 /* libsystem_malloc.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsystem_malloc.tbd; path = usr/lib/system/libsystem_malloc.tbd; sourceTree = SDKROOT; };
 		4CF05E9023EB0093009C0C95 /* libSystem.B.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libSystem.B.tbd; path = usr/lib/libSystem.B.tbd; sourceTree = SDKROOT; };
 		4CF05E9323EB0151009C0C95 /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/System.framework; sourceTree = DEVELOPER_DIR; };
@@ -619,9 +619,9 @@
 			isa = PBXGroup;
 			children = (
 				F3176402241011E300D68E7F /* libtbb.a */,
-				4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */,
+				4CDA2DA723FDD2CB00C6009D /* Tweaks.c */,
 				F366B08E2687813200B17E17 /* libjemalloc_pic.a */,
-				4CDA2DA823FDD2CB00C6009D /* Tweaks.hpp */,
+				4CDA2DA823FDD2CB00C6009D /* Tweaks.h */,
 				4C47258B23FD9E3C00AA02B2 /* MapDefines.h */,
 				F328A33225F2B68900E439C0 /* libcodedirectory.c */,
 				F9AA69BF10583E19003E3539 /* Resolver.cpp */,
@@ -1048,7 +1048,7 @@
 				F9AA44DC1294885F00CB8390 /* branch_shim.cpp in Sources */,
 				B3B672421406D42800A376BB /* Snapshot.cpp in Sources */,
 				B028FCF21A9E7C3F00E3584B /* bitcode_bundle.cpp in Sources */,
-				4CDA2DA923FDD2CB00C6009D /* Tweaks.cpp in Sources */,
+				4CDA2DA923FDD2CB00C6009D /* Tweaks.c in Sources */,
 				F9CC24191461FB4300A92174 /* blob.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1060,7 +1060,7 @@
 				F9AA6FF910618CD2003E3539 /* macho_relocatable_file.cpp in Sources */,
 				F9AE23291109015E0007ED5D /* lto_file.cpp in Sources */,
 				F933E3D9092E855B0083EAC8 /* ObjectDump.cpp in Sources */,
-				4C8D9C9B240597220040CE7C /* Tweaks.cpp in Sources */,
+				4C8D9C9B240597220040CE7C /* Tweaks.c in Sources */,
 				F34634572423BD3700F08C44 /* PlatformSupport.cpp in Sources */,
 				F9EA75BC09788857008B4F1D /* debugline.c in Sources */,
 			);

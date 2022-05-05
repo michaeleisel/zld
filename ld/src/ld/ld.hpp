@@ -34,10 +34,10 @@
 #include <set>
 #include <map>
 #include <vector>
-#include "Tweaks.hpp"
 #include <string>
 #include <unordered_set>
 
+#include "Tweaks.h"
 #include "configure.h"
 #include "MapDefines.h"
 #include "PlatformSupport.h"
@@ -1282,7 +1282,7 @@ typedef struct {
 } LDString;
 
 static inline size_t CRCHash(const char *__s, size_t len) {
-	if (Tweaks::reproEnabled()) {
+	if (tweaksReproEnabled()) {
 		size_t __h = 0;
 		for ( ; *__s; ++__s)
 			__h = 5 * __h + *__s;
