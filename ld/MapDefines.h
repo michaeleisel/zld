@@ -31,9 +31,10 @@
 #else
 
 #define LDOrderedMap absl::btree_map
-#define LDMap absl::node_hash_map
+#define LDMap absl::flat_hash_map
 #define LDFastMap absl::flat_hash_map
-#define LDSet absl::node_hash_set
+#define LDSet absl::flat_hash_set
+#define LDFastSet absl::flat_hash_set
 #define LDOrderedSet absl::btree_set
 
 #endif
