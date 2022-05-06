@@ -1379,6 +1379,7 @@
 					"-Wl,-stack_size,0x01000000",
 				);
 				PREBINDING = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
 				PRODUCT_NAME = zld;
 				PROVISIONING_PROFILE_SPECIFIER = "";
