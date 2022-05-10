@@ -641,8 +641,8 @@ public:
 								_type(sect.type()), _hidden(sect.isSectionHidden())  {}
 								
 	bool			operator==(const Section& rhs) const { return ( (_hidden==rhs._hidden) &&
-														(strcmp(_segmentName, rhs._segmentName)==0) &&
-														(strcmp(_sectionName, rhs._sectionName)==0) ); }
+														(_segmentName == rhs._segmentName || strcmp(_segmentName, rhs._segmentName)==0) &&
+														(_sectionName == rhs._sectionName || strcmp(_sectionName, rhs._sectionName)==0) ); }
 	bool			operator!=(const Section& rhs) const { return ! (*this == rhs); }
 	const char*			segmentName() const			{ return _segmentName; }
 	const char*			sectionName() const			{ return _sectionName; }
