@@ -79,8 +79,7 @@ public:
 	   }
 	   bool operator==(const LDString &other) const
 	   {
-			   return hash == other.hash
-				 && (str == other.str || strcmp(str, other.str) == 0);
+			   return hash == other.hash;
 	   }
 };
 
