@@ -93,7 +93,7 @@ public:
 
 private:
 	enum { kBufferSize = 0x01000000 };
-	typedef LDFastMap<std::string, int32_t> StringToOffset;
+	typedef LDFastMap<LDString, int32_t> StringToOffset;
 
 	const uint32_t							_pointerSize;
 	std::vector<char*>						_fullBuffers;
