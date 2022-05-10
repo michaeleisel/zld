@@ -1235,6 +1235,332 @@
 			};
 			name = "Release-assert";
 		};
+		F3EAC578282AAB47000B0535 /* Repro */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CLANG_X86_VECTOR_INSTRUCTIONS = sse4.2;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXCLUDED_INSTALLSRC_SUBDIRECTORY_PATTERNS = "$(inherited) build DerivedData";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(DT_TOOLCHAIN_DIR)/usr/local/include",
+					"$(TOOLCHAIN_DIR)/usr/local/include",
+					"$(SRCROOT)/../tapi-1100.0.11/include",
+					"$(SRCROOT)/../dyld-733.6/include",
+					"$(SRCROOT)/../llvm-8.0.1.src/include",
+					"$(SRCROOT)/../cfe-8.0.1.src/include",
+					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/src/ld",
+					"$(SRCROOT)/src/extra_include",
+				);
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				OTHER_CFLAGS = (
+					"-Wno-deprecated-declarations",
+					"-Wno-unknown-pragmas",
+					"-DREPRO=1",
+				);
+				OTHER_LDFLAGS = (
+					"-Wl,-U,_malloc_default_purgeable_zone",
+					"-Wl,-U,_fnd_get_demangled_name",
+					"-Wl,-client_name,ld",
+					"-Wl,-alias,_zldVersionString,_ldVersionString",
+					"-Wl,-all_load",
+					"-Wl,$(SRCROOT)/libabsl.a",
+					"-Wl,-stack_size,0x10000000",
+					"-ltapi",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
+					"-Wl,-exported_symbol,__mh_execute_header",
+					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
+					"-lxar",
+					"-stdlib=libc++",
+				);
+				SDKROOT = macosx;
+			};
+			name = Repro;
+		};
+		F3EAC579282AAB47000B0535 /* Repro */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				PRODUCT_NAME = all;
+				ZERO_LINK = NO;
+			};
+			name = Repro;
+		};
+		F3EAC57A282AAB47000B0535 /* Repro */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_USE_OPTIMIZATION_PROFILE = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = "$(RC_ProjectSourceVersion)";
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1)",
+					NDEBUG,
+					"$(GCC_PREPROCESSOR_DEFINITIONS_$(RC_RELEASE))",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "LD_VERS='\"ld64-$(RC_ProjectSourceVersion)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_WARN_ABOUT_INVALID_OFFSETOF_MACRO = NO;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
+				GCC_WARN_PEDANTIC = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(DT_TOOLCHAIN_DIR)/usr/local/include",
+					"$(TOOLCHAIN_DIR)/usr/local/include",
+					"$(SRCROOT)/../tapi-1100.0.11/include",
+					"$(SRCROOT)/../dyld-733.6/include",
+					"$(SRCROOT)/../llvm-8.0.1.src/include",
+					"$(SRCROOT)/../cfe-8.0.1.src/include",
+					"$(SRCROOT)/../abseil-cpp-20200225",
+					"$(SRCROOT)/../pstl/include",
+					"$(SRCROOT)/../pstl/stdlib",
+					"$(SRCROOT)/../tbb/include",
+					"$(SRCROOT)/../corecrypto/include",
+				);
+				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
+				LD_GENERATE_MAP_FILE = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/usr/lib/system",
+				);
+				LLVM_LTO = NO;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
+				PRODUCT_NAME = zld;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SECTORDER_FLAGS = "";
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = debugging;
+				TOOLCHAINS = osx;
+				VERSIONING_SYSTEM = "apple-generic";
+				WARNING_CFLAGS = "-Wall";
+			};
+			name = Repro;
+		};
+		F3EAC57B282AAB47000B0535 /* Repro */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LIBRARY = "libc++";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(GCC_PREPROCESSOR_DEFINITIONS_$(RC_RELEASE))";
+				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
+				OTHER_LDFLAGS = "-Wl,-exported_symbol,__mh_execute_header";
+				PREBINDING = NO;
+				PRODUCT_NAME = rebase;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = debugging;
+				VALID_ARCHS = "i386 ppc x86_64";
+			};
+			name = Repro;
+		};
+		F3EAC57C282AAB47000B0535 /* Repro */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LIBRARY = "libc++";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_WARN_ABOUT_INVALID_OFFSETOF_MACRO = NO;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-stdlib=libc++",
+					"$(OTHER_CFLAGS)",
+				);
+				OTHER_LDFLAGS = "-Wl,-exported_symbol,__mh_execute_header";
+				PREBINDING = NO;
+				PRODUCT_NAME = unwinddump;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = debugging;
+			};
+			name = Repro;
+		};
+		F3EAC57D282AAB47000B0535 /* Repro */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = NDEBUG;
+				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/local/bin";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-stdlib=libc++",
+					"$(OTHER_CFLAGS)",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-stdlib=libc++",
+					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
+				);
+				OTHER_REZFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = ObjectDump;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Repro;
+		};
+		F3EAC57E282AAB47000B0535 /* Repro */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = NDEBUG;
+				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/local/bin";
+				PRODUCT_NAME = objcimageinfo;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Repro;
+		};
+		F3EAC57F282AAB47000B0535 /* Repro */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LIBRARY = "libc++";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/local/bin";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-stdlib=libc++",
+					"$(OTHER_CFLAGS)",
+				);
+				OTHER_LDFLAGS = "-stdlib=libc++";
+				PREBINDING = NO;
+				PRODUCT_NAME = machocheck;
+			};
+			name = Repro;
+		};
+		F3EAC580282AAB47000B0535 /* Repro */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-stdlib=libc++",
+					"$(OTHER_CFLAGS)",
+				);
+				OTHER_LDFLAGS = "-stdlib=libc++";
+				PREBINDING = NO;
+				PRODUCT_NAME = dyldinfo;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = debugging;
+				ZERO_LINK = NO;
+			};
+			name = Repro;
+		};
+		F3EAC581282AAB47000B0535 /* Repro */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/local/lib";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-stdlib=libc++",
+					"$(OTHER_CFLAGS)",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = prunetrie;
+			};
+			name = Repro;
+		};
+		F3EAC582282AAB47000B0535 /* Repro */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				PRODUCT_NAME = "unit-tests";
+			};
+			name = Repro;
+		};
 		F933D91C09291AC90083EAC8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2157,6 +2483,7 @@
 			buildConfigurations = (
 				83046A801C8FF23E00024A7E /* Debug */,
 				83046A811C8FF23E00024A7E /* Release */,
+				F3EAC57E282AAB47000B0535 /* Repro */,
 				83046A821C8FF23E00024A7E /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2167,6 +2494,7 @@
 			buildConfigurations = (
 				F933D91C09291AC90083EAC8 /* Debug */,
 				F933D91D09291AC90083EAC8 /* Release */,
+				F3EAC57A282AAB47000B0535 /* Repro */,
 				F9849FFA10B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2177,6 +2505,7 @@
 			buildConfigurations = (
 				F933D92009291AC90083EAC8 /* Debug */,
 				F933D92109291AC90083EAC8 /* Release */,
+				F3EAC57D282AAB47000B0535 /* Repro */,
 				F9849FFD10B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2187,6 +2516,7 @@
 			buildConfigurations = (
 				F933D92409291AC90083EAC8 /* Debug */,
 				F933D92509291AC90083EAC8 /* Release */,
+				F3EAC578282AAB47000B0535 /* Repro */,
 				F9849FF810B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2197,6 +2527,7 @@
 			buildConfigurations = (
 				F96D536E094A2773008E9EE8 /* Debug */,
 				F96D536F094A2773008E9EE8 /* Release */,
+				F3EAC582282AAB47000B0535 /* Repro */,
 				F984A00110B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2207,6 +2538,7 @@
 			buildConfigurations = (
 				F9A3DDCB0ED762B800C590B9 /* Debug */,
 				F9A3DDCC0ED762B800C590B9 /* Release */,
+				F3EAC581282AAB47000B0535 /* Repro */,
 				F984A00010B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2217,6 +2549,7 @@
 			buildConfigurations = (
 				F9B1A26D0A3A568700DA8FAB /* Debug */,
 				F9B1A26E0A3A568700DA8FAB /* Release */,
+				F3EAC579282AAB47000B0535 /* Repro */,
 				F9849FF910B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2227,6 +2560,7 @@
 			buildConfigurations = (
 				F9B670060DDA176100E6D0DA /* Debug */,
 				F9B670070DDA176100E6D0DA /* Release */,
+				F3EAC57C282AAB47000B0535 /* Repro */,
 				F9849FFC10B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2237,6 +2571,7 @@
 			buildConfigurations = (
 				F9BA51630ECE58BF00D1D62E /* Debug */,
 				F9BA51640ECE58BF00D1D62E /* Release */,
+				F3EAC580282AAB47000B0535 /* Repro */,
 				F9849FFF10B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2247,6 +2582,7 @@
 			buildConfigurations = (
 				F9EA72D0097454D5008B4F1D /* Debug */,
 				F9EA72D1097454D5008B4F1D /* Release */,
+				F3EAC57F282AAB47000B0535 /* Repro */,
 				F9849FFE10B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2257,6 +2593,7 @@
 			buildConfigurations = (
 				F9EC77F10A2F8616002A3E39 /* Debug */,
 				F9EC77F20A2F8616002A3E39 /* Release */,
+				F3EAC57B282AAB47000B0535 /* Repro */,
 				F9849FFB10B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
