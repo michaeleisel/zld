@@ -45,6 +45,28 @@ static LDOrderedMap<const Atom*, uint64_t> sAtomToAddress;
 
 
 struct TargetAndOffset { const ld::Atom* atom; uint32_t offset; };
+
+class TargetAndOffsetHash
+{
+public:
+	size_t operator()(const TargetAndOffset& target) const
+	{
+		char bytes[sizeof(target.atom) + sizeof(target.offset)];
+		memcpy(bytes, &target.atom, sizeof(target.atom));
+		memcpy(bytes + sizeof(target.atom), &target.offset, sizeof(target.offset));
+		return hashString(bytes, sizeof(target.atom) + sizeof(target.offset));
+	}
+};
+
+class TargetAndOffsetEquals
+{
+public:
+	bool operator()(const TargetAndOffset& left, const TargetAndOffset& right) const
+	{
+		return left.atom == right.atom && left.offset == right.offset;
+	}
+};
+
 class TargetAndOffsetComparor
 {
 public:
@@ -495,7 +517,7 @@ static void makeIslandsForSection(const Options& opts, ld::Internal& state, ld::
 	const int kIslandRegionsCount = branchIslandInsertionPoints.size();
 
 	if (_s_log) fprintf(stderr, "ld: will use %u branch island regions\n", kIslandRegionsCount);
-	typedef LDOrderedMap<TargetAndOffset,const ld::Atom*, TargetAndOffsetComparor> AtomToIsland;
+	typedef LDMap<TargetAndOffset,const ld::Atom*, TargetAndOffsetHash, TargetAndOffsetEquals> AtomToIsland;
     AtomToIsland* regionsMap[kIslandRegionsCount];
 	uint64_t regionAddresses[kIslandRegionsCount];
 	std::vector<const ld::Atom*>* regionsIslands[kIslandRegionsCount];
