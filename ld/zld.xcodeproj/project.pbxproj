@@ -300,14 +300,15 @@
 		F338085F2422DA6D0086B7E8 /* inits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = inits.cpp; sourceTree = "<group>"; };
 		F33808612422DA830086B7E8 /* inits.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = inits.h; sourceTree = "<group>"; };
 		F33808622422DA8B0086B7E8 /* PlatformSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PlatformSupport.h; path = src/ld/PlatformSupport.h; sourceTree = "<group>"; };
-		F38899A3282ACC970070FCEE /* TimingHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TimingHelpers.h; sourceTree = "<group>"; };
 		F33808632422DAB40086B7E8 /* stub_arm64_32.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = stub_arm64_32.hpp; sourceTree = "<group>"; };
 		F33808642422DAB40086B7E8 /* stub_arm64e.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = stub_arm64e.hpp; sourceTree = "<group>"; };
 		F366B06326868B6600B17E17 /* AsyncHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AsyncHelpers.h; sourceTree = "<group>"; };
 		F366B06426868B6600B17E17 /* AsyncHelpers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AsyncHelpers.cpp; sourceTree = "<group>"; };
 		F366B08E2687813200B17E17 /* libjemalloc_pic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libjemalloc_pic.a; sourceTree = "<group>"; };
+		F38899A3282ACC970070FCEE /* TimingHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TimingHelpers.h; sourceTree = "<group>"; };
 		F3CC0EB527307C6200531802 /* xxhash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xxhash.h; sourceTree = "<group>"; };
 		F3CC0EB72730883D00531802 /* xxhash.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = xxhash.c; sourceTree = "<group>"; };
+		F3F8C4B0282C5D450094DABD /* zld.profdata */ = {isa = PBXFileReference; lastKnownFileType = file; path = zld.profdata; sourceTree = "<group>"; };
 		F9023C3906D5A23E001BBF46 /* zld */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = zld; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9023C3F06D5A254001BBF46 /* ld.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ld.cpp; path = src/ld/ld.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F91B7B0318987D5F0099486F /* AddressSpace.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AddressSpace.hpp; sourceTree = "<group>"; };
@@ -479,6 +480,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		F3F8C4AF282C5D450094DABD /* OptimizationProfiles */ = {
+			isa = PBXGroup;
+			children = (
+				F3F8C4B0282C5D450094DABD /* zld.profdata */,
+			);
+			path = OptimizationProfiles;
+			sourceTree = "<group>";
+		};
 		F9023C2C06D5A227001BBF46 = {
 			isa = PBXGroup;
 			children = (
@@ -491,6 +500,7 @@
 				F9B8137E0EC2651200F94C13 /* doc */,
 				F9023C3A06D5A23E001BBF46 /* Products */,
 				4CF05E8D23EB005B009C0C95 /* Frameworks */,
+				F3F8C4AF282C5D450094DABD /* OptimizationProfiles */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1385,7 +1395,6 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
 				);
-				LLVM_LTO = NO;
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
@@ -1619,7 +1628,6 @@
 					"$(SDKROOT)/usr/lib/system",
 				);
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
-				LLVM_LTO = NO;
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
 				PRODUCT_NAME = zld;
@@ -1638,7 +1646,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_USE_OPTIMIZATION_PROFILE = NO;
+				CLANG_USE_OPTIMIZATION_PROFILE = YES;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1689,7 +1697,6 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
 				);
-				LLVM_LTO = NO;
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
@@ -2014,7 +2021,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_USE_OPTIMIZATION_PROFILE = NO;
+				CLANG_USE_OPTIMIZATION_PROFILE = YES;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -2064,7 +2071,6 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
 				);
-				LLVM_LTO = NO;
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
