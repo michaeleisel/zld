@@ -111,7 +111,7 @@ ld::Section GOTAuthEntryAtom::_s_sectionWeak("__DATA", "__got_weak", ld::Section
 #endif
 
 
-static bool gotFixup(const Options& opts, ld::Internal& internal, const ld::Atom* targetOfGOT, const ld::Atom* fixupAtom,
+static bool gotFixup(const Options& opts, const ld::Internal& internal, const ld::Atom* targetOfGOT, const ld::Atom* fixupAtom,
 					 const ld::Fixup* fixup, bool* optimizable, bool* targetIsExternalWeakDef, bool* targetIsPersonalityFn)
 {
 	*targetIsExternalWeakDef = false;
@@ -262,8 +262,9 @@ void doPass(const Options& opts, ld::Internal& internal)
 
 	// walk all atoms and fixups looking for GOT-able references
 	// don't create GOT atoms during this loop because that could invalidate the sections iterator
+	// do section state here, same as stubs
 	std::vector<const ld::Atom*> atomsReferencingGOT;
-	LDOrderedMap<const ld::Atom*,bool>		weakImportMap;
+	LDMap<const ld::Atom*,bool>		weakImportMap;
 	LDMap<const ld::Atom*,bool>		weakDefMap;
 	atomsReferencingGOT.reserve(128);
 	for (std::vector<ld::Internal::FinalSection*>::iterator sit=internal.sections.begin(); sit != internal.sections.end(); ++sit) {
@@ -335,7 +336,7 @@ void doPass(const Options& opts, ld::Internal& internal)
 					// record if target is weak def
 					weakDefMap[targetOfGOT] = targetIsExternalWeakDef;
 					// record weak_import attribute
-					LDOrderedMap<const ld::Atom*,bool>::iterator pos = weakImportMap.find(targetOfGOT);
+					LDMap<const ld::Atom*,bool>::iterator pos = weakImportMap.find(targetOfGOT);
 					if ( pos == weakImportMap.end() ) {
 						// target not in weakImportMap, so add
 						if ( log ) fprintf(stderr, "weakImportMap[%s] = %d\n", targetOfGOT->name(), targetIsWeakImport);
