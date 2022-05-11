@@ -23,6 +23,7 @@
  */
 
 
+#import "AsyncHelpers.h"
 #include <stdint.h>
 #include <math.h>
 #include <unistd.h>
@@ -53,9 +54,9 @@ struct UnwindEntry {
 	const ld::Atom*				fde; 
 	const ld::Atom*				lsda; 
 	const ld::Atom*				personalityPointer; 
-	uint64_t					funcTentAddress;
 	uint32_t					functionOffset;
 	compact_unwind_encoding_t	encoding; 
+	uint64_t					funcTentAddress;
 };
 
 struct LSDAEntry { 
@@ -871,11 +872,17 @@ static uint64_t calculateEHFrameSize(ld::Internal& state)
 
 static void getAllUnwindInfos(const ld::Internal& state, std::vector<UnwindEntry>& entries)
 {
+	const std::vector<ld::Internal::FinalSection *> &sections = state.sections;
+	const std::vector<const ld::Atom *> &indirectBindingTable = state.indirectBindingTable;
+	struct SectionState {
+		std::vector<UnwindEntry> entries;
+	};
+	std::vector<std::vector<uint64_t>> sectionAddresses;
 	uint64_t address = 0;
-	for (std::vector<ld::Internal::FinalSection*>::const_iterator sit=state.sections.begin(); sit != state.sections.end(); ++sit) {
-		ld::Internal::FinalSection* sect = *sit;
-		for (std::vector<const ld::Atom*>::iterator ait=sect->atoms.begin(); ait != sect->atoms.end(); ++ait) {
-			const ld::Atom* atom = *ait;
+	for (const auto &section : sections) {
+		sectionAddresses.emplace_back();
+		std::vector<uint64_t> &addresses = sectionAddresses.back();
+		for (const auto &atom : section->atoms) {
 			// adjust address for atom alignment
 			uint64_t alignment = 1 << atom->alignment().powerOf2;
 			uint64_t currentModulus = (address % alignment);
@@ -886,11 +893,23 @@ static void getAllUnwindInfos(const ld::Internal& state, std::vector<UnwindEntry
 				else
 					address += requiredModulus+alignment-currentModulus;
 			}
+			addresses.emplace_back(address);
+			address += atom->size();
+		}
+	}
+	std::vector<SectionState> sectionStates(sections.size());
+	processAsyncIndexes(0, state.sections.size(), [&sections, &indirectBindingTable, &sectionStates, &sectionAddresses] (size_t index) {
+		const ld::Internal::FinalSection *sect = sections[index];
+		SectionState &sState = sectionStates[index];
+		const std::vector<uint64_t> &addresses = sectionAddresses[index];
+		for (size_t j = 0; j < sect->atoms.size(); j++) {
+			const ld::Atom* atom = sect->atoms[j];
+			uint64_t address = addresses[j];
 
 			if ( atom->beginUnwind() == atom->endUnwind() ) {
 				// be sure to mark that we have no unwind info for stuff in the TEXT segment without unwind info
 				if ( (atom->section().type() == ld::Section::typeCode) && (atom->size() !=0) ) {
-					entries.push_back(UnwindEntry(atom, address, 0, NULL, NULL, NULL, 0));
+					sState.entries.push_back(UnwindEntry(atom, address, 0, NULL, NULL, NULL, 0));
 				}
 			}
 			else {
@@ -936,7 +955,7 @@ static void getAllUnwindInfos(const ld::Internal& state, std::vector<UnwindEntry
 							if ( fit->kind == ld::Fixup::kindSetTargetAddress ) {
 								switch ( fit->binding ) {
 									case ld::Fixup::bindingsIndirectlyBound:
-										personalityPointer = state.indirectBindingTable[fit->u.bindingIndex];
+										personalityPointer = indirectBindingTable[fit->u.bindingIndex];
 										assert(personalityPointer->section().type() == ld::Section::typeNonLazyPointer);
 										break;
 									case ld::Fixup::bindingDirectlyBound:
@@ -951,11 +970,13 @@ static void getAllUnwindInfos(const ld::Internal& state, std::vector<UnwindEntry
 					}
 				}
 				for ( ld::Atom::UnwindInfo::iterator uit = atom->beginUnwind(); uit != atom->endUnwind(); ++uit ) {
-					entries.push_back(UnwindEntry(atom, address, uit->startOffset, fde, lsda, personalityPointer, uit->unwindInfo));
+					sState.entries.push_back(UnwindEntry(atom, address, uit->startOffset, fde, lsda, personalityPointer, uit->unwindInfo));
 				}
 			}
-			address += atom->size();
 		}
+	});
+	for (const auto &sState : sectionStates) {
+		entries.insert(entries.end(), sState.entries.begin(), sState.entries.end());
 	}
 }
 
