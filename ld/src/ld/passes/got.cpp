@@ -23,6 +23,7 @@
  */
 
 
+#import "AsyncHelpers.h"
 #include <stdint.h>
 #include <math.h>
 #include <unistd.h>
@@ -111,7 +112,7 @@ ld::Section GOTAuthEntryAtom::_s_sectionWeak("__DATA", "__got_weak", ld::Section
 #endif
 
 
-static bool gotFixup(const Options& opts, const ld::Internal& internal, const ld::Atom* targetOfGOT, const ld::Atom* fixupAtom,
+static bool gotFixup(const Options& opts, bool usingHugeSections, const ld::Atom* targetOfGOT, const ld::Atom* fixupAtom,
 					 const ld::Fixup* fixup, bool* optimizable, bool* targetIsExternalWeakDef, bool* targetIsPersonalityFn)
 {
 	*targetIsExternalWeakDef = false;
@@ -128,7 +129,7 @@ static bool gotFixup(const Options& opts, const ld::Internal& internal, const ld
 			if ( targetOfGOT->definition() == ld::Atom::definitionProxy ) 
 				*optimizable = false;
 			// cannot do LEA optimization if target in __huge section
-			if ( internal.usingHugeSections && (targetOfGOT->size() > 1024*1024)
+			if ( usingHugeSections && (targetOfGOT->size() > 1024*1024)
 											&& (   (targetOfGOT->section().type() == ld::Section::typeZeroFill)
 												|| (targetOfGOT->section().type() == ld::Section::typeTentativeDefs)) ) {
 				*optimizable = false;
@@ -263,12 +264,21 @@ void doPass(const Options& opts, ld::Internal& internal)
 	// walk all atoms and fixups looking for GOT-able references
 	// don't create GOT atoms during this loop because that could invalidate the sections iterator
 	// do section state here, same as stubs
-	std::vector<const ld::Atom*> atomsReferencingGOT;
-	LDMap<const ld::Atom*,bool>		weakImportMap;
-	LDMap<const ld::Atom*,bool>		weakDefMap;
-	atomsReferencingGOT.reserve(128);
-	for (std::vector<ld::Internal::FinalSection*>::iterator sit=internal.sections.begin(); sit != internal.sections.end(); ++sit) {
-		ld::Internal::FinalSection* sect = *sit;
+	struct SectionState {
+	public:
+		std::vector<const ld::Atom*> atomsReferencingGOT;
+		LDMap<const ld::Atom*,bool>		weakImportMap;
+		LDMap<const ld::Atom*,bool>		weakDefMap;
+		std::vector<std::pair<const ld::Atom *, bool>> gotMapInserts;
+	};
+	const std::vector<ld::Internal::FinalSection *> &sections = internal.sections;
+	const std::vector<const ld::Atom *> &indirectBindingTable = internal.indirectBindingTable;
+	std::vector<SectionState> sectionStates(sections.size());
+	bool usingHugeSections = internal.usingHugeSections;
+	processAsyncIndexes(0, sections.size(), [&sections, &sectionStates, &indirectBindingTable, &opts, usingHugeSections](size_t index) {
+		ld::Internal::FinalSection *sect = sections[index];
+		SectionState &sState = sectionStates[index];
+		sState.atomsReferencingGOT.reserve(128);
 		for (std::vector<const ld::Atom*>::iterator ait=sect->atoms.begin();  ait != sect->atoms.end(); ++ait) {
 			const ld::Atom* atom = *ait;
 			bool atomUsesGOT = false;
@@ -279,7 +289,7 @@ void doPass(const Options& opts, ld::Internal& internal)
 					targetOfGOT = NULL;
 				switch ( fit->binding ) {
 					case ld::Fixup::bindingsIndirectlyBound:
-						targetOfGOT = internal.indirectBindingTable[fit->u.bindingIndex];
+						targetOfGOT = indirectBindingTable[fit->u.bindingIndex];
 						targetIsWeakImport = fit->weakImport;
 						break;
 					case ld::Fixup::bindingDirectlyBound:
@@ -292,7 +302,7 @@ void doPass(const Options& opts, ld::Internal& internal)
 				bool optimizable;
 				bool targetIsExternalWeakDef;
 				bool targetIsPersonalityFn;
-				if ( !gotFixup(opts, internal, targetOfGOT, atom, fit, &optimizable, &targetIsExternalWeakDef, &targetIsPersonalityFn) )
+				if ( !gotFixup(opts, usingHugeSections, targetOfGOT, atom, fit, &optimizable, &targetIsExternalWeakDef, &targetIsPersonalityFn) )
 					continue;
 				if ( optimizable ) {
 					// change from load of GOT entry to lea of target
@@ -328,19 +338,20 @@ void doPass(const Options& opts, ld::Internal& internal)
 					// remember that we need to use GOT in this function
 					if ( log ) fprintf(stderr, "found GOT use in %s\n", atom->name());
 					if ( !atomUsesGOT ) {
-						atomsReferencingGOT.push_back(atom);
+						sState.atomsReferencingGOT.push_back(atom);
 						atomUsesGOT = true;
 					}
-					if ( gotMap.count({ targetOfGOT, targetIsPersonalityFn }) == 0 )
-						gotMap[{ targetOfGOT, targetIsPersonalityFn }] = NULL;
+					// if ( gotMap.count({ targetOfGOT, targetIsPersonalityFn }) == 0 )
+						// gotMap[{ targetOfGOT, targetIsPersonalityFn }] = NULL;
+					sState.gotMapInserts.push_back({ targetOfGOT, targetIsPersonalityFn });
 					// record if target is weak def
-					weakDefMap[targetOfGOT] = targetIsExternalWeakDef;
+					sState.weakDefMap[targetOfGOT] = targetIsExternalWeakDef;
 					// record weak_import attribute
-					LDMap<const ld::Atom*,bool>::iterator pos = weakImportMap.find(targetOfGOT);
-					if ( pos == weakImportMap.end() ) {
+					LDMap<const ld::Atom*,bool>::iterator pos = sState.weakImportMap.find(targetOfGOT);
+					if ( pos == sState.weakImportMap.end() ) {
 						// target not in weakImportMap, so add
 						if ( log ) fprintf(stderr, "weakImportMap[%s] = %d\n", targetOfGOT->name(), targetIsWeakImport);
-						weakImportMap[targetOfGOT] = targetIsWeakImport; 
+						sState.weakImportMap[targetOfGOT] = targetIsWeakImport;
 					}
 					else {
 						// target in weakImportMap, check for weakness mismatch
@@ -360,6 +371,22 @@ void doPass(const Options& opts, ld::Internal& internal)
 					}
 				}
 			}
+		}
+	});
+	
+	std::vector<const ld::Atom*> atomsReferencingGOT;
+	LDMap<const ld::Atom*,bool>		weakImportMap;
+	LDMap<const ld::Atom*,bool>		weakDefMap;
+	for (const auto &sState : sectionStates) {
+		atomsReferencingGOT.insert(atomsReferencingGOT.end(), sState.atomsReferencingGOT.begin(), sState.atomsReferencingGOT.end());
+		weakImportMap.insert(sState.weakImportMap.begin(), sState.weakImportMap.end());
+		weakDefMap.insert(sState.weakDefMap.begin(), sState.weakDefMap.end());
+		for (const auto &[atom, b] : sState.gotMapInserts) {
+			GotMapEntry entry;
+			entry.atom = atom;
+			entry.isPersonalityFn = b;
+			const ld::Atom *const a = NULL;
+			gotMap.emplace(entry, a);
 		}
 	}
 	
@@ -434,7 +461,7 @@ void doPass(const Options& opts, ld::Internal& internal)
 			bool optimizable;
 			bool targetIsExternalWeakDef;
 			bool targetIsPersonalityFn;
-			if ( (targetOfGOT == NULL) || !gotFixup(opts, internal, targetOfGOT, atom, fit,
+			if ( (targetOfGOT == NULL) || !gotFixup(opts, internal.usingHugeSections, targetOfGOT, atom, fit,
 													&optimizable, &targetIsExternalWeakDef, &targetIsPersonalityFn) )
 				continue;
 			if ( !optimizable ) {
