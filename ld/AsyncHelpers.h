@@ -1,4 +1,6 @@
 #import <vector>
+#import <tbb/parallel_do.h>
+#import <tbb/parallel_for.h>
 
 /*#import <Foundation/Foundation.h>
 
