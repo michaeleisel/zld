@@ -23,6 +23,7 @@
  */
 
 
+#import "AsyncHelpers.h"
 #include <stdint.h>
 #include <math.h>
 #include <unistd.h>
@@ -118,8 +119,9 @@ void doPass(const Options& opts, ld::Internal& internal)
 
 	// walk all atoms and fixups looking for TLV references and add them to list
 	std::vector<TlVReferenceCluster>	references;
-	for (std::vector<ld::Internal::FinalSection*>::iterator sit=internal.sections.begin(); sit != internal.sections.end(); ++sit) {
-		ld::Internal::FinalSection* sect = *sit;
+	std::mutex referencesMutex;
+	const std::vector<const ld::Atom *> &indirectBindingTable = internal.indirectBindingTable;
+	processAsync(internal.sections.begin(), internal.sections.end(), [&opts, &references, &indirectBindingTable, &referencesMutex](ld::Internal::FinalSection *sect) {
 		for (std::vector<const ld::Atom*>::iterator ait=sect->atoms.begin(); ait != sect->atoms.end(); ++ait) {
 			const ld::Atom* atom = *ait;
 			TlVReferenceCluster ref;
@@ -131,7 +133,7 @@ void doPass(const Options& opts, ld::Internal& internal)
 				}
 				switch ( fit->binding ) {
 					case ld::Fixup::bindingsIndirectlyBound:
-						ref.targetOfTLV = internal.indirectBindingTable[fit->u.bindingIndex];
+						ref.targetOfTLV = indirectBindingTable[fit->u.bindingIndex];
 						ref.fixupWithTarget = fit;
 						break;
 					case ld::Fixup::bindingDirectlyBound:
@@ -162,11 +164,13 @@ void doPass(const Options& opts, ld::Internal& internal)
 					if ( ! opts.canUseThreadLocalVariables() ) {
 						throwf("targeted OS version does not support use of thread local variables in %s", atom->name());
 					}
+					referencesMutex.lock();
 					references.push_back(ref);
+					referencesMutex.unlock();
 				}
 			}
 		}
-	}
+	});
 	
 	// compute which TLV references will be weak_imports
 	LDOrderedMap<const ld::Atom*,bool>		weakImportMap;
