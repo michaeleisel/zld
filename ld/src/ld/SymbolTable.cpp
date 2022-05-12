@@ -573,11 +573,10 @@ struct StrcmpSorter {
 
 void SymbolTable::undefines(std::vector<const char*>& undefs)
 {
-	// return all names in _byNameTable that have no associated atom
-	for (NameToSlot::iterator it=_byNameTable.begin(); it != _byNameTable.end(); ++it) {
-		//fprintf(stderr, "  _byNameTable[%s] = slot %d which has atom %p\n", it->first, it->second, _indirectBindingTable[it->second]);
-		if ( _indirectBindingTable[it->second] == NULL )
-			undefs.push_back(it->first.str);
+	for (size_t i = 0; i < _indirectBindingTable.size(); i++) {
+		if (_indirectBindingTable[i] == NULL) {
+			undefs.push_back(_byNameReverseTable[i]);
+		}
 	}
 	// sort so that undefines are in a stable order (not dependent on hashing functions)
 	struct StrcmpSorter strcmpSorter;
