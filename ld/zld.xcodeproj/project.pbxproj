@@ -64,6 +64,7 @@
 		F34634572423BD3700F08C44 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
 		F3CC0EB82730883D00531802 /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = F3CC0EB72730883D00531802 /* xxhash.c */; };
 		F3CF7591268BE74E00750B2F /* libjemalloc_pic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F366B08E2687813200B17E17 /* libjemalloc_pic.a */; };
+		F3F8C4B7282DA6320094DABD /* IndexedMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F3F8C4B5282DA6320094DABD /* IndexedMap.cpp */; };
 		F9023C4E06D5A272001BBF46 /* ld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9023C3F06D5A254001BBF46 /* ld.cpp */; };
 		F933E3D9092E855B0083EAC8 /* ObjectDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F971EED706D5AD240041D381 /* ObjectDump.cpp */; };
 		F93CB248116E69EB003233B8 /* tlvp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F93CB246116E69EB003233B8 /* tlvp.cpp */; };
@@ -309,6 +310,8 @@
 		F3CC0EB527307C6200531802 /* xxhash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xxhash.h; sourceTree = "<group>"; };
 		F3CC0EB72730883D00531802 /* xxhash.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = xxhash.c; sourceTree = "<group>"; };
 		F3F8C4B0282C5D450094DABD /* zld.profdata */ = {isa = PBXFileReference; lastKnownFileType = file; path = zld.profdata; sourceTree = "<group>"; };
+		F3F8C4B5282DA6320094DABD /* IndexedMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IndexedMap.cpp; sourceTree = "<group>"; };
+		F3F8C4B6282DA6320094DABD /* IndexedMap.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IndexedMap.hpp; sourceTree = "<group>"; };
 		F9023C3906D5A23E001BBF46 /* zld */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = zld; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9023C3F06D5A254001BBF46 /* ld.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ld.cpp; path = src/ld/ld.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F91B7B0318987D5F0099486F /* AddressSpace.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AddressSpace.hpp; sourceTree = "<group>"; };
@@ -650,6 +653,8 @@
 				F9AA687A10572E27003E3539 /* InputFiles.cpp */,
 				4C5E360723FB61D50073E2F5 /* configure.h */,
 				F9AA687B10572E27003E3539 /* InputFiles.h */,
+				F3F8C4B5282DA6320094DABD /* IndexedMap.cpp */,
+				F3F8C4B6282DA6320094DABD /* IndexedMap.hpp */,
 				F9AA5FCC103F5CD1003E3539 /* ld.hpp */,
 				F9023C3F06D5A254001BBF46 /* ld.cpp */,
 				F9C0D48A06DD1E1B001C7193 /* Options.cpp */,
@@ -1043,6 +1048,7 @@
 				F9AA65891051E750003E3539 /* macho_relocatable_file.cpp in Sources */,
 				F328A33325F2B68900E439C0 /* libcodedirectory.c in Sources */,
 				F328A31D25F2B65700E439C0 /* generic_dylib_file.cpp in Sources */,
+				F3F8C4B7282DA6320094DABD /* IndexedMap.cpp in Sources */,
 				F9AA65DD1051EC4A003E3539 /* archive_file.cpp in Sources */,
 				F9AA65DE1051EC4A003E3539 /* lto_file.cpp in Sources */,
 				F9AA65DF1051EC4A003E3539 /* macho_dylib_file.cpp in Sources */,

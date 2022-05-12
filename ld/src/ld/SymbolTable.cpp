@@ -61,7 +61,7 @@ static ld::IndirectBindingTable*	_s_indirectBindingTable = NULL;
 
 
 SymbolTable::SymbolTable(const Options& opts, std::vector<const ld::Atom*>& ibt) 
-	: _options(opts), _cstringTable(6151), _indirectBindingTable(ibt), _hasExternalTentativeDefinitions(false)
+	: _options(opts), _cstringTable(6151), _indirectBindingTable(ibt), _hasExternalTentativeDefinitions(false), _byNameReverseTable((const char *)0x1, NULL)
 {  
 	_s_indirectBindingTable = this;
 }
@@ -575,7 +575,7 @@ void SymbolTable::undefines(std::vector<const char*>& undefs)
 {
 	for (size_t i = 0; i < _indirectBindingTable.size(); i++) {
 		if (_indirectBindingTable[i] == NULL) {
-			undefs.push_back(_byNameReverseTable[i]);
+			undefs.push_back(_byNameReverseTable.getValueOrDefault(i));
 		}
 	}
 	// sort so that undefines are in a stable order (not dependent on hashing functions)
@@ -622,14 +622,15 @@ bool SymbolTable::hasName(const char* nameString)
 SymbolTable::IndirectBindingSlot SymbolTable::findSlotForName(const char* nameString)
 {
 	LDString name(nameString);
-	auto pos = _byNameTable.find(name);
-	if ( pos != _byNameTable.end() ) 
-		return pos->second;
+	const auto &pos = _byNameTable.emplace(name, 0);
+	if (!pos.second) {
+		return pos.first->second;
+	}
 	// create new slot for this name
 	SymbolTable::IndirectBindingSlot slot = _indirectBindingTable.size();
+	pos.first->second = slot;
 	_indirectBindingTable.push_back(NULL);
-	_byNameTable[name] = slot;
-	_byNameReverseTable[slot] = nameString;
+	_byNameReverseTable.setValue(slot, nameString);
 	return slot;
 }
 
@@ -884,9 +885,10 @@ const char*	SymbolTable::indirectName(IndirectBindingSlot slot) const
 		return target->name();
 	}
 	// handle case when by-name reference is indirected and no atom yet in _byNameTable
-	SlotToName::const_iterator pos = _byNameReverseTable.find(slot);
-	if ( pos != _byNameReverseTable.end() )
-		return pos->second;
+	bool exists = false;
+	const char *name = _byNameReverseTable.getValue(slot, &exists);
+	if ( exists )
+		return name;
 	assert(0);
 	return NULL;
 }
@@ -928,7 +930,7 @@ void SymbolTable::removeDeadUndefs(std::vector<const ld::Atom*>& allAtoms, const
 				allAtoms.erase(std::remove(allAtoms.begin(), allAtoms.end(), atom), allAtoms.end());
 			}
 			else if ( atom == nullptr ) {
-				if ( const char* undefName = _byNameReverseTable[slot] ) {
+				if ( const char* undefName = _byNameReverseTable.getValueOrDefault(slot) ) {
 					// <rdar://problem/55544746> Remove unused undef symbols from symbol table after LTO before doing final resolve
 					_byNameReverseTable.erase(slot);
 					_byNameTable.erase(undefName);

@@ -25,6 +25,7 @@
 #ifndef __SYMBOL_TABLE_H__
 #define __SYMBOL_TABLE_H__
 
+#import "IndexedMap.hpp"
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -87,7 +88,7 @@ private:
 	};
 	typedef LDFastMap<const ld::Atom*, IndirectBindingSlot, UTF16StringHashFuncs, UTF16StringHashFuncs> UTF16StringToSlot;
 
-	typedef LDFastMap<IndirectBindingSlot, const char*> SlotToName;
+	typedef IndexedMap<const char*> SlotToName;
 	typedef LDFastMap<const char*, CStringToSlot*, CStringHash, CStringEquals> NameToMap;
     
     typedef std::vector<const ld::Atom *> DuplicatedSymbolAtomList;
