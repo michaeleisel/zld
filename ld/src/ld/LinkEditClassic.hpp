@@ -39,6 +39,12 @@
 #include "Architectures.hpp"
 #include "MachOFileAbstraction.hpp"
 
+struct Identity {
+       size_t operator()(size_t hash) const {
+               return hash;
+       };
+};
+
 namespace ld {
 namespace tool {
 
@@ -93,7 +99,7 @@ public:
 
 private:
 	enum { kBufferSize = 0x01000000 };
-	typedef LDFastMap<LDString, int32_t> StringToOffset;
+	typedef LDFastMap<size_t, int32_t, Identity> StringToOffset;
 
 	const uint32_t							_pointerSize;
 	std::vector<char*>						_fullBuffers;
@@ -171,7 +177,7 @@ uint32_t StringPoolAtom::currentOffset()
 
 int32_t StringPoolAtom::addUnique(const char* str)
 {
-	const auto pos = _uniqueStrings.emplace(str, 0);
+	const auto pos = _uniqueStrings.emplace(hashString(str, strlen(str)), 0);
 	if ( pos.second ) {
 		pos.first->second = this->add(str);
 	}
