@@ -10,25 +10,14 @@ build_homebrew: fetch
 test: fetch
 	xcodebuild -project ld/zld.xcodeproj -scheme unit-tests -derivedDataPath build -configuration Debug build
 
-abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4:
-	curl -# -L https://github.com/abseil/abseil-cpp/archive/78f9680225b9792c26dfdd99d0bd26c96de53dd4.tar.gz | tar xz
-	mkdir $@/build $@/build_x86_64 $@/build_arm64
-	cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.14 -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -S $@ -B $@/build_x86_64
-	make -C $@/build_x86_64 -j
-	find $@/build_x86_64/absl -name '*.a' | xargs libtool -static -o $@/build/libabsl_x86_64.a
-	cmake -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -S $@ -B $@/build_arm64
-	make -C $@/build_arm64 -j
-	find $@/build_arm64/absl -name '*.a' | xargs libtool -static -o $@/build/libabsl_arm64.a
-	lipo -create $@/build/libabsl_x86_64.a $@/build/libabsl_arm64.a -output $@/build/libabsl.a
-
 clean:
-	rm -rf abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 build cfe-8.0.1.src dyld-733.6 dyld-940 llvm-8.0.1.src pstl llvm-13.0.1.src tapi-1100.0.11 tbb
+	rm -rf build cfe-8.0.1.src dyld-733.6 dyld-940 llvm-8.0.1.src pstl llvm-13.0.1.src tapi-1100.0.11 tbb
 
 dyld-940:
 	git clone --depth=1 https://github.com/apple-oss-distributions/dyld.git $@
 	patch -p1 -d $@ < patches/dyld.patch
 
-fetch: abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4 dyld-940 llvm-13.0.1.src tapi-1100.0.11 tbb
+fetch: dyld-940 llvm-13.0.1.src tapi-1100.0.11 tbb
 
 llvm-13.0.1.src:
 	curl -# -L https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.1/llvm-13.0.1.src.tar.xz | tar xJ
