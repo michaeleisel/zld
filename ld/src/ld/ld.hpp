@@ -34,13 +34,19 @@
 #include <set>
 #include <map>
 #include <vector>
-#include "Tweaks.hpp"
 #include <string>
 #include <unordered_set>
 
+#include "Tweaks.h"
 #include "configure.h"
 #include "MapDefines.h"
 #include "PlatformSupport.h"
+
+void printTime(const char* msg, uint64_t partTime, uint64_t totalTime);
+
+#include "TimingHelpers.h"
+
+#include "absl/hash/internal/city.h"
 
 #ifdef __x86_64__
 #include <nmmintrin.h>
@@ -48,6 +54,46 @@
 
 //FIXME: Only needed until we move VersionSet into PlatformSupport
 class Options;
+
+static inline int32_t CRC32(int32_t hash, uint64_t next) {
+#ifdef __x86_64__
+	   return _mm_crc32_u64(hash, next);
+#endif /* __x86_64__ */
+#ifdef __aarch64__
+	   return __builtin_arm_crc32d(hash, next);
+#endif /* __aarch64__ */
+}
+
+extern "C" {
+__attribute__((always_inline)) size_t hashString(const char *__s, size_t len);
+}
+
+struct LDString {
+public:
+	   const char *str;
+	   size_t hash;
+	   LDString(const char *string) {
+			   str = string;
+			   size_t stringLength = strlen(string);
+			   hash = hashString(string, stringLength);
+	   }
+	   bool operator==(const LDString &other) const
+	   {
+			   return hash == other.hash;
+	   }
+};
+
+namespace std
+{
+	   template <> struct hash<LDString>
+	   {
+			   size_t operator()( const LDString& string) const
+			   {
+					   return string.hash;
+			   }
+	   };
+}
+
 
 namespace ld {
 
@@ -594,8 +640,8 @@ public:
 								_type(sect.type()), _hidden(sect.isSectionHidden())  {}
 								
 	bool			operator==(const Section& rhs) const { return ( (_hidden==rhs._hidden) &&
-														(strcmp(_segmentName, rhs._segmentName)==0) &&
-														(strcmp(_sectionName, rhs._sectionName)==0) ); }
+														(_segmentName == rhs._segmentName || strcmp(_segmentName, rhs._segmentName)==0) &&
+														(_sectionName == rhs._sectionName || strcmp(_sectionName, rhs._sectionName)==0) ); }
 	bool			operator!=(const Section& rhs) const { return ! (*this == rhs); }
 	const char*			segmentName() const			{ return _segmentName; }
 	const char*			sectionName() const			{ return _sectionName; }
@@ -1111,7 +1157,7 @@ public:
  
 											Atom(const Section& sect, Definition d, Combine c, Scope s, ContentType ct, 
 												SymbolTableInclusion i, bool dds, bool thumb, bool al, Alignment a, bool cold=false) :
-													_section(&sect), _address(0), _alignmentModulus(a.modulus), 
+													_finalSection(NULL), _section(&sect), _address(0), _alignmentModulus(a.modulus),
 													_alignmentPowerOf2(a.powerOf2), _definition(d), _combine(c),   
 													_dontDeadStrip(dds), _thumb(thumb), _alias(al), _autoHide(false), 
 													_contentType(ct), _symbolTableInclusion(i),
@@ -1179,6 +1225,19 @@ public:
 	virtual const ld::File*				    originalFile() const       { return file(); }
 	virtual const char*						translationUnitSource() const { return NULL; }
 	virtual const char*						name() const = 0;
+	const char *						getFastName(size_t *length, bool *isFullString) const {
+		*isFullString = true;
+		auto* nm = name();
+		if (!nm)
+			return NULL;
+		if (!strstr(nm, ".llvm.")) {
+			return nm;
+		}
+		*isFullString = false;
+		std::string_view visibleName(nm);
+		*length = visibleName.rfind(".llvm.");
+		return nm;
+	}
 	std::string_view						getUserVisibleName() const {
 		auto* nm = name();
 		if (!nm)
@@ -1237,10 +1296,17 @@ public:
 												else
 													return "<internal>";
 											}
+	void *finalSectionUncasted() const {
+		return _finalSection;
+	}
+	void setFinalSection(void *finalSection) {
+		_finalSection = finalSection;
+	}
 
 protected:
 	enum AddressMode { modeSectionOffset, modeFinalAddress };
 
+	void*						_finalSection;
 	const Section *						_section;
 	uint64_t							_address;
 	uint16_t							_alignmentModulus;
@@ -1275,94 +1341,17 @@ public:
 
 
 
-typedef struct {
-	const char *str;
-	size_t length;
-	size_t hash;
-} LDString;
-
-static inline size_t CRCHash(const char *__s, size_t len) {
-	if (Tweaks::reproEnabled()) {
-		size_t __h = 0;
-		for ( ; *__s; ++__s)
-			__h = 5 * __h + *__s;
-		return __h;
-	}
-
-	uint32_t __h = 5183;
-	int curr = len;
-	uint64_t *chunks = (uint64_t *)__s;
-	while (curr >= 8) {
-#ifdef __x86_64__
-		__h = (uint32_t)_mm_crc32_u64((uint64_t)__h, *chunks);
-#else
-		__h = __builtin_arm_crc32d((uint64_t)__h, *chunks);
-#endif /* __x86_64__ */
-		chunks++;
-		curr -= 8;
-	}
-	if (curr >= 4) {
-		uint32_t *bits = (uint32_t *)(__s + len - curr);
-#ifdef __x86_64__
-		__h = _mm_crc32_u32(__h, *bits);
-#else
-		__h = __builtin_arm_crc32w(__h, *bits);
-#endif /* __x86_64__ */
-		curr -= 4;
-	}
-	if (curr >= 2) {
-		uint16_t *bits = (uint16_t *)(__s + len - curr);
-#ifdef __x86_64__
-		__h = _mm_crc32_u16(__h, *bits);
-#else
-		__h = __builtin_arm_crc32h(__h, *bits);
-#endif /* __x86_64__ */
-		curr -= 2;
-	}
-	if (curr >= 1) {
-#ifdef __x86_64__
-		__h = _mm_crc32_u8(__h, __s[len - 1]);
-#else
-		__h = __builtin_arm_crc32b(__h, __s[len - 1]);
-#endif /* __x86_64__ */
-	}
-	return (size_t)__h;
-}
-
-static inline LDString LDStringCreate(const char *str) {
-	auto length = strlen(str);
-	return (LDString){
-		.str = str,
-		.length = length,
-		.hash = CRCHash(str, length),
-	};
-}
-
-struct CLDStringHash {
-	size_t operator()(LDString __s) const {
-		return __s.hash;
-	}
-};
-
 // utility classes for using LDMap with c-strings
 struct CStringHash {
 	size_t operator()(const char* __s) const {
 		int len = strlen(__s);
-		return CRCHash(__s, len);
+		return hashString(__s, len);
 	};
-};
-
-struct CLDStringEquals
-{
-	bool operator()(LDString left, LDString right) const {
-		return left.hash == right.hash && left.length == right.length
-		  && (left.str == right.str || memcmp(left.str, right.str, left.length) == 0);
-    }
 };
 
 struct CStringEquals
 {
-	bool operator()(const char* left, const char* right) const { return (strcmp(left, right) == 0); }
+	bool operator()(const char* left, const char* right) const { return left == right || (strcmp(left, right) == 0); }
 };
 
 typedef	LDSet<const char*, ld::CStringHash, ld::CStringEquals>  CStringSet;
@@ -1392,8 +1381,6 @@ public:
 		bool							hasExternalRelocs;
 	};
 	
-	typedef LDOrderedMap<const ld::Atom*, FinalSection*>	AtomToSection;		
-
 	virtual uint64_t					assignFileOffsets() = 0;
 	virtual void						setSectionSizesAndAlignments() = 0;
 	virtual ld::Internal::FinalSection*	addAtom(const Atom&) = 0;
@@ -1419,7 +1406,6 @@ public:
 	std::vector<ld::dylib::File*>				dylibs;
 	std::vector<std::string>					archivePaths;
 	std::vector<ld::relocatable::File::Stab>	stabs;
-	AtomToSection								atomToSection;		
 	CStringSet									unprocessedLinkerOptionLibraries;
 	CStringSet									unprocessedLinkerOptionFrameworks;
 	CStringSet									linkerOptionNeededLibraries;
@@ -1469,6 +1455,10 @@ public:
 
 
 
-} // namespace ld 
+} // namespace ld
+
+static ld::Internal::FinalSection *getFinalSection(const ld::Atom &atom) {
+	return (ld::Internal::FinalSection *)atom.finalSectionUncasted();
+}
 
 #endif // __LD_HPP__

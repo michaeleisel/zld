@@ -121,7 +121,7 @@ private:
 	struct MemberState { ld::relocatable::File* file; const Entry *entry; bool logged; bool loaded; uint32_t index;};
 	bool											loadMember(MemberState& state, ld::File::AtomHandler& handler, const char *format, ...) const;
 
-	typedef LDMap<const char*, uint64_t, ld::CStringHash, ld::CStringEquals> NameToOffsetMap;
+	typedef LDMap<LDString, uint64_t> NameToOffsetMap;
 
 	typedef typename A::P							P;
 	typedef typename A::P::E						E;
@@ -492,7 +492,7 @@ bool File<A>::forEachAtom(ld::File::AtomHandler& handler) const
 	else if ( _forceLoadObjC ) {
 		// call handler on all .o files in this archive containing objc classes
 		for (const auto& entry : _hashTable) {
-			if ( (strncmp(entry.first, ".objc_c", 7) == 0) || (strncmp(entry.first, "_OBJC_CLASS_$_", 14) == 0) ) {
+			if ( (strncmp(entry.first.str, ".objc_c", 7) == 0) || (strncmp(entry.first.str, "_OBJC_CLASS_$_", 14) == 0) ) {
 				const Entry* member = (Entry*)&_archiveFileContent[entry.second];
 				MemberState& state = this->makeObjectFileForMember(member);
 				char memberName[256];

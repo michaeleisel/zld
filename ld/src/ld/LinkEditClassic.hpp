@@ -39,6 +39,12 @@
 #include "Architectures.hpp"
 #include "MachOFileAbstraction.hpp"
 
+struct Identity {
+       size_t operator()(size_t hash) const {
+               return hash;
+       };
+};
+
 namespace ld {
 namespace tool {
 
@@ -93,7 +99,7 @@ public:
 
 private:
 	enum { kBufferSize = 0x01000000 };
-	typedef LDMap<std::string, int32_t> StringToOffset;
+	typedef LDFastMap<size_t, int32_t, Identity> StringToOffset;
 
 	const uint32_t							_pointerSize;
 	std::vector<char*>						_fullBuffers;
@@ -171,15 +177,11 @@ uint32_t StringPoolAtom::currentOffset()
 
 int32_t StringPoolAtom::addUnique(const char* str)
 {
-	StringToOffset::iterator pos = _uniqueStrings.find(str);
-	if ( pos != _uniqueStrings.end() ) {
-		return pos->second;
+	const auto pos = _uniqueStrings.emplace(hashString(str, strlen(str)), 0);
+	if ( pos.second ) {
+		pos.first->second = this->add(str);
 	}
-	else {
-		int32_t offset = this->add(str);
-		_uniqueStrings[str] = offset;
-		return offset;
-	}
+	return pos.first->second;
 }
 
 
@@ -290,8 +292,22 @@ bool SymbolTableAtom<A>::addLocal(const ld::Atom* atom, StringPoolAtom* pool)
 	assert(atom->symbolTableInclusion() != ld::Atom::symbolTableNotIn);
 	 
 	// set n_strx
-	std::string nameStr = std::string(atom->getUserVisibleName());
-	const char* symbolName = nameStr.c_str();
+	const char *atomName = atom->name();
+	const char *symbolName;
+	int length = -1;
+	if (!atomName) {
+		symbolName = "";
+	} else if (strchr(atomName, '.') && strstr(atomName, ".llvm.")) {
+		length = std::string_view(atomName).rfind(".llvm.");
+	}
+	char buffer[length == -1 ? 0 : length + 1];
+	if (length != -1) {
+		memcpy(buffer, symbolName, length);
+		buffer[length] = '\0';
+		symbolName = buffer;
+	} else {
+		symbolName = atomName;
+	}
 	char anonName[32];
 	if ( this->_options.outputKind() == Options::kObjectFile ) {
 		if ( atom->contentType() == ld::Atom::typeCString ) {
@@ -797,11 +813,11 @@ private:
 
 uint32_t RelocationsAtomAbstract::symbolIndex(const ld::Atom* atom) const
 {
-	LDOrderedMap<const ld::Atom*, uint32_t>::iterator pos = this->_writer._atomToSymbolIndex.find(atom);
+	LDFastMap<const ld::Atom*, uint32_t>::iterator pos = this->_writer._atomToSymbolIndex.find(atom);
 	if ( pos != this->_writer._atomToSymbolIndex.end() )
 		return pos->second;
 	fprintf(stderr, "_atomToSymbolIndex content:\n");
-	for(LDOrderedMap<const ld::Atom*, uint32_t>::iterator it = this->_writer._atomToSymbolIndex.begin(); it != this->_writer._atomToSymbolIndex.end(); ++it) {
+	for(LDFastMap<const ld::Atom*, uint32_t>::iterator it = this->_writer._atomToSymbolIndex.begin(); it != this->_writer._atomToSymbolIndex.end(); ++it) {
 			fprintf(stderr, "%p(%s) => %d\n", it->first, it->first->name(), it->second);
 	}
 	throwf("internal error: atom not found in symbolIndex(%s)", atom->name());
@@ -2358,7 +2374,7 @@ ld::Section IndirectSymbolTableAtom<A>::_s_section("__LINKEDIT", "__ind_sym_tab"
 template <typename A>
 uint32_t IndirectSymbolTableAtom<A>::symbolIndex(const ld::Atom* atom)
 {
-	LDOrderedMap<const ld::Atom*, uint32_t>::iterator pos = this->_writer._atomToSymbolIndex.find(atom);
+	LDFastMap<const ld::Atom*, uint32_t>::iterator pos = this->_writer._atomToSymbolIndex.find(atom);
 	if ( pos != this->_writer._atomToSymbolIndex.end() )
 		return pos->second;
 	//fprintf(stderr, "_atomToSymbolIndex content:\n");
