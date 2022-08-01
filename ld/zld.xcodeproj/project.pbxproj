@@ -1350,7 +1350,6 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_USE_OPTIMIZATION_PROFILE = NO;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1652,7 +1651,6 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_USE_OPTIMIZATION_PROFILE = YES;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -2027,7 +2025,6 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_USE_OPTIMIZATION_PROFILE = YES;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
