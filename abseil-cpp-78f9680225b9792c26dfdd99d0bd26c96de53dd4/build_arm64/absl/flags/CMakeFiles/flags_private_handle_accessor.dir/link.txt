@@ -1,0 +1,2 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libabsl_flags_private_handle_accessor.a CMakeFiles/flags_private_handle_accessor.dir/internal/private_handle_accessor.cc.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libabsl_flags_private_handle_accessor.a

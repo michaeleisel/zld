@@ -1,0 +1,12 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=/usr/local/lib
+includedir=/usr/local/include
+
+Name: absl_cordz_info
+Description: Abseil cordz_info library
+URL: https://abseil.io/
+Version: head
+Requires: absl_base = head, absl_config = head, absl_cord_internal = head, absl_cordz_functions = head, absl_cordz_handle = head, absl_cordz_statistics = head, absl_cordz_update_tracker = head, absl_core_headers = head, absl_inlined_vector = head, absl_span = head, absl_raw_logging_internal = head, absl_stacktrace = head, absl_synchronization = head
+Libs: -L${libdir}  -labsl_cordz_info
+Cflags: -I${includedir} -Wno-float-conversion -Wno-implicit-float-conversion -Wno-implicit-int-float-conversion -Wno-implicit-int-conversion -Wno-shorten-64-to-32 -Wno-sign-conversion -Wno-unknown-warning-option -DNOMINMAX

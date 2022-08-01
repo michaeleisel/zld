@@ -1,0 +1,12 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=/usr/local/lib
+includedir=/usr/local/include
+
+Name: absl_cordz_sample_token
+Description: Abseil cordz_sample_token library
+URL: https://abseil.io/
+Version: head
+Requires: absl_config = head, absl_cordz_handle = head, absl_cordz_info = head
+Libs: -L${libdir}  -labsl_cordz_sample_token
+Cflags: -I${includedir} -Wno-float-conversion -Wno-implicit-float-conversion -Wno-implicit-int-float-conversion -Wno-implicit-int-conversion -Wno-shorten-64-to-32 -Wno-sign-conversion -Wno-unknown-warning-option -DNOMINMAX

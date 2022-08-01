@@ -1,0 +1,12 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=/usr/local/lib
+includedir=/usr/local/include
+
+Name: absl_random_internal_seed_material
+Description: Abseil random_internal_seed_material library
+URL: https://abseil.io/
+Version: head
+Requires: absl_core_headers = head, absl_optional = head, absl_random_internal_fast_uniform_bits = head, absl_raw_logging_internal = head, absl_span = head, absl_strings = head
+Libs: -L${libdir}  -labsl_random_internal_seed_material
+Cflags: -I${includedir} -Wno-float-conversion -Wno-implicit-float-conversion -Wno-implicit-int-float-conversion -Wno-implicit-int-conversion -Wno-shorten-64-to-32 -Wno-sign-conversion -Wno-unknown-warning-option -DNOMINMAX

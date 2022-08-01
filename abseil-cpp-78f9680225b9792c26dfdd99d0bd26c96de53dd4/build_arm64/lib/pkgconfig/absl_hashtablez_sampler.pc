@@ -1,0 +1,12 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=/usr/local/lib
+includedir=/usr/local/include
+
+Name: absl_hashtablez_sampler
+Description: Abseil hashtablez_sampler library
+URL: https://abseil.io/
+Version: head
+Requires: absl_base = head, absl_exponential_biased = head, absl_have_sse = head, absl_sample_recorder = head, absl_synchronization = head
+Libs: -L${libdir}  -labsl_hashtablez_sampler
+Cflags: -I${includedir} -Wno-float-conversion -Wno-implicit-float-conversion -Wno-implicit-int-float-conversion -Wno-implicit-int-conversion -Wno-shorten-64-to-32 -Wno-sign-conversion -Wno-unknown-warning-option -DNOMINMAX

@@ -1,0 +1,12 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=/usr/local/lib
+includedir=/usr/local/include
+
+Name: absl_inlined_vector
+Description: Abseil inlined_vector library
+URL: https://abseil.io/
+Version: head
+Requires: absl_algorithm = head, absl_core_headers = head, absl_inlined_vector_internal = head, absl_throw_delegate = head, absl_memory = head
+Libs: -L${libdir}  
+Cflags: -I${includedir} -Wno-float-conversion -Wno-implicit-float-conversion -Wno-implicit-int-float-conversion -Wno-implicit-int-conversion -Wno-shorten-64-to-32 -Wno-sign-conversion -Wno-unknown-warning-option -DNOMINMAX
