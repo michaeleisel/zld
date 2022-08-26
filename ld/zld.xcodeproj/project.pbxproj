@@ -62,6 +62,7 @@
 		F338085E2422DA520086B7E8 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
 		F33808602422DA6D0086B7E8 /* inits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085F2422DA6D0086B7E8 /* inits.cpp */; };
 		F34634572423BD3700F08C44 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
+		F3621EAB2897E928001D94E0 /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = F3CC0EB72730883D00531802 /* xxhash.c */; };
 		F3CC0EB82730883D00531802 /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = F3CC0EB72730883D00531802 /* xxhash.c */; };
 		F3CF7591268BE74E00750B2F /* libjemalloc_pic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F366B08E2687813200B17E17 /* libjemalloc_pic.a */; };
 		F3F8C4B7282DA6320094DABD /* IndexedMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F3F8C4B5282DA6320094DABD /* IndexedMap.cpp */; };
@@ -1085,6 +1086,7 @@
 				F9AE23291109015E0007ED5D /* lto_file.cpp in Sources */,
 				F933E3D9092E855B0083EAC8 /* ObjectDump.cpp in Sources */,
 				4C8D9C9B240597220040CE7C /* Tweaks.c in Sources */,
+				F3621EAB2897E928001D94E0 /* xxhash.c in Sources */,
 				F34634572423BD3700F08C44 /* PlatformSupport.cpp in Sources */,
 				F9EA75BC09788857008B4F1D /* debugline.c in Sources */,
 			);
@@ -1350,7 +1352,6 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_USE_OPTIMIZATION_PROFILE = NO;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1652,7 +1653,6 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_USE_OPTIMIZATION_PROFILE = YES;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -2027,7 +2027,6 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_USE_OPTIMIZATION_PROFILE = YES;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";

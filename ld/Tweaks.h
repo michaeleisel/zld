@@ -16,13 +16,13 @@
 extern "C" {
 #endif
 
-__attribute__((always_inline)) bool tweaksReproEnabled(void);
+__attribute__((always_inline)) static bool tweaksReproEnabled(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-__attribute__((always_inline)) bool tweaksReproEnabled() {
+__attribute__((always_inline)) static bool tweaksReproEnabled() {
 #ifdef REPRO
     return true;
 #else

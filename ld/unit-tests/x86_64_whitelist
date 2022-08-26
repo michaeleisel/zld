@@ -19,3 +19,5 @@ objc-category-class-property-mismatch
 objc-category-optimize
 demangle
 merge_zero_fill_sections
+lto-dead_strip-unused
+lto-dead_strip-coalesce
