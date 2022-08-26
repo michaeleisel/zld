@@ -1,0 +1,12 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=/usr/local/lib
+includedir=/usr/local/include
+
+Name: absl_demangle_internal
+Description: Abseil demangle_internal library
+URL: https://abseil.io/
+Version: head
+Requires: absl_base = head, absl_core_headers = head
+Libs: -L${libdir}  -labsl_demangle_internal
+Cflags: -I${includedir} -Wno-float-conversion -Wno-implicit-float-conversion -Wno-implicit-int-float-conversion -Wno-implicit-int-conversion -Wno-shorten-64-to-32 -Wno-sign-conversion -Wno-unknown-warning-option -DNOMINMAX
