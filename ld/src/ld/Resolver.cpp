@@ -1509,7 +1509,11 @@ void Resolver::checkUndefines(bool force)
 			for (int i=0; i < unresolvableCount; ++i) {
 				const char* name = unresolvableUndefines[i];
 				unsigned int slot = _symbolTable.findSlotForName(name);
-				fprintf(stderr, "  \"%s\", referenced from:\n", _options.demangleSymbol(name));
+				if (strstr(name, "_objc_msgSend")) {
+					fprintf(stderr, "  \"%s - this is a zld/Xcode 14 issue, see the bottom of the full error message for details\", referenced from:\n", _options.demangleSymbol(name));
+				} else {
+					fprintf(stderr, "  \"%s\", referenced from:\n", _options.demangleSymbol(name));
+				}
 				// scan all atoms for references
 				bool foundAtomReference = printReferencedBy(name, slot);
 				// scan command line options
@@ -1567,6 +1571,7 @@ void Resolver::checkUndefines(bool force)
 			for (const auto &name : unresolvableUndefines) {
 				if (strstr(name, "_objc_msgSend")) {
 					fprintf(stderr, "****************************\nNOTE: at least one missing symbol is due to changes in Xcode 14 (https://github.com/michaeleisel/zld/issues/113). Here are some workarounds:\n- Add the -fno-objc-msgsend-selector-stubs *compiler* flag to your build\n- Switch to lld, another fast alternative to ld64\n****************************\n");
+					break;
 				}
 			}
 		}
