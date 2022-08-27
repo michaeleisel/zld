@@ -1523,6 +1523,7 @@ void useFallbackLd(const char *fallbackPath, int argc, const char* argv[], const
 
 int main(int argc, const char* argv[])
 {
+	fprintf(stderr, "NOTE: zld is likely going to be sunset in the future. Please consider using lld, another fast and community-supported alternative!");
 	tbb::global_control c(tbb::global_control::thread_stack_size, 8 * 1024 * 1024);
 	const char* archName = NULL;
 	bool showArch = false;
