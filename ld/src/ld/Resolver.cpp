@@ -1570,7 +1570,7 @@ void Resolver::checkUndefines(bool force)
 			}
 			for (const auto &name : unresolvableUndefines) {
 				if (strstr(name, "_objc_msgSend")) {
-					fprintf(stderr, "****************************\nNOTE: at least one missing symbol is due to changes in Xcode 14 (https://github.com/michaeleisel/zld/issues/113). Here are some workarounds:\n- Add the -fno-objc-msgsend-selector-stubs *compiler* flag to your build\n- Switch to lld, another fast alternative to ld64 (https://lld.llvm.org/MachO/index.html)\n****************************\n");
+					fprintf(stderr, "****************************\nNOTE: at least one missing symbol is due to changes in Xcode 14 (https://github.com/michaeleisel/zld/issues/113). Here are some workarounds:\n- Add the -fno-objc-msgsend-selector-stubs *compiler* flag to your build\n- Switch to lld, another fast alternative to ld64. General usage info is at https://lld.llvm.org/MachO/index.html and prebuilt recent builds (necessary for lld's Xcode 14 support) are available at https://github.com/keith/ld64.lld/releases\n****************************\n");
 					break;
 				}
 			}
