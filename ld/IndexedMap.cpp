@@ -1,4 +1,0 @@
-
-
-#include "IndexedMap.hpp"
-

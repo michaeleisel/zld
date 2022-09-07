@@ -328,7 +328,7 @@ void doPass(const Options& opts, ld::Internal& state)
 									}
 									shims.push_back(shim);
 									thumbToAtomMap[target] = shim;
-									const_cast<Atom *>(shim)->setFinalSection(sect);
+									state.atomToSection[shim] = sect;
 								}
 								else {
 									shim = pos->second;
@@ -362,7 +362,7 @@ void doPass(const Options& opts, ld::Internal& state)
 										shim = new ARMtoThumbShimAtom(target, *sect);
 									shims.push_back(shim);
 									atomToThumbMap[target] = shim;
-									const_cast<Atom *>(shim)->setFinalSection(sect);
+									state.atomToSection[shim] = sect;
 								}
 								else {
 									shim = pos->second;

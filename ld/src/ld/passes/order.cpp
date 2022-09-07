@@ -38,7 +38,6 @@
 #include <dlfcn.h>
 #include <mach/machine.h>
 
-#import "AsyncHelpers.h"
 #include <vector>
 #include <map>
 #include <set>
@@ -46,7 +45,7 @@
 
 #include "ld.hpp"
 #include "order.h"
-#include "Tweaks.h"
+#include "Tweaks.hpp"
 
 namespace ld {
 namespace passes {
@@ -604,7 +603,7 @@ void Layout::buildOrdinalOverrideMap()
 			}
 			// update atom-to-section map
 			for (LDOrderedSet<const ld::Atom*>::iterator it=moveToData.begin(); it != moveToData.end(); ++it) {
-				const_cast<Atom *>(*it)->setFinalSection(dataSect);
+				_state.atomToSection[*it] = dataSect;
 			}
 		}
 	}
@@ -632,7 +631,8 @@ void Layout::doPass()
 	this->buildOrdinalOverrideMap();
 
 	// sort atoms in each section
-	processAsync(_state.sections.begin(), _state.sections.end(), [&](ld::Internal::FinalSection *sect) {
+	for (std::vector<ld::Internal::FinalSection*>::iterator sit=_state.sections.begin(); sit != _state.sections.end(); ++sit) {
+		ld::Internal::FinalSection* sect = *sit;
 		switch ( sect->type() ) {
 			case ld::Section::typeTempAlias:
 			case ld::Section::typeStub:
@@ -647,7 +647,7 @@ void Layout::doPass()
     				std::sort(sect->atoms.begin(), sect->atoms.end(), _comparer);
 				break;
 		}
-	});
+	}
 
 	if ( log ) {
 		fprintf(stderr, "Sorted atoms:\n");

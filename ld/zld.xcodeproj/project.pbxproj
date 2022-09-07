@@ -46,9 +46,9 @@
 /* Begin PBXBuildFile section */
 		41F71C50240F5814006DCEF9 /* libswiftDemangle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41F71C4F240F5814006DCEF9 /* libswiftDemangle.dylib */; };
 		4C8D9C99240587690040CE7C /* libLTO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8D9C98240587690040CE7C /* libLTO.dylib */; };
-		4C8D9C9B240597220040CE7C /* Tweaks.c in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA2DA723FDD2CB00C6009D /* Tweaks.c */; };
+		4C8D9C9B240597220040CE7C /* Tweaks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */; };
 		4C8D9CA0240597C10040CE7C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8D9C9F240597C10040CE7C /* Foundation.framework */; };
-		4CDA2DA923FDD2CB00C6009D /* Tweaks.c in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA2DA723FDD2CB00C6009D /* Tweaks.c */; };
+		4CDA2DA923FDD2CB00C6009D /* Tweaks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */; };
 		83046A851C8FF2F700024A7E /* objcimageinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83046A841C8FF2D000024A7E /* objcimageinfo.cpp */; };
 		B028FCF21A9E7C3F00E3584B /* bitcode_bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B028FCF11A9E7C3F00E3584B /* bitcode_bundle.cpp */; };
 		B3B672421406D42800A376BB /* Snapshot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3B672411406D42800A376BB /* Snapshot.cpp */; };
@@ -62,10 +62,6 @@
 		F338085E2422DA520086B7E8 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
 		F33808602422DA6D0086B7E8 /* inits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085F2422DA6D0086B7E8 /* inits.cpp */; };
 		F34634572423BD3700F08C44 /* PlatformSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F338085D2422DA520086B7E8 /* PlatformSupport.cpp */; };
-		F3621EAB2897E928001D94E0 /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = F3CC0EB72730883D00531802 /* xxhash.c */; };
-		F3CC0EB82730883D00531802 /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = F3CC0EB72730883D00531802 /* xxhash.c */; };
-		F3CF7591268BE74E00750B2F /* libjemalloc_pic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F366B08E2687813200B17E17 /* libjemalloc_pic.a */; };
-		F3F8C4B7282DA6320094DABD /* IndexedMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F3F8C4B5282DA6320094DABD /* IndexedMap.cpp */; };
 		F9023C4E06D5A272001BBF46 /* ld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9023C3F06D5A254001BBF46 /* ld.cpp */; };
 		F933E3D9092E855B0083EAC8 /* ObjectDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F971EED706D5AD240041D381 /* ObjectDump.cpp */; };
 		F93CB248116E69EB003233B8 /* tlvp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F93CB246116E69EB003233B8 /* tlvp.cpp */; };
@@ -277,8 +273,8 @@
 		4C5E360823FB61DC0073E2F5 /* compile_stubs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = compile_stubs.h; sourceTree = "<group>"; };
 		4C8D9C98240587690040CE7C /* libLTO.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libLTO.dylib; path = Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib; sourceTree = DEVELOPER_DIR; };
 		4C8D9C9F240597C10040CE7C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		4CDA2DA723FDD2CB00C6009D /* Tweaks.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Tweaks.c; sourceTree = "<group>"; };
-		4CDA2DA823FDD2CB00C6009D /* Tweaks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tweaks.h; sourceTree = "<group>"; };
+		4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tweaks.cpp; sourceTree = "<group>"; };
+		4CDA2DA823FDD2CB00C6009D /* Tweaks.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Tweaks.hpp; sourceTree = "<group>"; };
 		4CF05E8E23EB005B009C0C95 /* libsystem_malloc.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsystem_malloc.tbd; path = usr/lib/system/libsystem_malloc.tbd; sourceTree = SDKROOT; };
 		4CF05E9023EB0093009C0C95 /* libSystem.B.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libSystem.B.tbd; path = usr/lib/libSystem.B.tbd; sourceTree = SDKROOT; };
 		4CF05E9323EB0151009C0C95 /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/System.framework; sourceTree = DEVELOPER_DIR; };
@@ -304,15 +300,6 @@
 		F33808622422DA8B0086B7E8 /* PlatformSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PlatformSupport.h; path = src/ld/PlatformSupport.h; sourceTree = "<group>"; };
 		F33808632422DAB40086B7E8 /* stub_arm64_32.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = stub_arm64_32.hpp; sourceTree = "<group>"; };
 		F33808642422DAB40086B7E8 /* stub_arm64e.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = stub_arm64e.hpp; sourceTree = "<group>"; };
-		F366B06326868B6600B17E17 /* AsyncHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AsyncHelpers.h; sourceTree = "<group>"; };
-		F366B06426868B6600B17E17 /* AsyncHelpers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AsyncHelpers.cpp; sourceTree = "<group>"; };
-		F366B08E2687813200B17E17 /* libjemalloc_pic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libjemalloc_pic.a; sourceTree = "<group>"; };
-		F38899A3282ACC970070FCEE /* TimingHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TimingHelpers.h; sourceTree = "<group>"; };
-		F3CC0EB527307C6200531802 /* xxhash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xxhash.h; sourceTree = "<group>"; };
-		F3CC0EB72730883D00531802 /* xxhash.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = xxhash.c; sourceTree = "<group>"; };
-		F3F8C4B0282C5D450094DABD /* zld.profdata */ = {isa = PBXFileReference; lastKnownFileType = file; path = zld.profdata; sourceTree = "<group>"; };
-		F3F8C4B5282DA6320094DABD /* IndexedMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IndexedMap.cpp; sourceTree = "<group>"; };
-		F3F8C4B6282DA6320094DABD /* IndexedMap.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IndexedMap.hpp; sourceTree = "<group>"; };
 		F9023C3906D5A23E001BBF46 /* zld */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = zld; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9023C3F06D5A254001BBF46 /* ld.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ld.cpp; path = src/ld/ld.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F91B7B0318987D5F0099486F /* AddressSpace.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AddressSpace.hpp; sourceTree = "<group>"; };
@@ -337,7 +324,7 @@
 		F984A38110BB4B0D009E9878 /* branch_island.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = branch_island.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F98565241E98090F00528B1C /* dwarf2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dwarf2.h; path = src/ld/dwarf2.h; sourceTree = "<group>"; };
 		F989D0391062E6350014B60C /* stub_x86_64.hpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.h; path = stub_x86_64.hpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
-		F989D30B106826020014B60C /* OutputFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OutputFile.cpp; path = src/ld/OutputFile.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
+		F989D30B106826020014B60C /* OutputFile.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; indentWidth = 4; name = OutputFile.cpp; path = src/ld/OutputFile.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F989D30C106826020014B60C /* OutputFile.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; name = OutputFile.h; path = src/ld/OutputFile.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F989D3AA10684F5B0014B60C /* LinkEdit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.h; name = LinkEdit.hpp; path = src/ld/LinkEdit.hpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F989D44B10694F2E0014B60C /* LinkEditClassic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.h; name = LinkEditClassic.hpp; path = src/ld/LinkEditClassic.hpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
@@ -355,7 +342,7 @@
 		F9AA65101051BD2B003E3539 /* stubs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stubs.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA65871051E750003E3539 /* macho_relocatable_file.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = macho_relocatable_file.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA65881051E750003E3539 /* macho_relocatable_file.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = macho_relocatable_file.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
-		F9AA65D71051EC4A003E3539 /* archive_file.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = archive_file.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
+		F9AA65D71051EC4A003E3539 /* archive_file.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; indentWidth = 4; path = archive_file.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA65D81051EC4A003E3539 /* archive_file.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = archive_file.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA65D91051EC4A003E3539 /* lto_file.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lto_file.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA65DA1051EC4A003E3539 /* lto_file.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = lto_file.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
@@ -365,7 +352,7 @@
 		F9AA6785105700C2003E3539 /* opaque_section_file.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = opaque_section_file.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA67B410570C41003E3539 /* dtrace_dof.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = dtrace_dof.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA67B510570C41003E3539 /* dtrace_dof.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dtrace_dof.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
-		F9AA687A10572E27003E3539 /* InputFiles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = InputFiles.cpp; path = src/ld/InputFiles.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
+		F9AA687A10572E27003E3539 /* InputFiles.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; indentWidth = 4; name = InputFiles.cpp; path = src/ld/InputFiles.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA687B10572E27003E3539 /* InputFiles.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; name = InputFiles.h; path = src/ld/InputFiles.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA69B410583C0C003E3539 /* SymbolTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SymbolTable.cpp; path = src/ld/SymbolTable.cpp; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
 		F9AA69B510583C0C003E3539 /* SymbolTable.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; name = SymbolTable.h; path = src/ld/SymbolTable.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 1; };
@@ -425,7 +412,6 @@
 			files = (
 				4C8D9C99240587690040CE7C /* libLTO.dylib in Frameworks */,
 				F3176404241011E300D68E7F /* libtbb.a in Frameworks */,
-				F3CF7591268BE74E00750B2F /* libjemalloc_pic.a in Frameworks */,
 				41F71C50240F5814006DCEF9 /* libswiftDemangle.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -484,18 +470,9 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		F3F8C4AF282C5D450094DABD /* OptimizationProfiles */ = {
-			isa = PBXGroup;
-			children = (
-				F3F8C4B0282C5D450094DABD /* zld.profdata */,
-			);
-			path = OptimizationProfiles;
-			sourceTree = "<group>";
-		};
 		F9023C2C06D5A227001BBF46 = {
 			isa = PBXGroup;
 			children = (
-				F3CC0EB72730883D00531802 /* xxhash.c */,
 				F328A34825F2B8B700E439C0 /* ResponseFiles.cpp */,
 				4CFE4F80240481F60072BC3D /* ld.entitlements */,
 				F9B813A80EC27B6300F94C13 /* abstraction */,
@@ -504,7 +481,6 @@
 				F9B8137E0EC2651200F94C13 /* doc */,
 				F9023C3A06D5A23E001BBF46 /* Products */,
 				4CF05E8D23EB005B009C0C95 /* Frameworks */,
-				F3F8C4AF282C5D450094DABD /* OptimizationProfiles */,
 			);
 			sourceTree = "<group>";
 		};
@@ -638,12 +614,10 @@
 			isa = PBXGroup;
 			children = (
 				F3176402241011E300D68E7F /* libtbb.a */,
-				4CDA2DA723FDD2CB00C6009D /* Tweaks.c */,
-				F366B08E2687813200B17E17 /* libjemalloc_pic.a */,
-				4CDA2DA823FDD2CB00C6009D /* Tweaks.h */,
+				4CDA2DA723FDD2CB00C6009D /* Tweaks.cpp */,
+				4CDA2DA823FDD2CB00C6009D /* Tweaks.hpp */,
 				4C47258B23FD9E3C00AA02B2 /* MapDefines.h */,
 				F328A33225F2B68900E439C0 /* libcodedirectory.c */,
-				F38899A3282ACC970070FCEE /* TimingHelpers.h */,
 				F9AA69BF10583E19003E3539 /* Resolver.cpp */,
 				F9AA69C010583E19003E3539 /* Resolver.h */,
 				F9AA69B410583C0C003E3539 /* SymbolTable.cpp */,
@@ -654,8 +628,6 @@
 				F9AA687A10572E27003E3539 /* InputFiles.cpp */,
 				4C5E360723FB61D50073E2F5 /* configure.h */,
 				F9AA687B10572E27003E3539 /* InputFiles.h */,
-				F3F8C4B5282DA6320094DABD /* IndexedMap.cpp */,
-				F3F8C4B6282DA6320094DABD /* IndexedMap.hpp */,
 				F9AA5FCC103F5CD1003E3539 /* ld.hpp */,
 				F9023C3F06D5A254001BBF46 /* ld.cpp */,
 				F9C0D48A06DD1E1B001C7193 /* Options.cpp */,
@@ -675,9 +647,6 @@
 				F98565241E98090F00528B1C /* dwarf2.h */,
 				B3B672411406D42800A376BB /* Snapshot.cpp */,
 				B3B672441406D44300A376BB /* Snapshot.h */,
-				F366B06326868B6600B17E17 /* AsyncHelpers.h */,
-				F366B06426868B6600B17E17 /* AsyncHelpers.cpp */,
-				F3CC0EB527307C6200531802 /* xxhash.h */,
 			);
 			name = ld;
 			sourceTree = "<group>";
@@ -1049,7 +1018,6 @@
 				F9AA65891051E750003E3539 /* macho_relocatable_file.cpp in Sources */,
 				F328A33325F2B68900E439C0 /* libcodedirectory.c in Sources */,
 				F328A31D25F2B65700E439C0 /* generic_dylib_file.cpp in Sources */,
-				F3F8C4B7282DA6320094DABD /* IndexedMap.cpp in Sources */,
 				F9AA65DD1051EC4A003E3539 /* archive_file.cpp in Sources */,
 				F9AA65DE1051EC4A003E3539 /* lto_file.cpp in Sources */,
 				F9AA65DF1051EC4A003E3539 /* macho_dylib_file.cpp in Sources */,
@@ -1064,7 +1032,6 @@
 				F98498A310AE2159009E9878 /* compact_unwind.cpp in Sources */,
 				F98498A410AE2159009E9878 /* got.cpp in Sources */,
 				F9BA955E10A233000097A440 /* huge.cpp in Sources */,
-				F3CC0EB82730883D00531802 /* xxhash.c in Sources */,
 				F9849E3610B38EF5009E9878 /* order.cpp in Sources */,
 				F984A38210BB4B0D009E9878 /* branch_island.cpp in Sources */,
 				F9A4DB9110F816FF00BD8423 /* objc.cpp in Sources */,
@@ -1073,7 +1040,7 @@
 				F9AA44DC1294885F00CB8390 /* branch_shim.cpp in Sources */,
 				B3B672421406D42800A376BB /* Snapshot.cpp in Sources */,
 				B028FCF21A9E7C3F00E3584B /* bitcode_bundle.cpp in Sources */,
-				4CDA2DA923FDD2CB00C6009D /* Tweaks.c in Sources */,
+				4CDA2DA923FDD2CB00C6009D /* Tweaks.cpp in Sources */,
 				F9CC24191461FB4300A92174 /* blob.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1085,8 +1052,7 @@
 				F9AA6FF910618CD2003E3539 /* macho_relocatable_file.cpp in Sources */,
 				F9AE23291109015E0007ED5D /* lto_file.cpp in Sources */,
 				F933E3D9092E855B0083EAC8 /* ObjectDump.cpp in Sources */,
-				4C8D9C9B240597220040CE7C /* Tweaks.c in Sources */,
-				F3621EAB2897E928001D94E0 /* xxhash.c in Sources */,
+                                4C8D9C9B240597220040CE7C /* Tweaks.cpp in Sources */,
 				F34634572423BD3700F08C44 /* PlatformSupport.cpp in Sources */,
 				F9EA75BC09788857008B4F1D /* debugline.c in Sources */,
 			);
@@ -1269,320 +1235,6 @@
 			};
 			name = "Release-assert";
 		};
-		F3EAC578282AAB47000B0535 /* Repro */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CLANG_X86_VECTOR_INSTRUCTIONS = sse4.2;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				EXCLUDED_INSTALLSRC_SUBDIRECTORY_PATTERNS = "$(inherited) build DerivedData";
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(DT_TOOLCHAIN_DIR)/usr/local/include",
-					"$(TOOLCHAIN_DIR)/usr/local/include",
-					"$(SRCROOT)/../tapi-1100.0.11/include",
-					"$(SRCROOT)/../dyld-940/include",
-					"$(SRCROOT)/../llvm-13.0.1.src/include",
-					"$(SRCROOT)/../tapi-1100.0.11/include",
-					"$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4",
-					"$(SRCROOT)/src/ld",
-					"$(SRCROOT)/src/extra_include",
-					"$(SRCROOT)/../corecrypto/include",
-					"$(SRCROOT)/../pstl/include",
-					"$(SRCROOT)/../pstl/stdlib",
-					"$(SRCROOT)/../tbb/include",
-				);
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib";
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				OTHER_CFLAGS = (
-					"-Wno-deprecated-declarations",
-					"-Wno-unknown-pragmas",
-					"-DREPRO=1",
-				);
-				OTHER_LDFLAGS = (
-					"-Wl,-U,_malloc_default_purgeable_zone",
-					"-Wl,-U,_fnd_get_demangled_name",
-					"-Wl,-client_name,ld",
-					"-Wl,-alias,_zldVersionString,_ldVersionString",
-					"-Wl,-all_load",
-					"-Wl,-stack_size,0x10000000",
-					"-ltapi",
-					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
-					"-Wl,-exported_symbol,__mh_execute_header",
-					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
-					"-lxar",
-					"-stdlib=libc++",
-				);
-				SDKROOT = macosx;
-			};
-			name = Repro;
-		};
-		F3EAC579282AAB47000B0535 /* Repro */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				PRODUCT_NAME = all;
-				ZERO_LINK = NO;
-			};
-			name = Repro;
-		};
-		F3EAC57A282AAB47000B0535 /* Repro */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
-				CLANG_CXX_LIBRARY = "libc++";
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = "$(RC_ProjectSourceVersion)";
-				DEAD_CODE_STRIPPING = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
-				ENABLE_HARDENED_RUNTIME = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1)",
-					NDEBUG,
-					"$(GCC_PREPROCESSOR_DEFINITIONS_$(RC_RELEASE))",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "LD_VERS='\"ld64-$(RC_ProjectSourceVersion)\"'";
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
-				GCC_WARN_ABOUT_INVALID_OFFSETOF_MACRO = NO;
-				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = NO;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
-				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
-				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
-				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
-				GCC_WARN_MISSING_PARENTHESES = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
-				GCC_WARN_PEDANTIC = NO;
-				GCC_WARN_SHADOW = NO;
-				GCC_WARN_SIGN_COMPARE = YES;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = NO;
-				GCC_WARN_UNKNOWN_PRAGMAS = YES;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_LABEL = YES;
-				GCC_WARN_UNUSED_PARAMETER = NO;
-				GCC_WARN_UNUSED_VALUE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
-				LD_GENERATE_MAP_FILE = YES;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SDKROOT)/usr/lib/system",
-				);
-				ONLY_ACTIVE_ARCH = YES;
-				PREBINDING = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
-				PRODUCT_NAME = zld;
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = macosx;
-				SECTORDER_FLAGS = "";
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
-				TOOLCHAINS = osx;
-				VERSIONING_SYSTEM = "apple-generic";
-				WARNING_CFLAGS = "-Wall";
-			};
-			name = Repro;
-		};
-		F3EAC57B282AAB47000B0535 /* Repro */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_PREPROCESSOR_DEFINITIONS = "$(GCC_PREPROCESSOR_DEFINITIONS_$(RC_RELEASE))";
-				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
-				OTHER_LDFLAGS = "-Wl,-exported_symbol,__mh_execute_header";
-				PREBINDING = NO;
-				PRODUCT_NAME = rebase;
-				STRIP_INSTALLED_PRODUCT = YES;
-				STRIP_STYLE = debugging;
-				VALID_ARCHS = "i386 ppc x86_64";
-			};
-			name = Repro;
-		};
-		F3EAC57C282AAB47000B0535 /* Repro */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_WARN_ABOUT_INVALID_OFFSETOF_MACRO = NO;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
-				OTHER_CPLUSPLUSFLAGS = (
-					"-stdlib=libc++",
-					"$(OTHER_CFLAGS)",
-				);
-				OTHER_LDFLAGS = "-Wl,-exported_symbol,__mh_execute_header";
-				PREBINDING = NO;
-				PRODUCT_NAME = unwinddump;
-				STRIP_INSTALLED_PRODUCT = YES;
-				STRIP_STYLE = debugging;
-			};
-			name = Repro;
-		};
-		F3EAC57D282AAB47000B0535 /* Repro */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PREPROCESSOR_DEFINITIONS = NDEBUG;
-				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/local/bin";
-				OTHER_CPLUSPLUSFLAGS = (
-					"-stdlib=libc++",
-					"$(OTHER_CFLAGS)",
-				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-stdlib=libc++",
-					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
-				);
-				OTHER_REZFLAGS = "";
-				PREBINDING = NO;
-				PRODUCT_NAME = ObjectDump;
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
-			name = Repro;
-		};
-		F3EAC57E282AAB47000B0535 /* Repro */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PREPROCESSOR_DEFINITIONS = NDEBUG;
-				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/local/bin";
-				PRODUCT_NAME = objcimageinfo;
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
-			name = Repro;
-		};
-		F3EAC57F282AAB47000B0535 /* Repro */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/local/bin";
-				OTHER_CPLUSPLUSFLAGS = (
-					"-stdlib=libc++",
-					"$(OTHER_CFLAGS)",
-				);
-				OTHER_LDFLAGS = "-stdlib=libc++";
-				PREBINDING = NO;
-				PRODUCT_NAME = machocheck;
-			};
-			name = Repro;
-		};
-		F3EAC580282AAB47000B0535 /* Repro */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
-				OTHER_CPLUSPLUSFLAGS = (
-					"-stdlib=libc++",
-					"$(OTHER_CFLAGS)",
-				);
-				OTHER_LDFLAGS = "-stdlib=libc++";
-				PREBINDING = NO;
-				PRODUCT_NAME = dyldinfo;
-				STRIP_INSTALLED_PRODUCT = YES;
-				STRIP_STYLE = debugging;
-				ZERO_LINK = NO;
-			};
-			name = Repro;
-		};
-		F3EAC581282AAB47000B0535 /* Repro */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/local/lib";
-				OTHER_CPLUSPLUSFLAGS = (
-					"-stdlib=libc++",
-					"$(OTHER_CFLAGS)",
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = prunetrie;
-			};
-			name = Repro;
-		};
-		F3EAC582282AAB47000B0535 /* Repro */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				PRODUCT_NAME = "unit-tests";
-			};
-			name = Repro;
-		};
 		F933D91C09291AC90083EAC8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1598,6 +1250,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
+				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = G5;
@@ -1629,12 +1282,22 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
-				LD_GENERATE_MAP_FILE = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
 				);
 				LINKER_DISPLAYS_MANGLED_NAMES = NO;
+				LLVM_LTO = NO;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-stdlib=libc++",
+					"-lxar",
+					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
+					"-Wl,-exported_symbol,__mh_execute_header",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
+					"-ltapi",
+					"-Wl,-stack_size,0x10000000",
+				);
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
 				PRODUCT_NAME = zld;
@@ -1653,6 +1316,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_USE_OPTIMIZATION_PROFILE = NO;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1663,6 +1327,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
+				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -1698,12 +1363,21 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
-				LD_GENERATE_MAP_FILE = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
 				);
-				ONLY_ACTIVE_ARCH = YES;
+				LLVM_LTO = NO;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-stdlib=libc++",
+					"-lxar",
+					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
+					"-Wl,-exported_symbol,__mh_execute_header",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
+					"-ltapi",
+					"-Wl,-stack_size,0x01000000",
+				);
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
 				PRODUCT_NAME = zld;
@@ -1834,7 +1508,7 @@
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib /Library/Developer/CommandLineTools/usr/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-Wno-deprecated-declarations",
@@ -1842,18 +1516,12 @@
 				);
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
+					"-Wl,-t",
 					"-Wl,-U,_fnd_get_demangled_name",
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
 					"-Wl,-all_load",
 					"-Wl,$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4/build/libabsl.a",
-					"-Wl,-stack_size,0x10000000",
-					"-ltapi",
-					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
-					"-Wl,-exported_symbol,__mh_execute_header",
-					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
-					"-lxar",
-					"-stdlib=libc++",
 				);
 				SDKROOT = macosx;
 			};
@@ -1902,25 +1570,19 @@
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib /Library/Developer/CommandLineTools/usr/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_CFLAGS = (
 					"-Wno-deprecated-declarations",
 					"-Wno-unknown-pragmas",
 				);
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
+					"-Wl,-t",
 					"-Wl,-U,_fnd_get_demangled_name",
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
 					"-Wl,-all_load",
 					"-Wl,$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4/build/libabsl.a",
-					"-Wl,-stack_size,0x10000000",
-					"-ltapi",
-					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
-					"-Wl,-exported_symbol,__mh_execute_header",
-					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
-					"-lxar",
-					"-stdlib=libc++",
 				);
 				SDKROOT = macosx;
 			};
@@ -1987,25 +1649,19 @@
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path /var/db/xcode_select_link/Toolchains/XcodeDefault.xctoolchain/usr/lib /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib /usr/local/lib /Library/Developer/CommandLineTools/usr/lib";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_CFLAGS = (
 					"-Wno-deprecated-declarations",
 					"-Wno-unknown-pragmas",
 				);
 				OTHER_LDFLAGS = (
 					"-Wl,-U,_malloc_default_purgeable_zone",
+					"-Wl,-t",
 					"-Wl,-U,_fnd_get_demangled_name",
 					"-Wl,-client_name,ld",
 					"-Wl,-alias,_zldVersionString,_ldVersionString",
 					"-Wl,-all_load",
 					"-Wl,$(SRCROOT)/../abseil-cpp-78f9680225b9792c26dfdd99d0bd26c96de53dd4/build/libabsl.a",
-					"-Wl,-stack_size,0x10000000",
-					"-ltapi",
-					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
-					"-Wl,-exported_symbol,__mh_execute_header",
-					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
-					"-lxar",
-					"-stdlib=libc++",
 				);
 				SDKROOT = macosx;
 			};
@@ -2027,6 +1683,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_USE_OPTIMIZATION_PROFILE = NO;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = ld.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -2034,9 +1691,10 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = "$(RC_ProjectSourceVersion)";
 				DEAD_CODE_STRIPPING = YES;
-				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
+				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -2071,12 +1729,21 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = "$(DT_VARIANT)/$(TOOLCHAIN_INSTALL_DIR)/usr/bin";
-				LD_GENERATE_MAP_FILE = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
 				);
+				LLVM_LTO = NO;
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPLUSPLUSFLAGS)";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-stdlib=libc++",
+					"-lxar",
+					"-Wl,-lazy_library,$(DT_TOOLCHAIN_DIR)/usr/lib/libLTO.dylib",
+					"-Wl,-exported_symbol,__mh_execute_header",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib",
+					"-ltapi",
+				);
 				PREBINDING = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eisel.zld;
 				PRODUCT_NAME = zld;
@@ -2489,7 +2156,6 @@
 			buildConfigurations = (
 				83046A801C8FF23E00024A7E /* Debug */,
 				83046A811C8FF23E00024A7E /* Release */,
-				F3EAC57E282AAB47000B0535 /* Repro */,
 				83046A821C8FF23E00024A7E /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2500,7 +2166,6 @@
 			buildConfigurations = (
 				F933D91C09291AC90083EAC8 /* Debug */,
 				F933D91D09291AC90083EAC8 /* Release */,
-				F3EAC57A282AAB47000B0535 /* Repro */,
 				F9849FFA10B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2511,7 +2176,6 @@
 			buildConfigurations = (
 				F933D92009291AC90083EAC8 /* Debug */,
 				F933D92109291AC90083EAC8 /* Release */,
-				F3EAC57D282AAB47000B0535 /* Repro */,
 				F9849FFD10B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2522,7 +2186,6 @@
 			buildConfigurations = (
 				F933D92409291AC90083EAC8 /* Debug */,
 				F933D92509291AC90083EAC8 /* Release */,
-				F3EAC578282AAB47000B0535 /* Repro */,
 				F9849FF810B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2533,7 +2196,6 @@
 			buildConfigurations = (
 				F96D536E094A2773008E9EE8 /* Debug */,
 				F96D536F094A2773008E9EE8 /* Release */,
-				F3EAC582282AAB47000B0535 /* Repro */,
 				F984A00110B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2544,7 +2206,6 @@
 			buildConfigurations = (
 				F9A3DDCB0ED762B800C590B9 /* Debug */,
 				F9A3DDCC0ED762B800C590B9 /* Release */,
-				F3EAC581282AAB47000B0535 /* Repro */,
 				F984A00010B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2555,7 +2216,6 @@
 			buildConfigurations = (
 				F9B1A26D0A3A568700DA8FAB /* Debug */,
 				F9B1A26E0A3A568700DA8FAB /* Release */,
-				F3EAC579282AAB47000B0535 /* Repro */,
 				F9849FF910B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2566,7 +2226,6 @@
 			buildConfigurations = (
 				F9B670060DDA176100E6D0DA /* Debug */,
 				F9B670070DDA176100E6D0DA /* Release */,
-				F3EAC57C282AAB47000B0535 /* Repro */,
 				F9849FFC10B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2577,7 +2236,6 @@
 			buildConfigurations = (
 				F9BA51630ECE58BF00D1D62E /* Debug */,
 				F9BA51640ECE58BF00D1D62E /* Release */,
-				F3EAC580282AAB47000B0535 /* Repro */,
 				F9849FFF10B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2588,7 +2246,6 @@
 			buildConfigurations = (
 				F9EA72D0097454D5008B4F1D /* Debug */,
 				F9EA72D1097454D5008B4F1D /* Release */,
-				F3EAC57F282AAB47000B0535 /* Repro */,
 				F9849FFE10B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2599,7 +2256,6 @@
 			buildConfigurations = (
 				F9EC77F10A2F8616002A3E39 /* Debug */,
 				F9EC77F20A2F8616002A3E39 /* Release */,
-				F3EAC57B282AAB47000B0535 /* Repro */,
 				F9849FFB10B5DE8E009E9878 /* Release-assert */,
 			);
 			defaultConfigurationIsVisible = 0;

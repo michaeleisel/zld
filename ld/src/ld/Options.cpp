@@ -5492,7 +5492,7 @@ void Options::reconfigureDefaults()
 		while ( !isdigit(*end) && (end > sdkPath) )
 			--end;
 		const char* start = end-1;
-		while ( (start > sdkPath) && (isdigit(*start) || (*start == '.')))
+		while ( (isdigit(*start) || (*start == '.')) && (start > sdkPath))
 			--start;
 		char sdkVersionStr[32];
 		int len = end-start+1;

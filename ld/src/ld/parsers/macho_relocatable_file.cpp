@@ -5945,7 +5945,7 @@ template <typename A>
 unsigned long Literal4Section<A>::contentHash(const class Atom<A>* atom, const ld::IndirectBindingTable& ind) const
 {
 	const uint32_t* literalContent = (uint32_t*)atom->contentPointer();
-	return CRC32(5381, *literalContent);
+	return *literalContent;
 }
 
 template <typename A>
@@ -5974,8 +5974,17 @@ bool Literal8Section<A>::ignoreLabel(const char* label) const
 template <typename A>
 unsigned long Literal8Section<A>::contentHash(const class Atom<A>* atom, const ld::IndirectBindingTable& ind) const
 {
+#if __LP64__
 	const uint64_t* literalContent = (uint64_t*)atom->contentPointer();
-	return CRC32(5381, *literalContent);
+	return *literalContent;
+#else
+	unsigned long hash = 5381;
+	const uint8_t* byteContent = atom->contentPointer();
+	for (int i=0; i < 8; ++i) {
+		hash = hash * 33 + byteContent[i];
+	}
+	return hash;
+#endif
 }
 
 template <typename A>
@@ -6006,8 +6015,13 @@ template <typename A>
 unsigned long Literal16Section<A>::contentHash(const class Atom<A>* atom, const ld::IndirectBindingTable& ind) const
 {
 	const uint64_t* byteContent = (uint64_t *)atom->contentPointer();
-	uint64_t hash = CRC32(5381, byteContent[0]);
-	return CRC32(hash, byteContent[1]);
+	unsigned long hash = 5381;
+#ifdef __x86_64__
+	return _mm_crc32_u64(hash, byteContent[0]) ^ _mm_crc32_u64(hash, byteContent[1]);
+#endif /* __x86_64__ */
+#ifdef __aarch64__
+	return __builtin_arm_crc32d(hash, byteContent[0]) ^ __builtin_arm_crc32d(hash, byteContent[1]);
+#endif /* __aarch64__ */
 }
 
 template <typename A>
@@ -6062,7 +6076,7 @@ template <typename A>
 unsigned long CStringSection<A>::contentHash(const class Atom<A>* atom, const ld::IndirectBindingTable& ind) const
 {
 	const char* stringContent = (char*)atom->contentPointer();
-	return hashString(stringContent, strlen(stringContent));
+	return ld::CRCHash(stringContent, strlen(stringContent));
 }
 
 
@@ -6210,8 +6224,11 @@ template <typename A>
 unsigned long NonLazyPointerSection<A>::contentHash(const class Atom<A>* atom, const ld::IndirectBindingTable& ind) const
 {
 	assert(atom->combine() == ld::Atom::combineByNameAndReferences);
-	const char *name = this->targetName(atom, ind);
-	return hashString(name, strlen(name));
+	unsigned long hash = 9508;
+	for (const char* s = this->targetName(atom, ind); *s != '\0'; ++s) {
+		hash = hash * 33 + *s;
+	}
+	return hash;
 }
 
 template <typename A>
@@ -6332,9 +6349,12 @@ template <typename A>
 unsigned long TLVPointerSection<A>::contentHash(const class Atom<A>* atom, const ld::IndirectBindingTable& ind) const
 {
 	assert(atom->combine() == ld::Atom::combineByNameAndReferences);
-	bool isStatic = false;
-	const char *name = this->targetName(atom, ind, &isStatic);
-	return hashString(name, strlen(name));
+	unsigned long hash = 9508;
+	bool isStatic;
+	for (const char* s = this->targetName(atom, ind, &isStatic); *s != '\0'; ++s) {
+		hash = hash * 33 + *s;
+	}
+	return hash;
 }
 
 template <typename A>
@@ -6643,13 +6663,15 @@ unsigned long PointerToCStringSection<A>::contentHash(const class Atom<A>* atom,
 	unsigned long hash = 123;
 	if (this->_sectionHash == 0) {
     	// make hash from section name and target cstring name
-		hash = hashString(this->sectionName(), strlen(this->sectionName()));
+    	for (const char* s = this->sectionName(); *s != '\0'; ++s) {
+    		hash = hash * 33 + *s;
+    	}
 		this->_sectionHash = hash;
 	} else {
 		hash = this->_sectionHash;
 	}
 	const char* s = this->targetCString(atom, indirectBindingTable);
-	return CRC32(hash, hashString(s, strlen(s)));
+	return hash ^ ld::CRCHash(s, strlen(s));
 }
 
 template <typename A>

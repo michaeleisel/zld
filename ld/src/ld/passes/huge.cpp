@@ -70,6 +70,7 @@ protected:
 
 ld::Section DataPadAtom::_s_section("__DATA", "__data", ld::Section::typeUnclassified);
 
+
 void doPass(const Options& opts, ld::Internal& state)
 {
 	const bool log = false;
@@ -137,7 +138,7 @@ void doPass(const Options& opts, ld::Internal& state)
 				const ld::Atom* atom = *ait;
 				if ( atom->size() > 1024*1024 ) {
 					hugeSection->atoms.push_back(atom);
-					const_cast<ld::Atom *>(atom)->setFinalSection(hugeSection);
+					state.atomToSection[atom] = hugeSection;
 					if (log) fprintf(stderr, "moved to __huge: %s, size=%llu\n", atom->name(), atom->size());
 					*ait = NULL;  // change atom to NULL for later bulk removal
 					movedSome = true;
