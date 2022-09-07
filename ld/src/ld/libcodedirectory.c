@@ -18,8 +18,6 @@
 #include <corecrypto/ccsha1.h>
 #include <corecrypto/ccsha2.h>
 
-#define LIBCD_PARALLEL 1
-
 #define LIBCD_HAS_PLATFORM_VERSION 1
 #include "libcodedirectory.h"
 

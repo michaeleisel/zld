@@ -310,8 +310,6 @@ void doPass(const Options& opts, ld::Internal& state)
     unsigned atomsBeingComparedCount = 0;
     uint64_t dedupSavings = 0;
     std::vector<const ld::Atom*>& textAtoms = textSection->atoms;
-    typedef std::pair<size_t, const ld::Atom*> Insertion;
-    std::vector<Insertion> insertions;
     LDMap<const ld::Atom*, const ld::Atom*> replacementMap;
     for (auto& entry : map) {
         const ld::Atom* masterAtom = entry.first;
@@ -331,30 +329,13 @@ void doPass(const Options& opts, ld::Internal& state)
             const ld::Atom* aliasAtom = new DeDupAliasAtom(dupAtom, masterAtom);
             auto pos = std::find(textAtoms.begin(), textAtoms.end(), masterAtom);
             if ( pos != textAtoms.end() ) {
-                insertions.emplace_back(pos - textAtoms.begin(), aliasAtom);
-                (const_cast<ld::Atom*>(aliasAtom))->setFinalSection(textSection);
+                textAtoms.insert(pos, aliasAtom);
+                state.atomToSection[aliasAtom] = textSection;
                 replacementMap[dupAtom] = aliasAtom;
                 (const_cast<ld::Atom*>(dupAtom))->setCoalescedAway();
             }
         }
     }
-    std::vector<const ld::Atom *>newAtoms;
-    std::stable_sort(insertions.begin(), insertions.end(), [&](const Insertion &a, const Insertion &b) {
-        return a.first < b.first;
-    });
-    size_t nextChunkIndex = 0;
-    for (const auto &[index, atom] : insertions) {
-        const auto first = textAtoms.begin() + nextChunkIndex;
-        const auto last = textAtoms.begin() + index;
-        if (last > first) {
-            std::copy(first, last, std::back_inserter(newAtoms));
-        }
-        newAtoms.push_back(atom);
-        nextChunkIndex = index;
-    }
-    std::copy(textAtoms.begin() + nextChunkIndex, textAtoms.end(), std::back_inserter(newAtoms));
-    textSection->atoms = std::move(newAtoms);
-
     if ( verbose )  {
         fprintf(stderr, "deduplication saved %llu bytes of __text\n", dedupSavings);
     }
@@ -401,7 +382,7 @@ void doPass(const Options& opts, ld::Internal& state)
                 textSection->atoms.end());
 
    for (auto& entry : replacementMap)
-       const_cast<ld::Atom *>(entry.first)->setFinalSection(NULL);
+        state.atomToSection.erase(entry.first);
 
     if ( log ) {
         fprintf(stderr, "atoms after pruning:\n");

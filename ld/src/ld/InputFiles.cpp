@@ -42,9 +42,9 @@
 #include <mach-o/fat.h>
 #include <sys/sysctl.h>
 #include <libkern/OSAtomic.h>
+#include <Foundation/Foundation.h>
 #include "pstl/algorithm"
 #include "pstl/execution"
-#include "AsyncHelpers.h"
 
 #include <fstream>
 #include <string>
@@ -756,7 +756,7 @@ void InputFiles::addLinkerOptionLibraries(ld::Internal& state, ld::File::AtomHan
 		for (size_t i = 0; i < infosToParse.size(); i++) {
 			iz.push_back(i);
 		}
-		processAsync(iz.begin(), iz.end(), [&](size_t idx) {
+		std::for_each(pstl::execution::par, iz.begin(), iz.end(), [&](auto &&idx) {
 			auto &pair = infosToParse[idx];
 			auto triple = Triple(this->makeFile(pair.first, true), pair.first, pair.second);
 			readers[idx] = triple;
@@ -1338,7 +1338,9 @@ void InputFiles::forEachInitialAtom(ld::File::AtomHandler& handler, ld::Internal
 
 	while (fileIndex < _inputFiles.size()) {
 		ld::File *file = _inputFiles[fileIndex];
-		file->forEachAtom(handler);
+		if (file->type() != ld::File::Archive) {
+    		file->forEachAtom(handler);
+		}
 		fileIndex++;
 	}
 
@@ -1433,9 +1435,11 @@ void InputFiles::preParseLibraries() const {
 			}
 		}
 	}
-
-	processAsync(ops.begin(), ops.end(), [=](const Operation &op) {
-		op._file->parseMember(op._member);
+	const tbb::blocked_range<size_t> range(0, ops.size());
+	tbb::parallel_for(range, [=](const tbb::blocked_range<size_t>& subrange) {
+		for (auto i = subrange.begin(); i != subrange.end(); i++) {
+			ops[i]._file->parseMember(ops[i]._member);
+		}
 	});
 }
 

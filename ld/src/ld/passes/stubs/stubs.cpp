@@ -29,7 +29,6 @@
 #include <unistd.h>
 #include <assert.h>
 #include <libkern/OSByteOrder.h>
-#import "AsyncHelpers.h"
 
 #include <vector>
 #include <set>
@@ -69,7 +68,7 @@ private:
 		 }
 	};
 
-	const ld::Atom*				stubableFixup(const ld::Fixup* fixup, const std::vector<const ld::Atom *> &) const;
+	const ld::Atom*				stubableFixup(const ld::Fixup* fixup, ld::Internal&);
 	ld::Atom*					makeStub(const ld::Atom& target, bool weakImport);
 	void						verifyNoResolverFunctions(ld::Internal& state);
 
@@ -117,10 +116,10 @@ Pass::Pass(const Options& opts)
 } 
 
 
-const ld::Atom* Pass::stubableFixup(const ld::Fixup* fixup, const std::vector<const ld::Atom *> &indirectBindingTable) const
+const ld::Atom* Pass::stubableFixup(const ld::Fixup* fixup, ld::Internal& state)
 {
 	if ( fixup->binding == ld::Fixup::bindingsIndirectlyBound ) {
-		const ld::Atom* target = indirectBindingTable[fixup->u.bindingIndex];
+		const ld::Atom* target = state.indirectBindingTable[fixup->u.bindingIndex];
 		switch ( fixup->kind ) {
 			case ld::Fixup::kindStoreTargetAddressX86BranchPCRel32:
 			case ld::Fixup::kindStoreTargetAddressARMBranch24:
@@ -334,40 +333,30 @@ void Pass::process(ld::Internal& state)
 	
 	// walk all atoms and fixups looking for stubable references
 	// don't create stubs inline because that could invalidate the sections iterator
-	class SectionState {
-	public:
-		std::vector<const ld::Atom*> atomsCallingStubs;
-		LDMap<const ld::Atom*,ld::Atom*> stubFor;
-		LDMap<const ld::Atom*,bool>		weakImportMap;
-		uint64_t codeSize;
-		SectionState() {
-			codeSize = 0;
-		}
-	};
-	std::vector<SectionState> sectionStates(state.sections.size());
-	const std::vector<const ld::Atom *> &indirectBindingTable = state.indirectBindingTable;
-	const std::vector<ld::Internal::FinalSection *> &sections = state.sections;
-	processAsyncIndexes(0, state.sections.size(), [&sectionStates, &sections, &indirectBindingTable, this] (size_t index) {
-		SectionState &sState = sectionStates[index];
-		const ld::Internal::FinalSection *sect = sections[index];
-		sState.atomsCallingStubs.reserve(128);
-
-		for (const auto &atom : sect->atoms) {
-			sState.codeSize += atom->size();
+	std::vector<const ld::Atom*> atomsCallingStubs;
+	LDOrderedMap<const ld::Atom*,ld::Atom*> stubFor;
+	LDOrderedMap<const ld::Atom*,bool>		weakImportMap;
+	atomsCallingStubs.reserve(128);
+	uint64_t codeSize = 0;
+	for (std::vector<ld::Internal::FinalSection*>::iterator sit=state.sections.begin(); sit != state.sections.end(); ++sit) {
+		ld::Internal::FinalSection* sect = *sit;
+		for (std::vector<const ld::Atom*>::iterator ait=sect->atoms.begin();  ait != sect->atoms.end(); ++ait) {
+			const ld::Atom* atom = *ait;
+			codeSize += atom->size();
 			bool atomNeedsStub = false;
 			for (ld::Fixup::iterator fit = atom->fixupsBegin(), end=atom->fixupsEnd(); fit != end; ++fit) {
-				const ld::Atom* stubableTargetOfFixup = stubableFixup(fit, indirectBindingTable);
+				const ld::Atom* stubableTargetOfFixup = stubableFixup(fit, state);
 				if ( stubableTargetOfFixup != NULL ) {
 					if ( !atomNeedsStub ) {
-						sState.atomsCallingStubs.push_back(atom);
+						atomsCallingStubs.push_back(atom);
 						atomNeedsStub = true;
 					}
-					sState.stubFor[stubableTargetOfFixup] = NULL;
+					stubFor[stubableTargetOfFixup] = NULL;	
 					// record weak_import attribute
-					LDMap<const ld::Atom*,bool>::iterator pos = sState.weakImportMap.find(stubableTargetOfFixup);
-					if ( pos == sState.weakImportMap.end() ) {
+					LDOrderedMap<const ld::Atom*,bool>::iterator pos = weakImportMap.find(stubableTargetOfFixup);
+					if ( pos == weakImportMap.end() ) {
 						// target not in weakImportMap, so add
-						sState.weakImportMap[stubableTargetOfFixup] = fit->weakImport;
+						weakImportMap[stubableTargetOfFixup] = fit->weakImport;
 					}
 					else {
 						// target in weakImportMap, check for weakness mismatch
@@ -397,24 +386,12 @@ void Pass::process(ld::Internal& state)
 					else
 						throwf("resolver functions (%s) can only be used when targeting Mac OS X 10.6 or later", atom->name());
 				}
-				sState.stubFor[atom] = NULL;
+				stubFor[atom] = NULL;	
 			}
 		}
-	});
-
-	std::vector<const ld::Atom*> atomsCallingStubs;
-	LDMap<const ld::Atom*,ld::Atom*> stubFor;
-	LDMap<const ld::Atom*,bool>		weakImportMap;
-	uint64_t codeSize = 0;
-
-	for (const auto &sState : sectionStates) {
-		stubFor.insert(sState.stubFor.begin(), sState.stubFor.end());
-		weakImportMap.insert(sState.weakImportMap.begin(), sState.weakImportMap.end());
-		atomsCallingStubs.insert(atomsCallingStubs.end(), sState.atomsCallingStubs.begin(), sState.atomsCallingStubs.end());
-		codeSize += sState.codeSize;
 	}
 
-	const bool needStubForMain = _options.needsEntryPointLoadCommand()
+	const bool needStubForMain = _options.needsEntryPointLoadCommand() 
 								&& (state.entryPoint != NULL) 
 								&& (state.entryPoint->definition() == ld::Atom::definitionProxy);
 	if ( needStubForMain ) {
@@ -458,31 +435,16 @@ void Pass::process(ld::Internal& state)
         }
     }
 	
-	typedef std::pair<const ld::Atom *, ld::Atom **> TargetPair;
-	class Comparer {
-	public:
-		bool operator()(const TargetPair &left, const TargetPair &right) {
-			return left.first < right.first;
-		}
-	};
-
-	// make stub atoms
-	std::vector<TargetPair> orderedStubs;
-	orderedStubs.reserve(stubFor.size());
-	for (const auto &[stub, target] : stubFor) {
-		orderedStubs.emplace_back(stub, (ld::Atom **)&target);
+	// make stub atoms 
+	for (LDOrderedMap<const ld::Atom*,ld::Atom*>::iterator it = stubFor.begin(); it != stubFor.end(); ++it) {
+		it->second = makeStub(*it->first, weakImportMap[it->first]);
 	}
-	Comparer comparer;
-	std::sort(orderedStubs.begin(), orderedStubs.end(), comparer);
-	for (const auto &pair : orderedStubs) {
-		*pair.second = makeStub(*pair.first, weakImportMap[pair.first]);
-	}
-
+	
 	// updated atoms to use stubs
 	for (std::vector<const ld::Atom*>::iterator it=atomsCallingStubs.begin(); it != atomsCallingStubs.end(); ++it) {
 		const ld::Atom* atom = *it;
 		for (ld::Fixup::iterator fit = atom->fixupsBegin(), end=atom->fixupsEnd(); fit != end; ++fit) {
-			const ld::Atom* stubableTargetOfFixup = stubableFixup(fit, state.indirectBindingTable);
+			const ld::Atom* stubableTargetOfFixup = stubableFixup(fit, state);
 			if ( stubableTargetOfFixup != NULL ) {
 				ld::Atom* stub = stubFor[stubableTargetOfFixup];
 				assert(stub != NULL && "stub not created");
