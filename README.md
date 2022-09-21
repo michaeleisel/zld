@@ -1,10 +1,6 @@
 # zld
 ## A faster version of Apple's linker
 
-### As used by
-
-Most of the really big third-party apps out there.
-
 ### Introduction
 
 For large projects, the linking phase ([explanation](https://stackoverflow.com/questions/6264249/how-does-the-compilation-linking-process-work)) can significantly increase incremental build times. This project is a fork of the Apple linker, `ld`. It is a drop-in replacement that can substantially speed things up.
