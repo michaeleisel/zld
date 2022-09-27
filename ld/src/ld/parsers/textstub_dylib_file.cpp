@@ -250,15 +250,8 @@ void File<A>::init(tapi::LinkerInterfaceFile* file, const Options *opts, bool bu
 		this->_allowableClients.emplace_back(strdup(client.c_str()));
 
 	ld::VersionSet lcPlatforms;
-#if ((TAPI_API_VERSION_MAJOR == 1 &&  TAPI_API_VERSION_MINOR >= 6) || (TAPI_API_VERSION_MAJOR > 1))
-	if (tapi::APIVersion::isAtLeast(1, 6)) {
-		for (const auto &platform : file->getPlatformSet())
-			lcPlatforms.insert((ld::Platform)platform);
-	} else
-#endif
-	{
-		lcPlatforms = mapPlatform(file->getPlatform(), useSimulatorVariant());
-	}
+	for (const auto &platform : file->getPlatformSet())
+		lcPlatforms.insert((ld::Platform)platform);
 
 	// check cross-linking
 	cmdLinePlatforms.checkDylibCrosslink(lcPlatforms, path, ".tbd", internalSDK, indirectDylib, usingBitcode, _isUnzipperedTwin, _dylibInstallPath, fromSDK, platformMismatchesAreWarning);
