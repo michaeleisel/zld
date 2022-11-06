@@ -32,7 +32,7 @@ github_release: build
 
 tapi-1100.0.11:
 	mkdir -p $@
-	curl -# -L https://opensource.apple.com/tarballs/tapi/tapi-1100.0.11.tar.gz | tar xz -C $@ --strip-components=1
+	curl -# -L https://github.com/apple-oss-distributions/tapi/archive/tapi-1100.0.11.tar.gz | tar xz -C $@ --strip-components=1
 	patch -p1 -d $@ < patches/tapi.patch
 
 tbb:
