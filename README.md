@@ -96,3 +96,4 @@ Whether you use this project or not, there are a number of things that can speed
 The biggest way to contribute to `zld` is to file issues! If you encountered any problems, feel free to file an issue, and you can expect a prompt response.
 
 Special thanks to @dmaclach's [ld64](https://github.com/dmaclach/ld64), which helped with building `ld`.
+
