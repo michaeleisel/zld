@@ -63,6 +63,8 @@ You can edit `~/.cargo/config` to add a linker flag, e.g.:
 
 ```
 [target.x86_64-apple-darwin]
+# For Apple silicon:
+# [target.aarch64-apple-darwin]
 
 rustflags = ["-C", "link-arg=-fuse-ld=<path to zld>"]
 ```
