@@ -1,7 +1,7 @@
 # zld
 ## A faster version of Apple's linker
 
-#### NOTE: consider using lld instead of zld. It is a generally faster, more reproducible linker, and has a few notable fixes over zld. More info [here](https://lld.llvm.org/MachO/index.html).
+#### NOTE: consider using lld instead of zld. It is a generally faster, more reproducible linker, unlike zld. More info is [here](https://lld.llvm.org/MachO/index.html), and the binary can be downloaded from [here](https://github.com/keith/ld64.lld/releases).
 
 ### Introduction
 
