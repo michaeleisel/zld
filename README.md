@@ -1,6 +1,8 @@
 # zld
 ## A faster version of Apple's linker
 
+#### NOTE: consider using lld instead of zld. It is a generally faster, more reproducible linker, and has a few notable fixes over zld. More info [here](https://lld.llvm.org/MachO/index.html).
+
 ### Introduction
 
 For large projects, the linking phase ([explanation](https://stackoverflow.com/questions/6264249/how-does-the-compilation-linking-process-work)) can significantly increase incremental build times. This project is a fork of the Apple linker, `ld`. It is a drop-in replacement that can substantially speed things up.
