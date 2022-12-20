@@ -1,3 +1,5 @@
+#### NOTE: zld is headed towards maintenance mode. Consider using lld instead of zld. More info is [here](https://eisel.me/lld).
+
 # zld
 ## A faster version of Apple's linker
 
